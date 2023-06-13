@@ -1,0 +1,24 @@
+body {
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+}
+
+/* 配色は https://colorate.azurewebsites.net/ja/Color/E6E9EE で作成 */
+.container-fluid {
+  background-color: seashell;
+}
+
+.col-8 {
+  /* border: solid 0.1em #758194; */
+  /* border-radius: 1em; */
+  /* background-color:#E6E9EE; */
+  background-color: whitesmoke;
+}
+
+.mapContainer {
+  overflow: hidden;
+}
+
+.map {
+  height: calc(100vh - 120px);
+  border: solid 0.1em black;
+}

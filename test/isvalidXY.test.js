@@ -1,0 +1,31 @@
+import { isValidNumber } from "../js/isvalidNumber";
+
+test('validation table value', () => {
+  expect(isValidNumber('1')).toBe(true);
+  expect(isValidNumber('1.1')).toBe(true);
+  expect(isValidNumber('+1.1')).toBe(true);
+  expect(isValidNumber('-1.1')).toBe(true);
+  expect(isValidNumber('0.1')).toBe(true);
+  expect(isValidNumber('0')).toBe(false);
+  expect(isValidNumber(' ')).toBe(false);
+  expect(isValidNumber('b')).toBe(false);
+  expect(isValidNumber('')).toBe(false);
+  expect(isValidNumber('１')).toBe(false);
+  expect(isValidNumber('１．１')).toBe(false);
+  expect(isValidNumber('０．１')).toBe(false);
+  expect(isValidNumber('０')).toBe(false);
+  expect(isValidNumber('　')).toBe(false);
+  expect(isValidNumber('ｂ')).toBe(false);
+  expect(isValidNumber('+１．１')).toBe(false);
+  expect(isValidNumber('＋1.1')).toBe(false);
+  expect(isValidNumber('＋１．１')).toBe(false);
+  expect(isValidNumber('-１．１')).toBe(false);
+  expect(isValidNumber('―1.1')).toBe(false);
+  expect(isValidNumber('－1.1')).toBe(false);
+  expect(isValidNumber('ー1.1')).toBe(false);
+  expect(isValidNumber('‐1.1')).toBe(false);
+  expect(isValidNumber('―１．１')).toBe(false);
+  expect(isValidNumber('－１．１')).toBe(false);
+  expect(isValidNumber('ー１．１')).toBe(false);
+  expect(isValidNumber('‐１．１')).toBe(false);
+});
