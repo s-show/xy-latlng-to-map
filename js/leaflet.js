@@ -1,3 +1,6 @@
+const getImage = (fileName) => {
+  return new URL(`../assets/${fileName}.png`, import.meta.url).href;
+};
 // Google map の航空写真
 // const googlemapHybrid = L.gridLayer.googleMutant({
 // 	type: "hybrid", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
@@ -63,21 +66,21 @@ const baseMaps = {
 }
 
 const redArrowIcon = L.icon({
-  iconUrl: '../assets/redMarker.png',
+  iconUrl: getImage('redMarker'),
   iconSize:     [20, 20], // size of the icon
   iconAnchor:   [10, 20], // point of the icon which will correspond to marker's location
   popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 
 const blueArrowIcon = L.icon({
-  iconUrl: '../assets/blueMarker.png',
+  iconUrl: getImage('blueMarker'),
   iconSize:     [20, 20], // size of the icon
   iconAnchor:   [10, 20], // point of the icon which will correspond to marker's location
   popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 
 const greenArrowIcon = L.icon({
-  iconUrl: '../assets/greenMarker.png',
+  iconUrl: getImage('greenMarker'),
   iconSize:     [20, 20], // size of the icon
   iconAnchor:   [10, 20], // point of the icon which will correspond to marker's location
   popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
