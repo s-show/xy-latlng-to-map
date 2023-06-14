@@ -52,44 +52,44 @@ document.getElementById('addMarkerBtn').addEventListener('click', () => {
   let blTableValue = blTable.getData(false);
   // 緯度経度テーブルのデータが全て削除されていると blTableValue.length は 1 になる
   if (blTableValue.length > 1) {
-  const selectMarkerIcon = document.getElementById('selectMarkerIcon');
-  let sourceData = [];
-  blTableValue.forEach((bl) => {
-    if (isValidNumber(bl[0]) && isValidNumber(bl[1])) {
-      sourceData.push(bl);
-      return;
-    }
-  })
-  sourceData.forEach((bl) => {
-    try {
-      if (selectMarkerIcon.value == 'redArrowIcon') {
-        L.marker([Number(bl[0]), Number(bl[1])], {icon: redArrowIcon}).addTo(map).on('click', (e) => {
-          e.target.remove()
-        });
-      } else if (selectMarkerIcon.value == 'blueArrowIcon') {
-        L.marker([Number(bl[0]), Number(bl[1])], {icon: blueArrowIcon}).addTo(map).on('click', (e) => {
-          e.target.remove()
-        });
-      } else {
-        L.marker([Number(bl[0]), Number(bl[1])], {icon: greenArrowIcon}).addTo(map).on('click', (e) => {
-          e.target.remove()
-        });
+    const selectMarkerIcon = document.getElementById('selectMarkerIcon');
+    let sourceData = [];
+    blTableValue.forEach((bl) => {
+      if (isValidNumber(bl[0]) && isValidNumber(bl[1])) {
+        sourceData.push(bl);
+        return;
       }
-    } catch (error) {
-      displayErrorMessage(error);
-      return      
-    }
-  })
-  let temp1 = [];
-  sourceData.forEach((bl) => {
-    let tempArray = [bl[0], bl[1]];
-    temp1.push(tempArray);
-  })
-  let temp2 = transpose(temp1);
-  const southWestPoint = L.latLng([Math.min(...temp2[0]), Math.min(...temp2[1])]);
-  const northEastPoint = L.latLng([Math.max(...temp2[0]), Math.max(...temp2[1])]);
-  const bounds = L.latLngBounds(southWestPoint, northEastPoint);
-  map.fitBounds(bounds);
+    })
+    sourceData.forEach((bl) => {
+      try {
+        if (selectMarkerIcon.value == 'redArrowIcon') {
+          L.marker([Number(bl[0]), Number(bl[1])], {icon: redArrowIcon}).addTo(map).on('click', (e) => {
+            e.target.remove()
+          });
+        } else if (selectMarkerIcon.value == 'blueArrowIcon') {
+          L.marker([Number(bl[0]), Number(bl[1])], {icon: blueArrowIcon}).addTo(map).on('click', (e) => {
+            e.target.remove()
+          });
+        } else {
+          L.marker([Number(bl[0]), Number(bl[1])], {icon: greenArrowIcon}).addTo(map).on('click', (e) => {
+            e.target.remove()
+          });
+        }
+      } catch (error) {
+        displayErrorMessage(error);
+        return      
+      }
+    })
+    let temp1 = [];
+    sourceData.forEach((bl) => {
+      let tempArray = [bl[0], bl[1]];
+      temp1.push(tempArray);
+    })
+    let temp2 = transpose(temp1);
+    const southWestPoint = L.latLng([Math.min(...temp2[0]), Math.min(...temp2[1])]);
+    const northEastPoint = L.latLng([Math.max(...temp2[0]), Math.max(...temp2[1])]);
+    const bounds = L.latLngBounds(southWestPoint, northEastPoint);
+    map.fitBounds(bounds);
   }
 })
 
@@ -115,9 +115,8 @@ document.getElementById('zoomRange').addEventListener('input', (e) => {
 
 function convertXYAndBl(direction, element) {
   const geodeticSystemBeforeConversion = document.getElementById('geodeticSystemBeforeConversion').value;
-  const zoneNoBeforeConversion = document.getElementById('zoneNoBeforeConversion').value;
+  const zoneNo = document.getElementById('zoneNo').value;
   const geodeticSystemAfterConversion = document.getElementById('geodeticSystemAfterConversion').value;
-  const zoneNoAfterConversion = document.getElementById('zoneNoAfterConversion').value;
   let convertedData = [];
   let sourceData = [];
   if (direction == 'xy2bl') {
@@ -130,10 +129,10 @@ function convertXYAndBl(direction, element) {
     })
     sourceData.forEach((data) => {
       try {
-        let temp = proj4(geodeticSystems[geodeticSystemBeforeConversion][zoneNoBeforeConversion],
+        let temp = proj4(geodeticSystems[geodeticSystemBeforeConversion][zoneNo],
                          geodeticSystems[geodeticSystemAfterConversion][0],
                          [Number(data.y), Number(data.x)]);
-        convertedData.push([temp[1].toFixed(4), temp[0].toFixed(4)]);
+        convertedData.push([temp[1], temp[0]]);
       } catch (error) {
         displayErrorMessage(error);
         return;
@@ -151,9 +150,9 @@ function convertXYAndBl(direction, element) {
     sourceData.forEach((data) => {
       try {
         let temp = proj4(geodeticSystems[geodeticSystemBeforeConversion][0],
-                         geodeticSystems[geodeticSystemAfterConversion][zoneNoAfterConversion],
+                         geodeticSystems[geodeticSystemAfterConversion][zoneNo],
                          [Number(data.longitude), Number(data.latitude)]);
-        convertedData.push([temp[1].toFixed(4), temp[0].toFixed(4)]);
+        convertedData.push([temp[1], temp[0]]);
       } catch (error) {
         displayErrorMessage(error);
         return

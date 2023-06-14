@@ -29,10 +29,10 @@
       空白がある行は無視します。行の削除はセルの上で右クリックして「選択した行を削除」をクリック。</p>
       <form id="inputForm" class="">
         <div id="beforeConvert" class="mb-3 pt-3 ps-3 pe-3">
-          <h3>変換前の測地系の情報</h3>
+          <h3>変換前後の測地系の情報</h3>
           <div class="row">
             <div class="col">
-              <label class="mb-1" for="geodeticSystemBeforeConversion">測地系</label>
+              <label class="mb-1" for="geodeticSystemBeforeConversion">変換前の測地系</label>
               <select id="geodeticSystemBeforeConversion" class="form-select mb-3" aria-label="Default select">
                 <option value="TOKYO">日本測地系 * ～2002(H14).3.31</option>
                 <option value="JGD2000">世界測地系（JGD2000） * 2002(H14).4.1～2011(H23).10.30</option>
@@ -40,36 +40,7 @@
               </select>  
             </div>
             <div class="col">
-              <label class="mb-1" for="zoneNoBeforeConversion">系番号</label>
-              <select id="zoneNoBeforeConversion" class="form-select" aria-label="Default select example">
-                <option selected value="1">1系</option>
-                <option value="2">2系</option>
-                <option value="3">3系</option>
-                <option value="4">4系</option>
-                <option value="5">5系</option>
-                <option value="6">6系</option>
-                <option value="7">7系</option>
-                <option value="8">8系</option>
-                <option value="9">9系</option>
-                <option value="10">10系</option>
-                <option value="11">11系</option>
-                <option value="12">12系</option>
-                <option value="13">13系</option>
-                <option value="14">14系</option>
-                <option value="15">15系</option>
-                <option value="16">16系</option>
-                <option value="17">17系</option>
-                <option value="18">18系</option>
-                <option value="19">19系</option>
-              </select>    
-            </div>  
-          </div>
-        </div>
-        <div id="afterConvert" class="mb-3 pt-3 ps-3 pe-3">
-          <h3>変換後の測地系の情報</h3>
-          <div class="row">
-            <div class="col">
-              <label class="mb-1" for="geodeticSystemAfterConversion">測地系</label>
+              <label class="mb-1" for="geodeticSystemAfterConversion">変換後の測地系</label>
               <select id="geodeticSystemAfterConversion" class="form-select mb-3" aria-label="Default select">
                 <option value="TOKYO">日本測地系 * ～2002(H14).3.31</option>
                 <option value="JGD2000">世界測地系（JGD2000） * 2002(H14).4.1～2011(H23).10.30</option>
@@ -77,8 +48,8 @@
               </select>    
             </div>
             <div class="col">
-              <label class="mb-1" for="zoneNoAfterConversion">系番号</label>
-              <select id="zoneNoAfterConversion" class="form-select" aria-label="Default select example">
+              <label class="mb-1" for="zoneNo">系番号</label>
+              <select id="zoneNo" class="form-select" aria-label="Default select">
                 <option selected value="1">1系</option>
                 <option value="2">2系</option>
                 <option value="3">3系</option>
@@ -218,15 +189,17 @@
               </div>
               <div>
                 <button id="xy2blConvertBtn" type="" class="btn btn-primary mt-1 mb-1">緯度経度に変換</button>
+                <button id="clearDataXYTable" type="" class="btn btn-warning mt-1 mb-1">データを削除</button>
               </div>
             </div>
             <div class="col">
               <div>
-                <p class="mb-1">緯度経度 (10進数 ( ex 34.5010 ) 形式のみ対応)</p>
+                <p class="mb-1">緯度経度 (10進数形式のみ対応 ( ex 34.5010 ) )</p>
                 <div id="blTable"></div>
               </div>
               <div>
                 <button id="bl2xyConvertBtn" class="btn btn-primary mt-1 mb-1">XY座標に変換</button>
+                <button id="clearDataBLTable" type="" class="btn btn-warning mt-1 mb-1">データを削除</button>
               </div>      
             </div>
           </div>
