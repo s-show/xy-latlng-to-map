@@ -29,7 +29,17 @@ const contextMenuItems = (obj, x, y, e) => {
 }
 
 const beforeDeleteColumn = (instance, cell, x, y, value) => {
-  return false;
+  if (instance.jspreadsheet.colgroup.length == 2) {
+    return false;
+  }
+}
+
+const beforeInsertColumn = (instance, cell, x, y, value) => {
+  // instance.jspreadsheet.colgroup.length は列追加前の列数。
+  // 列数が2なら列追加の必要は無いので false を返してキャンセルする
+  if (instance.jspreadsheet.colgroup.length == 2) {
+    return false;
+  }
 }
 
 // コンテキストメニューに表示するメニューの日本語訳
@@ -47,12 +57,13 @@ const xytable = jspreadsheet(document.getElementById('xyTable'), {
   data: initTableData,
   columns: [
     // mask: キーを設定しないと入力制限がかからないので設定している
-    { type: 'numeric', title: 'X', mask: '0.0000', width: 140, name: 'x' },
-    { type: 'numeric', title: 'y', mask: '0.0000', width: 140, name: 'y' }
+    { type: 'numeric', title: 'X', width: 180, name: 'x' },
+    { type: 'numeric', title: 'y', width: 180, name: 'y' }
   ],
   onbeforechange: beforechange,
   contextMenu: contextMenuItems,
   onbeforedeletecolumn: beforeDeleteColumn,
+  onbeforeinsertcolumn: beforeInsertColumn,
   text: text,
   freezeColumns: 2,
 });
@@ -60,11 +71,13 @@ const xytable = jspreadsheet(document.getElementById('xyTable'), {
 const bltable = jspreadsheet(document.getElementById('blTable'), {
   data: initTableData,
   columns: [
-    { type: 'numeric', title: '緯度', mask: '0.0000', width: 140, name: 'latitude' },
-    { type: 'numeric', title: '経度', mask: '0.0000', width: 140, name: 'longitude' }
+    { type: 'numeric', title: '緯度', width: 180, name: 'latitude' },
+    { type: 'numeric', title: '経度', width: 180, name: 'longitude' }
   ],
   onbeforechange: beforechange,
   contextMenu: contextMenuItems,
+  onbeforedeletecolumn: beforeDeleteColumn,
+  onbeforeinsertcolumn: beforeInsertColumn,
   text: text,
   freezeColumns: 2,
 });
