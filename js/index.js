@@ -24,9 +24,35 @@ document.getElementById('bl2xyConvertBtn').addEventListener('click', (e) => {
   convertXYAndBl('bl2xy', e);
 })
 
+document.getElementById('clearDataXYTable').addEventListener('click', (e) => {
+  const tableData = [
+    [, ],
+  ];
+  if (window.confirm('表のデータを削除して良いですか？')) {
+    xyTable.setData(tableData);
+    e.preventDefault();  
+  } else {
+    e.preventDefault();  
+  }
+})
+
+document.getElementById('clearDataBLTable').addEventListener('click', (e) => {
+  const tableData = [
+    [, ],
+  ];
+  if (window.confirm('表のデータを削除して良いですか？')) {
+    blTable.setData(tableData);
+    e.preventDefault();  
+  } else {
+    e.preventDefault();  
+  }
+})
+
 document.getElementById('addMarkerBtn').addEventListener('click', () => {
-  const selectMarkerIcon = document.getElementById('selectMarkerIcon');
   let blTableValue = blTable.getData(false);
+  // 緯度経度テーブルのデータが全て削除されていると blTableValue.length は 1 になる
+  if (blTableValue.length > 1) {
+  const selectMarkerIcon = document.getElementById('selectMarkerIcon');
   let sourceData = [];
   blTableValue.forEach((bl) => {
     if (isValidNumber(bl[0]) && isValidNumber(bl[1])) {
@@ -64,6 +90,7 @@ document.getElementById('addMarkerBtn').addEventListener('click', () => {
   const northEastPoint = L.latLng([Math.max(...temp2[0]), Math.max(...temp2[1])]);
   const bounds = L.latLngBounds(southWestPoint, northEastPoint);
   map.fitBounds(bounds);
+  }
 })
 
 document.getElementById('openBigmap').addEventListener('click', () => {
