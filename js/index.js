@@ -93,6 +93,11 @@ document.getElementById('addMarkerBtn').addEventListener('click', () => {
   }
 })
 
+document.getElementById('removeMarkerBtn').addEventListener('click', (e) => {
+  let markers = document.querySelectorAll('.leaflet-marker-pane>img');
+  markers.forEach((marker) => marker.remove());
+})
+
 document.getElementById('openBigmap').addEventListener('click', () => {
   const openBigmapBtn = document.getElementById('openBigmap');
   const inputForm = document.getElementById('inputForm');
