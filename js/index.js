@@ -57,7 +57,6 @@ document.getElementById('addMarkerBtn').addEventListener('click', () => {
     blTableValue.forEach((bl) => {
       if (isValidNumber(bl[0]) && isValidNumber(bl[1])) {
         sourceData.push(bl);
-        return;
       }
     })
     sourceData.forEach((bl) => {
@@ -77,7 +76,6 @@ document.getElementById('addMarkerBtn').addEventListener('click', () => {
         }
       } catch (error) {
         displayErrorMessage(error);
-        return      
       }
     })
     let temp1 = [];
@@ -129,7 +127,6 @@ function convertXYAndBl(direction, element) {
     xyTableData.forEach((xy) => {
       if (isValidNumber(xy.x) && isValidNumber(xy.y)) {
         sourceData.push(xy);
-        return;
       }
     })
     sourceData.forEach((data) => {
@@ -140,7 +137,6 @@ function convertXYAndBl(direction, element) {
         convertedData.push([temp[1], temp[0]]);
       } catch (error) {
         displayErrorMessage(error);
-        return;
       }
     });
     blTable.setData(JSON.stringify(convertedData));
@@ -149,7 +145,6 @@ function convertXYAndBl(direction, element) {
     blTableData.forEach((bl) => {
       if (isValidNumber(bl.longitude) && isValidNumber(bl.latitude)) {
         sourceData.push(bl);
-        return;
       }
     })
     sourceData.forEach((data) => {
@@ -160,7 +155,6 @@ function convertXYAndBl(direction, element) {
         convertedData.push([temp[1], temp[0]]);
       } catch (error) {
         displayErrorMessage(error);
-        return
       }
     })
     xyTable.setData(JSON.stringify(convertedData));
