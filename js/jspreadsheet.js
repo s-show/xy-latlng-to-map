@@ -1,8 +1,10 @@
 import { isValidNumber } from "./isvalidNumber";
 import { zen2han } from "./zen2han";
 
-// 直接入力では数値以外は入力できないように設定しているので、アプリで使えない値が貼付けされた場合の処理を記述している。
+// 変換できるのは数値だけなので、数値以外は無視するようにしている。
+// ただし、桁区切りで使われる `,` を取り除けば数値とみなせる値は受け入れている。
 const beforechange = (instance, cell, x, y, value) => {
+  value = value.replace(',', '');
   if (isValidNumber(zen2han(value))) {
     return zen2han(value);
   } else {
@@ -28,15 +30,14 @@ const contextMenuItems = (obj, x, y, e) => {
   return items;
 }
 
+// instance.jspreadsheet.colgroup.length は列追加前の列数。
+// 列数が2なら列追加・列削除の必要は無いので false を返してキャンセルする
 const beforeDeleteColumn = (instance, cell, x, y, value) => {
   if (instance.jspreadsheet.colgroup.length == 2) {
     return false;
   }
 }
-
 const beforeInsertColumn = (instance, cell, x, y, value) => {
-  // instance.jspreadsheet.colgroup.length は列追加前の列数。
-  // 列数が2なら列追加の必要は無いので false を返してキャンセルする
   if (instance.jspreadsheet.colgroup.length == 2) {
     return false;
   }
@@ -56,7 +57,6 @@ const initTableData = [
 const xytable = jspreadsheet(document.getElementById('xyTable'), {
   data: initTableData,
   columns: [
-    // mask: キーを設定しないと入力制限がかからないので設定している
     { type: 'numeric', title: 'X', width: 180, name: 'x' },
     { type: 'numeric', title: 'y', width: 180, name: 'y' }
   ],
