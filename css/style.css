@@ -1,17 +1,29 @@
+:root {
+  --jexcel_header_color: #000;
+  --jexcel_header_color_highlighted: #000;
+  --jexcel_header_background: #f3f3f3;
+  --jexcel_header_background_highlighted: #dcdcdc;
+  --jexcel_content_color: #000;
+  --jexcel_content_color_highlighted: #000;
+  --jexcel_content_background: #fff;
+  --jexcel_content_background_highlighted: rgba(0,0,0,0.05);
+  --jexcel_menu_background: #fff;
+  --jexcel_menu_background_highlighted: #ebebeb;
+  --jexcel_menu_color: #555;
+  --jexcel_menu_color_highlighted: #555;
+  --jexcel_menu_box_shadow: 2px 2px 2px 0px rgba(143, 144, 145, 1);
+  --jexcel_border_color: #ccc;
+  --jexcel_border_color_highlighted: #000;
+  --active_color: #007aff;
+}
+
 body {
-  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  /* font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; */
 }
 
 /* 配色は https://colorate.azurewebsites.net/ja/Color/E6E9EE で作成 */
 .container-fluid {
-  background-color: seashell;
-}
-
-.col-8 {
-  /* border: solid 0.1em #758194; */
-  /* border-radius: 1em; */
-  /* background-color:#E6E9EE; */
-  background-color: whitesmoke;
+  /* background-color: #d3d3d3; */
 }
 
 .mapContainer {
@@ -19,6 +31,62 @@ body {
 }
 
 .map {
-  height: calc(100vh - 120px);
+  height: calc(100vh - 240px);
   border: solid 0.1em black;
+}
+
+/* https://www.yuu-diaryblog.com/2017/03/14/list-design/ を参考に設定 */
+ol.userGuide {
+  counter-reset: list;
+  list-style-type: none;
+  padding: 0;
+}
+ol.userGuide li{
+  position: relative;
+  line-height: 2em;
+  margin: 7px 0 10px 40px;
+  padding-left: 10px;
+  border-bottom: solid 0.1em #cfe2ff;
+}
+ol.userGuide li:before{
+  counter-increment: list;
+  content: counter(list);
+  position: absolute;
+  left: -30px;
+  width: 30px;
+  height: 32px;
+  background: #cfe2ff;
+  text-align: center;
+  font-weight: bold;
+  top: 50%;
+  -moz-transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.info-paragraph {
+  background-color: #cff4fc;
+}
+
+.circle-figure {
+  background: #cff4fc;
+  border-radius: 50%;
+  width: 1.5em;
+  height: 1.5em;
+  font-size: 1em;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 0.2em;
+}
+
+.nav-tabs .nav-item .nav-link {
+  color: #000000;
+  background-color: #ffffff;
+}
+
+.nav-tabs .nav-item .nav-link.active {
+  color: #ffffff;
+  background-color: #0d6efd;  
 }

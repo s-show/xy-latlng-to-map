@@ -1,83 +1,205 @@
 <!DOCTYPE html>
 <html lang="jp" data-bs-theme="light">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <!-- proj4js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.min.js" integrity="sha512-Y/B11KRfeaNHAonSdwnF0fvpzsA+W27fqfMPmfkxRAwuySCcA7aT9LfJcWz5fi32McMI02jngFYj7LYT1z+VVg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.min.js"
+    integrity="sha512-Y/B11KRfeaNHAonSdwnF0fvpzsA+W27fqfMPmfkxRAwuySCcA7aT9LfJcWz5fi32McMI02jngFYj7LYT1z+VVg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <!-- jspreadsheet -->
   <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
   <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css" type="text/css" />
+  <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.themes.css" type="text/css" />
   <script src="https://jsuites.net/v4/jsuites.js"></script>
   <!-- leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <!-- Noto Sans JP -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="./css/style.css">
-  <title>XY座標と緯度経度の相互変換</title>
+  <title>座標の地図表示と座標・緯度経度の変換</title>
 </head>
+
 <body>
-  <div class="container-fluid">
-    <h1 class="text-center">座標⇔緯度経度変換</h1>
-    <p id="information" class="border border-info rounded text-bg-light m-3 p-1">変換前後の測地系の情報を選択してから、変換したいXY座標・緯度経度を表に入力してください。Excelの表の貼り付けもOKです。数値以外は受け付けません。<br>
-      空白がある行は無視します。行の削除はセルの上で右クリックして「選択した行を削除」をクリック。</p>
-      <form id="inputForm" class="">
-        <div id="beforeConvert" class="mb-3 pt-3 ps-3 pe-3">
-          <h3>変換前後の測地系の情報</h3>
-          <div class="row">
-            <div class="col">
-              <label class="mb-1" for="geodeticSystemBeforeConversion">変換前の測地系</label>
-              <select id="geodeticSystemBeforeConversion" class="form-select mb-3" aria-label="Default select">
-                <option value="TOKYO">日本測地系 * ～2002(H14).3.31</option>
-                <option value="JGD2000">世界測地系（JGD2000） * 2002(H14).4.1～2011(H23).10.30</option>
-                <option selected value="JGD2011">世界測地系（JGD2011） * 2011(H23).10.31～</option>
-              </select>  
+  <div class="container-fluid p-5">
+    <h1 class="text-center">座標の地図表示と座標・緯度経度の変換</h1>
+    <!-- https://www.codepel.com/bootstrap/bootstrap-5-nested-accordion/ を元にしてアコーディオンの入れ子を実現-->
+    <div class="accordion m-3" id="userGuideAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header border border-1 border-dark-subtle rounded" id="heading">
+          <button class="accordion-button collapsed" type="button"
+            data-bs-toggle="collapse" data-bs-target="#userGuide" aria-expanded="true" aria-controls="userGuide">
+            このページの使い方
+          </button>
+        </h2>
+        <div id="userGuide" class="accordion-collapse collapse border border-1 border-dark-subtle rounded" aria-labelledby="heading"
+          data-bs-parent="userGuideAccordion">
+          <div class="accordion-body">
+            <div class="accordion" id="userGuideDetail">
+              <div class="accordion-item">
+                <h2 class="accordion-header border border-1 border-dark-subtle rounded" id="addMarkerToMapGuide">
+                  <button class="accordion-button collapsed"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#addMarkerToMapGuideDetail" aria-expanded="false"
+                    aria-controls="addMarkerToMapGuideDetail">
+                    地図にマーカーを表示
+                  </button>
+                </h2>
+                <div id="addMarkerToMapGuideDetail" class="accordion-collapse collapse" data-bs-parent="#userGuideDetail">
+                  <div class="accordion-body border border-1 border-dark-subtle rounded">
+                    <ol class="userGuide">
+                      <li>用意したXY座標または緯度経度の詳細な情報を選択します</li>
+                      <li>データテーブルに用意したXY座標または緯度経度を入力します</li>
+                      <li>「地図加工」タブの「マーカーの色」から好きな色を選択します</li>
+                      <li>「地図加工」タブの「マーカー追加」ボタンをクリックします</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header border border-1 border-dark-subtle rounded" id="convertXYAndBLGuide">
+                  <button class="accordion-button collapsed"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#convertXYAndBLGuideDetail" aria-expanded="false"
+                    aria-controls="convertXYAndBLGuideDetail">
+                    XY座標 or 緯度経度を相互変換
+                  </button>
+                </h2>
+                <div id="convertXYAndBLGuideDetail" class="accordion-collapse collapse" data-bs-parent="#userGuideDetail">
+                  <div class="accordion-body border border-1 border-dark-subtle rounded">
+                    <ol class="userGuide">
+                      <li>変換元データのデータの詳細な情報を選択します</li>
+                      <li>データテーブルに変換元データを入力します</li>
+                      <li>「データ変換」タブで変換先のXY座標または緯度経度の詳細な情報を選択します</li>
+                      <li>「データ変換」タブの「変換」ボタンをクリックします</li>
+                      <li>変換後のデータは、テーブル上で右クリックして「コピー」をクリックすればコピーできます</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="col">
-              <label class="mb-1" for="geodeticSystemAfterConversion">変換後の測地系</label>
-              <select id="geodeticSystemAfterConversion" class="form-select mb-3" aria-label="Default select">
-                <option value="TOKYO">日本測地系 * ～2002(H14).3.31</option>
-                <option value="JGD2000">世界測地系（JGD2000） * 2002(H14).4.1～2011(H23).10.30</option>
-                <option selected value="JGD2011">世界測地系（JGD2011） * 2011(H23).10.31～</option>
-              </select>    
-            </div>
-            <div class="col">
-              <label class="mb-1" for="zoneNo">系番号</label>
-              <select id="zoneNo" class="form-select" aria-label="Default select">
-                <option selected value="1">1系</option>
-                <option value="2">2系</option>
-                <option value="3">3系</option>
-                <option value="4">4系</option>
-                <option value="5">5系</option>
-                <option value="6">6系</option>
-                <option value="7">7系</option>
-                <option value="8">8系</option>
-                <option value="9">9系</option>
-                <option value="10">10系</option>
-                <option value="11">11系</option>
-                <option value="12">12系</option>
-                <option value="13">13系</option>
-                <option value="14">14系</option>
-                <option value="15">15系</option>
-                <option value="16">16系</option>
-                <option value="17">17系</option>
-                <option value="18">18系</option>
-                <option value="19">19系</option>
-              </select>    
-            </div>  
           </div>
         </div>
-        <div class="mb-3 ps-3 pe-3">
+      </div>
+    </div>
+  <form id="inputForm" class="">
+    <div id="dataInformation" class="row mb-4 pt-3 pb-3 border-top border-bottom border-2 border-dark-subtle">
+      <h3>データ詳細情報</h3>
+      <div class="col border-end border-2 border-dark-subtle">
+        <p class="mb-1 fs-5">種類</p>
+        <div class="form-check">
+          <input type="radio" class="form-check-input border border-2 border-dark-subtle" name="sourceDataType" id="sourceIsXY" value="XY" checked>
+          <label class="form-check-label mb-1" for="sourceIsXY">XY座標</label>
+        </div>
+        <div class="form-check">
+          <input type="radio" class="form-check-input border border-2 border-dark-subtle" name="sourceDataType" value="BL" id="sourceIsBL">
+          <label class="form-check-label mb-1" for="sourceIsBL">緯度経度</label>
+        </div>
+      </div>
+      <div class="col border-end border-2 border-dark-subtle">
+        <p class="mb-1 fs-5">測地系</p>
+        <div class="form-check">
+          <input id="sourceIsTOKYO" type="radio" class="form-check-input border border-2 border-dark-subtle" name="sourceGeodeticSystem" value="TOKYO"
+            checked>
+          <label class="form-check-label mb-1" for="sourceIsTOKYO">日本測地系</label>
+        </div>
+        <div class="form-check">
+          <input id="sourceIsJGD2000" type="radio" class="form-check-input border border-2 border-dark-subtle" name="sourceGeodeticSystem" value="JGD2000">
+          <label class="form-check-label mb-1" for="sourceIsJGD2000">世界測地系（JGD2000）</label>
+        </div>
+        <div class="form-check">
+          <input id="sourceIsJGD2011" type="radio" class="form-check-input border border-2 border-dark-subtle" name="sourceGeodeticSystem" value="JGD2011">
+          <label class="form-check-label mb-1" for="sourceIsJGD2011">世界測地系（JGD2011）</label>
+        </div>
+        <!-- 測地系の部分 -->
+        <div class="mt-4">
           <!-- Button trigger modal -->
-          <button type="button" class="btn btn-outline-secondary d-print-none" data-bs-toggle="modal" data-bs-target="#zoneNoAndAreaName">系番号と適用区域</button>
+          <button type="button" class="btn btn-info d-print-none" data-bs-toggle="modal"
+            data-bs-target="#geodeticSystemName">解説</button>
           <!-- Modal -->
-          <div class="modal fade" id="zoneNoAndAreaName" tabindex="-1" aria-labelledby="zoneNoAndAreaNameLabel" aria-hidden="true">
+          <div class="modal fade" id="geodeticSystemName" tabindex="-1" aria-labelledby="geodeticSystemNameLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="geodeticSystemNameLabel">測地系の解説</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <table id="geodeticSystemNameTable" class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th scope="col">系番号</th>
+                        <th scope="col">適用区域</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                      <tr>
+                        <td>日本測地系</td>
+                        <td>
+                          明治時代に採用された測地系で、2002(H14)年3月31日まで使用されていた。明治時代の測量技術等による制約や採用後の地殻変動でずれが生じていたため、世界測地系に移行することとなった。
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>世界測地系（JGD2000）</td>
+                        <td>
+                          日本測地系のずれを解消するために採用した世界共通の測地系で、2002(H14)年4月1日～2011(H23)年10月30日まで使用されていた。平成23年（2011年）東北地方太平洋沖地震による地殻変動を受けて、世界測地系（JGD2011）に移行することとなった。
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>世界測地系（JGD2011）</td>
+                        <td>
+                          平成23年（2011年）東北地方太平洋沖地震による地殻変動に対応した測地系で、2011(H23)年10月31日から使用されている。地殻変動の影響が少ない西日本と北海道では世界測地系（JGD2000）と同じであるが、東日本と北陸4県では世界測地系（JGD2000）から変更されている。
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-info" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <label class="mb-1 fs-5" for="sourceZoneNo">系番号</label>
+        <select id="sourceZoneNo" class="form-select border border-2 border-dark-subtle" aria-label="Default select">
+          <!-- フォーム初期化の際にXY座標を選択するので、組み合わせ不可の選択肢を使用不可にする -->
+          <option value="0" disabled>緯度経度用の選択肢</option>
+          <option selected value="1">1系</option>
+          <option value="2">2系</option>
+          <option value="3">3系</option>
+          <option value="4">4系</option>
+          <option value="5">5系</option>
+          <option value="6">6系</option>
+          <option value="7">7系</option>
+          <option value="8">8系</option>
+          <option value="9">9系</option>
+          <option value="10">10系</option>
+          <option value="11">11系</option>
+          <option value="12">12系</option>
+          <option value="13">13系</option>
+          <option value="14">14系</option>
+          <option value="15">15系</option>
+          <option value="16">16系</option>
+          <option value="17">17系</option>
+          <option value="18">18系</option>
+          <option value="19">19系</option>
+        </select>
+        <p class="mt-2">データの種類がXY座標の場合、地域に応じた系番号を選択します。緯度経度の場合、系番号は「緯度経度用」を選択します。</p>
+        <!-- 測地系の系番号の解説部分 -->
+        <div class="mt-2">
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-info d-print-none" data-bs-toggle="modal"
+            data-bs-target="#zoneNoAndAreaName">地域別の系番号</button>
+          <!-- Modal -->
+          <div class="modal fade" id="zoneNoAndAreaName" tabindex="-1" aria-labelledby="zoneNoAndAreaNameLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
@@ -95,7 +217,9 @@
                     <tbody class="table-group-divider">
                       <tr>
                         <td>1系</td>
-                        <td>長崎県 鹿児島県のうち北方北緯32度南方北緯27度西方東経128度18分東方東経130度を境界線とする区域内（奄美群島は東経130度13分までを含む。)にあるすべての島、小島、環礁及び岩礁</td>
+                        <td>長崎県
+                          鹿児島県のうち北方北緯32度南方北緯27度西方東経128度18分東方東経130度を境界線とする区域内（奄美群島は東経130度13分までを含む。)にあるすべての島、小島、環礁及び岩礁
+                        </td>
                       </tr>
                       <tr>
                         <td>2系</td>
@@ -135,7 +259,9 @@
                       </tr>
                       <tr>
                         <td>11系</td>
-                        <td>小樽市　函館市　伊達市　北斗市　北海道後志総合振興局の所管区域　北海道胆振総合振興局の所管区域のうち豊浦町、壮瞥町及び洞爺湖町　北海道渡島総合振興局の所管区域　北海道檜山振興局の所管区域</td>
+                        <td>
+                          小樽市　函館市　伊達市　北斗市　北海道後志総合振興局の所管区域　北海道胆振総合振興局の所管区域のうち豊浦町、壮瞥町及び洞爺湖町　北海道渡島総合振興局の所管区域　北海道檜山振興局の所管区域
+                        </td>
                       </tr>
                       <tr>
                         <td>12系</td>
@@ -143,7 +269,9 @@
                       </tr>
                       <tr>
                         <td>13系</td>
-                        <td>北見市　帯広市　釧路市　網走市　根室市　北海道オホーツク総合振興局の所管区域のうち美幌町、津別町、斜里町、清里町、小清水町、訓子府町、置戸町、佐呂間町及び大空町　北海道十勝総合振興局の所管区域　北海道釧路総合振興局の所管区域　北海道根室振興局の所管区域</td>
+                        <td>
+                          北見市　帯広市　釧路市　網走市　根室市　北海道オホーツク総合振興局の所管区域のうち美幌町、津別町、斜里町、清里町、小清水町、訓子府町、置戸町、佐呂間町及び大空町　北海道十勝総合振興局の所管区域　北海道釧路総合振興局の所管区域　北海道根室振興局の所管区域
+                        </td>
                       </tr>
                       <tr>
                         <td>14系</td>
@@ -177,52 +305,90 @@
                 </div>
               </div>
             </div>
-          </div>              
-        </div>
-        <hr>
-        <div class="mb-3 p-3">
-          <div class="row">
-            <div class="col">
-              <div>
-                <p class="mb-1">XY座標</p>
-                <div id="xyTable"></div>
-              </div>
-              <div>
-                <button id="xy2blConvertBtn" type="" class="btn btn-primary mt-1 mb-1">緯度経度に変換</button>
-                <button id="clearDataXYTable" type="" class="btn btn-warning mt-1 mb-1">データを削除</button>
-              </div>
-            </div>
-            <div class="col">
-              <div>
-                <p class="mb-1">緯度経度 (10進数形式のみ対応 ( ex 34.5010 ) )</p>
-                <div id="blTable"></div>
-              </div>
-              <div>
-                <button id="bl2xyConvertBtn" class="btn btn-primary mt-1 mb-1">XY座標に変換</button>
-                <button id="clearDataBLTable" type="" class="btn btn-warning mt-1 mb-1">データを削除</button>
-              </div>      
-            </div>
           </div>
         </div>
-      </form>
-      <hr>
-      <div class="ps-3 pe-3 accentBorder">
-        <div class="row">
-          <div class="col">
-            <button id="addMarkerBtn" class="btn btn-primary mt-1 mb-1">緯度経度の場所にアイコン</button>
-          </div>
-          <div class="col">
-            <select id="selectMarkerIcon" class="form-select mt-1 mb-1">
-              <option value="redArrowIcon">赤矢印アイコン</option>
-              <option value="blueArrowIcon">青矢印アイコン</option>
-              <option value="greenArrowIcon">緑矢印アイコン</option>
+      </div>
+    </div>
+    <div class="row mb-4 pb-3 border-bottom border-2 border-dark-subtle">
+      <h3>データテーブル</h3>
+      <div class="col border-end border-2 border-dark-subtle">
+        <div id="sourceDataTable"></div>
+        <div>
+          <button id="clearSourceDataTableBtn" type="" class="btn btn-danger mb-3">データを削除</button>
+        </div>
+      </div>
+      <div class="col border-end border-2 border-dark-subtle">
+        <ul class="">
+          <li class="">数値のみ入力できます。</li>
+          <li class="">Excelから貼り付けられます。</li>
+          <li class="">空白行は無視して処理します。</li>
+          <li class="">行の削除は、セルの上で右クリックして「選択した行を削除」をクリックします。</li>
+          <li>「36度6分16.60秒」の度分秒の形式の緯度経度は「36.104611」の10進数に変換して入力します。</li>
+        </ul>
+      </div>
+      <div class="col">
+        <div class="border border-2 border-info rounded p-2">
+          <div class="circle-figure">i</div>
+          <p>度分秒から10進数への変換</p>
+          <dl>
+            <dt>変換式</dt>
+            <dd>度 + (分÷60) + (秒÷3600)</dd>
+            <dt>実例</dt>
+            <dd>36 + (6 / 60) + (16.60 / 3600) = 36.1046111111</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- 地図とデータ変換部分を切り替えるタブ -->
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link border-dark-subtle border-2 border-start border-top border-end active" href="#map-content"
+        data-bs-toggle="tab">
+        地図加工
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link border-dark-subtle border-2 border-start border-top border-end" href="#dataConvert"
+        data-bs-toggle="tab">
+        データ変換
+      </a>
+    </li>
+  </ul>
+
+  <!-- 地図加工のタブ -->
+  <div class="tab-content">
+    <div id="map-content" class="tab-pane active">
+      <div class="tab-content-div p-3 border border-2 border-dark-subtle">
+        <div class="row pb-3 border-bottom border-2 border-dark-subtle">
+          <div class="col border-end border-2 border-dark-subtle">
+            <label class="mb-1 fs-5" for="selectMarkerIcon">マーカーの種類</label>
+            <select id="selectMarkerIcon" class="form-select border border-2 border-dark-subtle mt-1 mb-1">
+              <option value="redPinMarker">赤色ピン</option>
+              <option value="bluePinMarker">青色ピン</option>
+              <option value="yellowPinMarker">黄色ピン</option>
+              <option value="greenPinMarker">緑色ピン</option>
             </select>
           </div>
-          <div class="col">
-            <button id="removeMarkerBtn" class="btn btn-danger mt-1 mb-1">アイコンを全て削除</button>
+          <div class="col border-end border-2 border-dark-subtle">
+            <label class="mb-1 fs-5" for="selectLineColor">ラインの種類</label>
+            <select id="selectLineColor" class="form-select border border-2 border-dark-subtle mt-1 mb-1">
+              <option value="noLine">線無し</option>
+              <option value="redLine">赤線</option>
+              <option value="blueLine">青線</option>
+              <option value="yellowLine">黄線</option>
+              <option value="greenLine">緑線</option>
+            </select>
           </div>
-          <div id="zoomRangeWrap" class="col">
-            <label for="zoomRange" class="">地図を引き伸ばす</label>
+          <div class="col border-end border-2 border-dark-subtle">
+            <button id="addMarkerBtn" class="btn btn-primary mt-1 mb-1">マーカー追加</button>
+            <button id="removeMarkerBtn" class="btn btn-danger mt-1 mb-1">マーカー全削除</button>
+            </div>
+          <div id="zoomRangeWrap" class="col border-end border-2 border-dark-subtle">
+            <div>
+              <label for="zoomRange" class="mb-2 fs-5">地図を引き伸ばす</label>
+            </div>
             <input id="zoomRange" type="range" class="" value="1" min="1" max="3" step="0.2" list="zoomRangeMarkers">
             <output id="zoomRangeValue" for="zoomRange">1x</output>
             <datalist id="zoomRangeMarkers">
@@ -237,31 +403,116 @@
             <button id="openBigmap" class="btn btn-primary mt-1 mb-1">地図以外を隠す</button>
           </div>
         </div>
-        <p id="iconInformation">アイコンはクリックすると消えます。地図を選択して表示されない時は縮尺を変えてください。</p>
+        <p id="iconInformation" class="mt-2">マーカーと線はクリックして消せます。地図が表示されない時は縮尺を変えてみてください。</p>
         <div class="mapContainer">
-          <div id="map" class="mb-5 map"></div>
+          <div id="map" class="mb-2 map"></div>
         </div>
         <div id="errorMessageWrap" class="alert alert-danger visually-hidden" role="alert">
           <h4 class="alert-heading">エラーメッセージ</h4>
           <p id="errorMessage"></p>
         </div>
-        <div class="pb-5">
-          <div class="position-relative">
-            <div class="position-absolute top-0 start-50 translate-middle">
-              <a class="me-5" href="https://github.com/s-show/interchangeXYandBL" target="_blank"><img src="/assets/github-mark.png" alt="github icon" width="30"></a>
-              <strong class="">License: </strong><a href="https://licenses.opensource.jp/MIT/MIT.html" target="_blank">MIT</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- データ変換のタブ -->
+  <div class="tab-content">
+    <div id="dataConvert" class="tab-pane">
+      <div class="tab-content-div p-3 border border-2 border-dark-subtle">
+        <div class="row pb-3 border-bottom border-2 border-dark-subtle">
+          <div class="col border-end border-2 border-dark-subtle">
+            <p class="mb-1 fs-5">変換先のデータ形式</p>
+            <div class="form-check">
+              <input id="convertToXY" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToDataType" value="XY" checked>
+              <label class="form-check-label mb-1" for="convertToXY">XY座標</label>
+            </div>
+            <div class="form-check">
+              <input id="convertToBL" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToDataType" value="BL">
+              <label class="form-check-label mb-1" for="convertToBL">緯度経度</label>
+            </div>
+          </div>
+          <div class="col border-end border-2 border-dark-subtle">
+            <p class="mb-1 fs-5">変換先の測地系</p>
+            <div class="form-check">
+              <input id="convertToTOKYO" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToGeodeticSystem"
+                value="TOKYO" checked>
+              <label class="form-check-label mb-1" for="convertToTOKYO">日本測地系</label>
+            </div>
+            <div class="form-check">
+              <input id="convertToJGD2000" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToGeodeticSystem"
+                value="JGD2000">
+              <label class="form-check-label mb-1" for="convertToJGD2000">世界測地系（JGD2000）</label>
+            </div>
+            <div class="form-check">
+              <input id="convertToJGD2011" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToGeodeticSystem"
+                value="JGD2011">
+              <label class="form-check-label mb-1" for="convertToJGD2011">世界測地系（JGD2011）</label>
+            </div>
+          </div>
+          <div class="col">
+            <label class="mb-1 fs-5" for="convertZoneNo">変換先の系番号</label>
+            <select id="convertZoneNo" class="form-select border border-2 border-dark-subtle" aria-label="Default select">
+              <!-- フォーム初期化の際にXY座標を選択するので、組み合わせ不可の選択肢を使用不可にする -->
+              <option value="0" disabled>緯度経度用の選択肢</option>
+              <option selected value="1">1系</option>
+              <option value="2">2系</option>
+              <option value="3">3系</option>
+              <option value="4">4系</option>
+              <option value="5">5系</option>
+              <option value="6">6系</option>
+              <option value="7">7系</option>
+              <option value="8">8系</option>
+              <option value="9">9系</option>
+              <option value="10">10系</option>
+              <option value="11">11系</option>
+              <option value="12">12系</option>
+              <option value="13">13系</option>
+              <option value="14">14系</option>
+              <option value="15">15系</option>
+              <option value="16">16系</option>
+              <option value="17">17系</option>
+              <option value="18">18系</option>
+              <option value="19">19系</option>
+            </select>    
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <div>
+              <button id="dataConvertBtn" type="" class="btn btn-primary mb-3">変換</button>
+            </div>
+            <div id="convertedDataTable" class="mb-3"></div>
+            <div>
+              <button id="clearConvertedDataTableBtn" type="" class="btn btn-danger mb-3">データを削除</button>
             </div>
           </div>
         </div>
       </div>
+    </div>
   </div>
+  <div class="row">
+    <div class="col text-center m-3">
+      <!-- Githubのロゴは https://github.com/logos から入手 -->
+      <a class="me-3 ms-3" href="https://github.com/s-show/interchangeXYandBL" target="_blank"><img
+          src="/assets/GitHub_Logo.png" alt="github icon" width="100"></a>
+      <strong class="">License: </strong><a href="https://licenses.opensource.jp/MIT/MIT.html" target="_blank">MIT</a>
+    </div>
+  </div>
+  </div>
+
   <!-- Bootstrap5 -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+    crossorigin="anonymous"></script>
   <!-- leaflet -->
   <!-- Make sure you put this AFTER Leaflet's CSS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script>
   <script type="module" src="./js/index.js"></script>
 </body>
+
 </html>

@@ -12,7 +12,7 @@ const beforechange = (instance, cell, x, y, value) => {
   }
 }
 
-// 行削除以外のメニューは不要なので表示させていない
+// 行削除とコピー以外のメニューは不要なので表示させていない
 const contextMenuItems = (obj, x, y, e) => {
   let items = [];
   if (y != null) {
@@ -21,6 +21,14 @@ const contextMenuItems = (obj, x, y, e) => {
         title: obj.options.text.deleteSelectedRows,
         onclick: function() {
             obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+        }
+      });
+      items.push({
+        title: obj.options.text.copy,
+        // icon: 'content_copy',
+        shortcut: 'Ctrl + C',
+        onclick: function() {
+            obj.copy();
         }
       });
     }
@@ -46,6 +54,7 @@ const beforeInsertColumn = (instance, cell, x, y, value) => {
 // コンテキストメニューに表示するメニューの日本語訳
 const text = {
   deleteSelectedRows: '選択した行を削除',
+  copy: '表の値をコピー',
 }
 
 const initTableData = [
@@ -54,12 +63,14 @@ const initTableData = [
   [130.3000, 53.3000]
 ];
 
-const xytable = jspreadsheet(document.getElementById('xyTable'), {
+const columnsConfig = [
+  { type: 'numeric', title: 'X(緯度)', width: 180, name: 'x_latitude' },
+  { type: 'numeric', title: 'y(経度)', width: 180, name: 'y_longitude' }
+]
+
+const sourceTable = jspreadsheet(document.getElementById('sourceDataTable'), {
   data: initTableData,
-  columns: [
-    { type: 'numeric', title: 'X', width: 180, name: 'x' },
-    { type: 'numeric', title: 'y', width: 180, name: 'y' }
-  ],
+  columns: columnsConfig,
   onbeforechange: beforechange,
   contextMenu: contextMenuItems,
   onbeforedeletecolumn: beforeDeleteColumn,
@@ -68,12 +79,9 @@ const xytable = jspreadsheet(document.getElementById('xyTable'), {
   freezeColumns: 2,
 });
 
-const bltable = jspreadsheet(document.getElementById('blTable'), {
+const convertedTable = jspreadsheet(document.getElementById('convertedDataTable'), {
   data: initTableData,
-  columns: [
-    { type: 'numeric', title: '緯度', width: 180, name: 'latitude' },
-    { type: 'numeric', title: '経度', width: 180, name: 'longitude' }
-  ],
+  columns: columnsConfig,
   onbeforechange: beforechange,
   contextMenu: contextMenuItems,
   onbeforedeletecolumn: beforeDeleteColumn,
@@ -82,4 +90,4 @@ const bltable = jspreadsheet(document.getElementById('blTable'), {
   freezeColumns: 2,
 });
 
-export { xytable, bltable }
+export { sourceTable, convertedTable }

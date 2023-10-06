@@ -65,25 +65,28 @@ const baseMaps = {
   "地理院地図 (航空写真・1961-69年)": gsiSatellite1961_1969,
 }
 
-const redArrowIcon = L.icon({
-  iconUrl: getImage('redMarker'),
-  iconSize:     [20, 20], // size of the icon
-  iconAnchor:   [10, 20], // point of the icon which will correspond to marker's location
-  popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+const redPinMarker = L.icon({
+  iconUrl: getImage('redPinMarker'),
+  iconSize:     [30, 30], // size of the icon
+  iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
 });
 
-const blueArrowIcon = L.icon({
-  iconUrl: getImage('blueMarker'),
-  iconSize:     [20, 20], // size of the icon
-  iconAnchor:   [10, 20], // point of the icon which will correspond to marker's location
-  popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+const bluePinMarker = L.icon({
+  iconUrl: getImage('bluePinMarker'),
+  iconSize:     [30, 30], // size of the icon
+  iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
 });
 
-const greenArrowIcon = L.icon({
-  iconUrl: getImage('greenMarker'),
-  iconSize:     [20, 20], // size of the icon
-  iconAnchor:   [10, 20], // point of the icon which will correspond to marker's location
-  popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+const yellowPinMarker = L.icon({
+  iconUrl: getImage('yellowPinMarker'),
+  iconSize:     [30, 30], // size of the icon
+  iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
 });
 
-export { gsiStandard, gsiSatellite, baseMaps, redArrowIcon, blueArrowIcon, greenArrowIcon }
+const greenPinMarker = L.icon({
+  iconUrl: getImage('greenPinMarker'),
+  iconSize:     [30, 30], // size of the icon
+  iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
+});
+
+export { gsiStandard, gsiSatellite, baseMaps, redPinMarker, bluePinMarker, yellowPinMarker, greenPinMarker }
