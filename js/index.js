@@ -1,5 +1,5 @@
 import { proj4Defs, geodeticSystems } from './proj4.js';
-import { gsiStandard, baseMaps, redPinMarker, bluePinMarker, yellowPinMarker, greenPinMarker } from './leaflet.js';
+import { gsiStandard, baseMaps, pinMarkers, addCircle } from './leaflet.js';
 import { sourceTable, convertedTable } from './jspreadsheet.js';
 import { transpose } from './tranpose.js';
 import { isValidNumber } from './isvalidNumber.js';
@@ -8,7 +8,8 @@ import { isValidNumber } from './isvalidNumber.js';
 const sourceDataTable = sourceTable;
 const convertedDataTable = convertedTable;
 
-// 初期位置を日本緯度経度原点にして leaflet をセットアップ
+// leaflet のセットアップ
+// 初期位置は日本緯度経度原点
 // 日本緯度経度原点
 // 経度 東経 １３９°４４′２８.８８６９”
 // 緯度 北緯 ３５°３９′２９.１５７２”
@@ -19,9 +20,18 @@ let map = L.map('map',
   }).setView([35.6580992222, 139.7413574722], 15);
 L.control.layers(baseMaps).addTo(map);
 gsiStandard.addTo(map);
+let circles = [];
 
 // proj4js のセットアップ
 proj4.defs(proj4Defs);
+
+// 印刷時に選択していない項目を非表示にするラジオボタン
+const noPrintRadioBtn = [
+  'sourceDataType',
+  'sourceGeodeticSystem',
+  'convertToDataType',
+  'convertToGeodeticSystem'
+];
 
 // 変換元データのXY座標・緯度経度の選択に応じて系番号を変更する
 document.getElementsByName('sourceDataType').forEach((selectedBtn) => {
@@ -52,6 +62,48 @@ document.getElementsByName('convertToDataType').forEach((selectedBtn) => {
     }
     console.debug(e.target.value);
   })
+})
+
+// 座標系の説明ダイアログ表示処理
+document.getElementById('openGeodeticSystemDialog').addEventListener('click', () => {
+  const dialog = document.getElementById('geodeticSystem')
+  dialog.showModal();
+  dialog.addEventListener('click', (e) => {
+    if (e.target.id === 'geodeticSystem') {
+      dialog.close();
+    }
+  })
+})
+document.getElementById('closeGeodeticSystemDialog').addEventListener('click', () => {
+  document.getElementById('geodeticSystem').close();
+})
+
+// 系番号の説明ダイアログ表示処理
+document.getElementById('openZoneNoDialog').addEventListener('click', () => {
+  const dialog = document.getElementById('zoneNoDialog')
+  dialog.showModal();
+  dialog.addEventListener('click', (e) => {
+    if (e.target.id === 'zoneNoDialog') {
+      dialog.close();
+    }
+  })
+})
+document.getElementById('closeZoneNoDialog').addEventListener('click', () => {
+  document.getElementById('zoneNoDialog').close();
+})
+
+// データテーブルの注意事項ダイアログの表示処理
+document.getElementById('openConsiderationsDialog').addEventListener('click', () => {
+  const dialog = document.getElementById('considerationsDialog')
+  dialog.showModal();
+  dialog.addEventListener('click', (e) => {
+    if (e.target.id === 'considerationsDialog') {
+      dialog.close();
+    }
+  })
+})
+document.getElementById('closeConsiderationsDialog').addEventListener('click', () => {
+  document.getElementById('considerationsDialog').close();
 })
 
 // データ変換
@@ -85,6 +137,16 @@ document.getElementById('clearConvertedDataTableBtn').addEventListener('click', 
   e.preventDefault();
 })
 
+// 印刷用のスタイル変更処理
+// 処理1: 印刷時にデータテーブルの幅を狭くし、印刷終了後に幅を戻す処理
+// 処理2: 選択していないラジオボタンを印刷時に非表示にし、印刷終了後に戻す処理。
+window.addEventListener("beforeprint", (event) => {
+  preparePrint();
+});
+window.addEventListener("afterprint", (event) => {
+  afterPrint();
+});
+
 // マーカー追加ボタンクリック時の動作
 document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
   // 緯度経度テーブルのデータが全て削除されていると blTableValue.length は 1 になる
@@ -99,44 +161,34 @@ document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
       '0');
     const sourceData = sourceDataCleansing(sourceDataTable.getJson(false));
     const convertedData = convertData(convertParameter, sourceData);
+    let iconColor = ''
+
+    switch (selectMarkerIcon.value) {
+      case 'redPinMarker':
+        iconColor = pinMarkers.red;
+        break;
+      case 'bluePinMarker':
+        iconColor = pinMarkers.blue;
+        break;
+      case 'yellowPinMarker':
+        iconColor = pinMarkers.yellow;
+        break;
+      default:
+        iconColor = pinMarkers.green;
+        break;
+    }
 
     convertedData.forEach((data) => {
       try {
-        if (selectMarkerIcon.value === 'redPinMarker') {
-          L.marker([Number(data[0]), Number(data[1])], { icon: redPinMarker }).addTo(map).on('click', (e) => {
-            e.target.remove()
-          });
-        } else if (selectMarkerIcon.value === 'bluePinMarker') {
-          L.marker([Number(data[0]), Number(data[1])], { icon: bluePinMarker }).addTo(map).on('click', (e) => {
-            e.target.remove()
-          });
-        } else if (selectMarkerIcon.value === 'yellowPinMarker') {
-          L.marker([Number(data[0]), Number(data[1])], { icon: yellowPinMarker }).addTo(map).on('click', (e) => {
-            e.target.remove()
-          });
-        } else {
-          L.marker([Number(data[0]), Number(data[1])], { icon: greenPinMarker }).addTo(map).on('click', (e) => {
-            e.target.remove()
-          });
-        }
+        L.marker([Number(data[0]), Number(data[1])], { icon: iconColor }).addTo(map).on('click', (e) => {
+          e.target.remove()
+        });
       } catch (error) {
         displayErrorMessage(error);
       }
       try {
-        if (lineColor.value === 'redLine') {
-          L.polyline(convertedData, { color: 'red' }).addTo(map).on('click', (e) => {
-            e.target.remove()
-          });
-        } else if (lineColor.value === 'blueLine') {
-          L.polyline(convertedData, { color: 'blue' }).addTo(map).on('click', (e) => {
-            e.target.remove()
-          });
-        } else if (lineColor.value === 'yellowLine') {
-          L.polyline(convertedData, { color: 'yellow' }).addTo(map).on('click', (e) => {
-            e.target.remove()
-          });
-        } else if (lineColor.value === 'greenLine') {
-          L.polyline(convertedData, { color: 'green' }).addTo(map).on('click', (e) => {
+        if (lineColor.value != 'no') {
+          L.polyline(convertedData, { color: lineColor.value}).addTo(map).on('click', (e) => {
             e.target.remove()
           });
         }
@@ -161,14 +213,16 @@ document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
 // マーカー全削除
 document.getElementById('removeMarkerBtn').addEventListener('click', (e) => {
   map.eachLayer((layer) => {
-    // `layer._icon` が未定義でなければ Marker レイヤーと判定している。
-    // （Polyline レイヤーやベースマップレイヤーでは未定義である）
+    // `layer._icon` が定義されていれば Marker レイヤーと判定している。
     if (layer._icon != undefined) {
       map.removeLayer(layer);
     }
-    // `layer.options.color` が未定義でなければ Marker レイヤーと判定している。
-    // （Marker レイヤーやベースマップレイヤーでは未定義である）
-    if (layer.options.color != undefined) {
+    // `layer._bounds` が定義されていれば Marker レイヤーと判定している。
+    if (layer._bounds != undefined) {
+      map.removeLayer(layer);
+    }
+    // `layer._mRadius` が定義されていれば Circle レイヤーと判定している。
+    if (layer._mRadius != undefined) {
       map.removeLayer(layer);
     }
   })
@@ -176,21 +230,13 @@ document.getElementById('removeMarkerBtn').addEventListener('click', (e) => {
   e.preventDefault();
 })
 
-// 印刷用に地図より上の部分を非表示にする
-document.getElementById('openBigmap').addEventListener('click', (e) => {
-  const openBigmapBtn = document.getElementById('openBigmap');
-  const inputForm = document.getElementById('inputForm');
-  const information = document.getElementById('information');
-  const iconInformation = document.getElementById('iconInformation');
-  inputForm.classList.toggle('visually-hidden');
-  information.classList.toggle('visually-hidden');
-  iconInformation.classList.toggle('visually-hidden');
-  if (inputForm.classList.contains('visually-hidden')) {
-    openBigmapBtn.innerText = '地図以外を表示';
+// 印刷プレビュー画面の作成
+document.getElementById('printPreviewBtn').addEventListener('input', (e) => {
+  if (e.target.checked) {
+    preparePrint();
   } else {
-    openBigmapBtn.innerText = '地図以外を隠す';
+    afterPrint();
   }
-  e.preventDefault();
 })
 
 // 地図引き伸ばし
@@ -269,6 +315,74 @@ function convertData(convertParameter, sourceData) {
   });
   return convertedData;
 };
+
+// 印刷しないパーツの非表示処理
+function preparePrint() {
+  sourceDataTable.setWidth(0, 110);
+  sourceDataTable.setWidth(1, 110);
+  sourceDataTable.hideIndex();
+  const notPrintDoms = document.querySelectorAll('.d-print-none');
+  notPrintDoms.forEach((notPrintDom) => {
+    notPrintDom.classList.add('d-none');
+  })
+  noPrintRadioBtn.forEach((radioBtn) => {
+    document.getElementsByName(radioBtn).forEach((radioBtn) => {
+      if (!radioBtn.checked) { 
+        radioBtn.parentElement.classList.add('d-none')
+      }
+    })
+  })
+}
+
+// 印刷前に非表示にしたパーツを表示する処理
+function afterPrint() {
+  sourceDataTable.setWidth(0, 180);
+  sourceDataTable.setWidth(1, 180);
+  sourceDataTable.showIndex();
+  const notPrintDoms = document.querySelectorAll('.d-print-none');
+  notPrintDoms.forEach((notPrintDom) => {
+    notPrintDom.classList.remove('d-none');
+  })
+  noPrintRadioBtn.forEach((radioBtn) => {
+    document.getElementsByName(radioBtn).forEach((radioBtn) => {
+      if (!radioBtn.checked) { 
+        radioBtn.parentElement.classList.remove('d-none')
+      }
+    })
+  })
+}
+
+// クリックした箇所を中心に指定した直径の円を描く
+map.addEventListener('click', (e) => {
+  const selectLineColor = document.getElementById('selectLineColor');
+  let lineColor = 'red';
+  if (selectLineColor.value != 'no') {
+    lineColor = selectLineColor.value;
+  }
+  const circleRadius = document.getElementById('circleRadius'); 
+  let radius = 0;
+  if (Number(circleRadius.value) >= 0) {
+    radius = Number(circleRadius.value);
+  }
+  const circleOption = {
+    radius: radius,
+    color: lineColor,
+    opacity: 1.0,
+    fill: true,
+    fillOpacity: 0.05,
+    // circle はイベントバブリングがデフォルトで有効。
+    // バブリングが有効だと、円を削除するためにクリックした時に、
+    // 円が削除されると同時に新しい円が描画されてしまう。
+    // オプションの説明は https://leafletjs.com/reference.html#circle-bubblingmouseevents 参照
+    bubblingMouseEvents: false
+  }
+  const circle = L.circle(e.latlng, circleOption);
+  circle.addTo(map);
+  circle.on('click', (e) => {
+    e.target.remove();
+  })
+  circles.push(circle);
+})
 
 window.onerror = function myErrorHandler(errorMsg) {
   document.getElementById('errorMessage').innerText = errorMsg;

@@ -70,23 +70,31 @@ const redPinMarker = L.icon({
   iconSize:     [30, 30], // size of the icon
   iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
 });
-
 const bluePinMarker = L.icon({
   iconUrl: getImage('bluePinMarker'),
   iconSize:     [30, 30], // size of the icon
   iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
 });
-
 const yellowPinMarker = L.icon({
   iconUrl: getImage('yellowPinMarker'),
   iconSize:     [30, 30], // size of the icon
   iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
 });
-
 const greenPinMarker = L.icon({
   iconUrl: getImage('greenPinMarker'),
   iconSize:     [30, 30], // size of the icon
   iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
 });
 
-export { gsiStandard, gsiSatellite, baseMaps, redPinMarker, bluePinMarker, yellowPinMarker, greenPinMarker }
+const pinMarkers = {
+  'red': redPinMarker,
+  'blue': bluePinMarker,
+  'yellow': yellowPinMarker,
+  'green': greenPinMarker,
+}
+
+function addCircle(latLng, diameter) {
+  console.log(latLng);
+}
+
+export { gsiStandard, baseMaps, pinMarkers, addCircle }

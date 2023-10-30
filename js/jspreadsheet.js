@@ -65,7 +65,7 @@ const initTableData = [
 
 const columnsConfig = [
   { type: 'numeric', title: 'X(緯度)', width: 180, name: 'x_latitude' },
-  { type: 'numeric', title: 'y(経度)', width: 180, name: 'y_longitude' }
+  { type: 'numeric', title: 'Y(経度)', width: 180, name: 'y_longitude' }
 ]
 
 const sourceTable = jspreadsheet(document.getElementById('sourceDataTable'), {

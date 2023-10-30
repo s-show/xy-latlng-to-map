@@ -17,21 +17,13 @@
   --active_color: #007aff;
 }
 
-body {
-  /* font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; */
-}
-
-/* 配色は https://colorate.azurewebsites.net/ja/Color/E6E9EE で作成 */
-.container-fluid {
-  /* background-color: #d3d3d3; */
-}
-
 .mapContainer {
   overflow: hidden;
 }
 
 .map {
-  height: calc(100vh - 240px);
+  /* height: calc(100vh - 240px); */
+  height: calc(100vw / 12 * 6);
   border: solid 0.1em black;
 }
 
@@ -89,4 +81,73 @@ ol.userGuide li:before{
 .nav-tabs .nav-item .nav-link.active {
   color: #ffffff;
   background-color: #0d6efd;  
+}
+
+.modalDialog {
+  border-color: #555;
+  border-width: 0.1em;
+  border-radius: 0.5em;
+}
+
+dialog {
+  padding: 0em;
+}
+.innerDialog {
+  padding: 1em;
+}
+
+.dl-inline {
+  margin-bottom: 0em;
+}
+.dl-inline dt {
+  float: left;
+  clear: left;
+  margin-right: 10px;
+}
+.dl-inline dd {
+  margin-left: 0px;
+  margin-bottom: 0em;
+}
+.dl-inline.same-width dt {
+  width: 3em;
+}
+
+/* 印刷用ページ表示ボタンの装飾 */
+.switch-label {
+  display: flex;
+  align-items: center;
+}
+#printPreviewBtn {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.switch-base {
+  width: 40px;
+  border-radius: 15px;
+  height: 24px;
+  background-color: #ddd;
+}
+.switch-title {
+  /* margin-left: 0.5em; */
+}
+#printPreviewBtn:checked ~ .switch-base {
+  background-color: rgb(219, 234, 254);
+  transition: 0.1s;
+}
+.switch-circle {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background-color: #333333;
+}
+.toggle-switch {
+  position: relative;
+}
+#printPreviewBtn:checked ~ .switch-circle {
+  transform: translateX(100%);
+  background-color: #003366;
 }
