@@ -1,7 +1,8 @@
-# interchangeXYandBL
-XY座標と緯度経度の相互変換と地図へのマーキングができるWebアプリ
+# xy-latlng-to-map
 
-[XY座標と緯度経度の相互変換](https://kankodori-blog.com/interchangeXYandBL/)
+測量の成果であるXY座標を緯度経度に変換したり、XY座標が示す場所にピンを立てたり、地図の好きな場所に円を描画したりできる Web アプリです。
+
+[xy-latlng-to-map](https://xy-latlng-to-map.com/)
 
 本アプリは、次のライブラリやフリー素材を利用しています。
 
