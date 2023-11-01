@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main()
+  # Actions タブから手動でワークフローを実行できるようにします
+  workflow_dispatch:
 
 jobs:
   deploy:
