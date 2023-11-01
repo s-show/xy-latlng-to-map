@@ -75,8 +75,8 @@
                       data-bs-parent="#userGuideDetail">
                       <div class="accordion-body border border-2 border-dark-subtle rounded">
                         <ol class="userGuide">
-                          <li>表示したい円の直径を「円の直径（m）」に入力します</li>
-                          <li>地図を動かして円の中心とする箇所をクリックします</li>
+                          <li>地図を動かして円を追加したい場所を表示してその場所をクリックします。</li>
+                          <li>半径を入力する画面が表示されたら、半径を入力して追加ボタンをクリックします。</li>
                         </ol>
                       </div>
                     </div>
@@ -383,6 +383,7 @@
                     <option value="yellowPinMarker">黄色ピン</option>
                     <option value="greenPinMarker">緑色ピン</option>
                   </select>
+                  <p class="fs-6">地図に追加するマーカーの色を選択します。</p>
                 </div>
                 <div class="col border-end border-2 border-dark-subtle">
                   <label class="mb-1 fs-6" for="selectLineColor">線の有無・色</label>
@@ -400,9 +401,7 @@
                   <button id="removeMarkerBtn" class="btn btn-danger mt-1 mb-1">図形を全削除</button>
                 </div>
                 <div class="col border-end border-2 border-dark-subtle">
-                  <label class="mb-1 fs-6" for="circleRadius">円の直径（m）</label>
-                  <input type="number" min="0" value="0" id="circleRadius" class="border border-2 border-dark-subtle mt-1 mb-1 p-1"  onclick="this.select()">
-                  <p class="fs-6">指定した直径の円をクリックしたところに描画します。線の色のデフォルトは赤です。</p>
+                  <p class="fs-6">地図上でクリックすると円を描画できます。色は、デフォルトの赤 or 左の欄で選んだ色です。クリックして表示される画面で半径を指定します。</p>
                 </div>
                 <div id="zoomRangeWrap" class="col border-2 border-dark-subtle">
                   <div>
@@ -527,9 +526,18 @@
 
   <dialog id="inputDiameter" class="modalDialog">
     <div class="innerDialog">
-      <p>円の直径を入力</p>
-      <input type="number" name="diameter" id="diameter">
-      <button id="addCircleToMap" type="submit">OK</button>
+      <form action="">
+        <input id="latitude" hidden>
+        <input id="longitude" hidden>
+        <div class="mt-2 mb-3">
+          <label for="radius">円の半径を入力 (m)</label>
+          <input type="number" name="radius" id="radius" class="form-control mt-1" value="0" autofocus>
+        </div>
+        <div class="mt-2 mb-2">
+          <button id="addCircleToMap" type="submit" class="btn btn-primary">追加</button>
+          <button id="cancelAddCircle" type="" class="btn btn-secondary">キャンセル</button>
+        </div>
+      </form>
     </div>
   </dialog>
 

@@ -352,19 +352,35 @@ function afterPrint() {
   })
 }
 
-// クリックした箇所を中心に指定した直径の円を描く
+// 地図をクリックして円を追加する処理
+// 半径を入力するダイアログを表示する処理
 map.addEventListener('click', (e) => {
-  const selectLineColor = document.getElementById('selectLineColor');
+  const dialog = document.getElementById('inputDiameter');
+  dialog.showModal();
+  document.getElementById('radius').select(); 
+  document.getElementById('latitude').value = e.latlng.lat;
+  document.getElementById('longitude').value = e.latlng.lng;
+  dialog.addEventListener('click', (e) => {
+    if (e.target.id === 'inputDiameter') {
+      dialog.close();
+    }
+  })
+})
+// 円の半径を入力するダイアログの「追加」ボタンをクリックしたときの処理
+document.getElementById('addCircleToMap').addEventListener('click', (e) => {
+  let latitude = document.getElementById('latitude').value;
+  let longitude = document.getElementById('longitude').value;
+  let selectLineColor = document.getElementById('selectLineColor');
   let lineColor = 'red';
   if (selectLineColor.value != 'no') {
     lineColor = selectLineColor.value;
   }
-  const circleRadius = document.getElementById('circleRadius'); 
+  let circleRadius = document.getElementById('radius'); 
   let radius = 0;
   if (Number(circleRadius.value) >= 0) {
     radius = Number(circleRadius.value);
   }
-  const circleOption = {
+  let circleOption = {
     radius: radius,
     color: lineColor,
     opacity: 1.0,
@@ -376,13 +392,19 @@ map.addEventListener('click', (e) => {
     // オプションの説明は https://leafletjs.com/reference.html#circle-bubblingmouseevents 参照
     bubblingMouseEvents: false
   }
-  const circle = L.circle(e.latlng, circleOption);
-  circle.addTo(map);
-  circle.on('click', (e) => {
+  let circle = L.circle([Number(latitude), Number(longitude)], circleOption).addTo(map).on('click', (e) => {
     e.target.remove();
   })
   circles.push(circle);
-})
+  circleRadius.value = '0';
+  document.getElementById('inputDiameter').close();
+  e.preventDefault();
+});
+// 円の半径を入力するダイアログの「キャンセル」ボタンをクリックしたときの処理
+document.getElementById('cancelAddCircle').addEventListener('click', (e) => {
+  document.getElementById('inputDiameter').close();
+  e.preventDefault();
+});
 
 window.onerror = function myErrorHandler(errorMsg) {
   document.getElementById('errorMessage').innerText = errorMsg;
