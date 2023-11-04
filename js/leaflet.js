@@ -1,3 +1,5 @@
+import * as leaflet from 'leaflet'
+
 const getImage = (fileName) => {
   return new URL(`../assets/${fileName}.png`, import.meta.url).href;
 };

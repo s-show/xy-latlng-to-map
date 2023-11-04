@@ -11,6 +11,14 @@
   },
   "devDependencies": {
     "jest": "^29.5.0",
+    "sass": "^1.69.5",
     "vite": "^4.3.9"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.2",
+    "jspreadsheet-ce": "^4.13.4",
+    "leaflet": "^1.9.4",
+    "proj4": "^2.9.2"
   }
 }

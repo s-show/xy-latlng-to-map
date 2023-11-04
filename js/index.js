@@ -3,6 +3,11 @@ import { gsiStandard, baseMaps, pinMarkers, addCircle } from './leaflet.js';
 import { sourceTable, convertedTable } from './jspreadsheet.js';
 import { transpose } from './tranpose.js';
 import { isValidNumber } from './isvalidNumber.js';
+// Import all of Bootstrap's JS
+import * as bootstrap from 'bootstrap'
+import L from "leaflet";
+import 'leaflet/dist/leaflet.css';
+import proj4 from 'proj4';
 
 // Jspreadsheet のセットアップ
 const sourceDataTable = sourceTable;

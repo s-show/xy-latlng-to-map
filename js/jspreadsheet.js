@@ -1,5 +1,9 @@
 import { isValidNumber } from "./isvalidNumber";
 import { zen2han } from "./zen2han";
+import "jsuites/dist/jsuites.js";
+import "jsuites/dist/jsuites.css";
+import "jspreadsheet-ce/dist/jspreadsheet.css";
+import jspreadsheet from "jspreadsheet-ce";
 
 // 変換できるのは数値だけなので、数値以外は無視するようにしている。
 // ただし、桁区切りで使われる `,` を取り除けば数値とみなせる値は受け入れている。
