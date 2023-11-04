@@ -1,3 +1,6 @@
+// Import all of Bootstrap's CSS
+@import "bootstrap/scss/bootstrap";
+
 :root {
   --jexcel_header_color: #000;
   --jexcel_header_color_highlighted: #000;
@@ -15,6 +18,32 @@
   --jexcel_border_color: #ccc;
   --jexcel_border_color_highlighted: #000;
   --active_color: #007aff;
+}
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .border#{$infix}-top {      border-top: $border-width solid; }
+    .border#{$infix}-end {      border-right: $border-width solid; }
+    .border#{$infix}-bottom {   border-bottom: $border-width solid; }
+    .border#{$infix}-start {    border-left: $border-width solid; }
+
+    .border#{$infix}-top-0 {    border-top: 0 !important; }
+    .border#{$infix}-end-0 {    border-right: 0 !important; }
+    .border#{$infix}-bottom-0 { border-bottom: 0 !important; }
+    .border#{$infix}-start-0 {  border-left: 0 !important; }
+
+    .border#{$infix}-x {
+      border-left: $border-width solid $border-color ;
+      border-right: $border-width solid $border-color ;
+    }
+
+    .border#{$infix}-y {
+      border-top: $border-width solid $border-color ;
+      border-bottom: $border-width solid $border-color ;
+    }
+  }
 }
 
 .mapContainer {
