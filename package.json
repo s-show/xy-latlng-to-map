@@ -1,5 +1,5 @@
 {
-  "name": "interchangeXYandBL",
+  "name": "xy-latlng-to-map",
   "version": "0.1.0",
   "license": "MIT",
   "type": "module",
