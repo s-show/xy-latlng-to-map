@@ -433,10 +433,9 @@ document.getElementById('addCircleToMap').addEventListener('click', (e) => {
     // オプションの説明は https://leafletjs.com/reference.html#circle-bubblingmouseevents 参照
     bubblingMouseEvents: false
   }
-  let circle = L.circle([Number(latitude), Number(longitude)], circleOption).addTo(map).on('click', (e) => {
+  L.circle([Number(latitude), Number(longitude)], circleOption).addTo(map).on('click', (e) => {
     e.target.remove();
   })
-  circles.push(circle);
   circleRadius.value = '0';
   document.getElementById('inputDiameter').close();
   e.preventDefault();
@@ -446,6 +445,11 @@ document.getElementById('cancelAddCircle').addEventListener('click', (e) => {
   document.getElementById('inputDiameter').close();
   e.preventDefault();
 });
+// 円の半径を入力するダイアログを閉じる時の処理
+document.getElementById('inputDiameter').addEventListener('close', (e) => {
+  document.getElementById('radius').value = '0';
+  e.preventDefault();
+})
 
 window.onerror = function myErrorHandler(errorMsg) {
   document.getElementById('errorMessage').innerText = errorMsg;
