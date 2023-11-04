@@ -30,6 +30,42 @@ let circles = [];
 // proj4js のセットアップ
 proj4.defs(proj4Defs);
 
+// ウィンドウサイズに応じてデータテーブルの大きさを変える
+window.addEventListener('resize', () => {
+  const viewPortWidth = Math.max(document.querySelector('.container-fluid').clientWidth, window.innerWidth || 0);
+  // viewPortWidth <= 992 で col-lg-* が適用される
+  // viewPortWidth < 992 でデータテーブルと地図が縦並びになるのでテーブルの幅を戻している。
+  if (viewPortWidth < 992) {
+    sourceDataTable.setWidth(0, 180);
+    sourceDataTable.setWidth(1, 180);
+    sourceDataTable.showIndex();
+    convertedTable.setWidth(0, 180);
+    convertedTable.setWidth(1, 180);
+    convertedTable.showIndex();
+  } else if (viewPortWidth <= 1400) {
+    sourceDataTable.setWidth(0, 110);
+    sourceDataTable.setWidth(1, 110);
+    sourceDataTable.hideIndex();
+    convertedTable.setWidth(0, 110);
+    convertedTable.setWidth(1, 110);
+    convertedTable.hideIndex();
+  } else if (viewPortWidth <= 1800) {
+    sourceDataTable.setWidth(0, 110);
+    sourceDataTable.setWidth(1, 110);
+    sourceDataTable.showIndex();
+    convertedTable.setWidth(0, 110);
+    convertedTable.setWidth(1, 110);
+    convertedTable.showIndex();
+  } else {
+    sourceDataTable.setWidth(0, 180);
+    sourceDataTable.setWidth(1, 180);
+    sourceDataTable.showIndex();
+    convertedTable.setWidth(0, 180);
+    convertedTable.setWidth(1, 180);
+    convertedTable.showIndex();
+  }
+})
+
 // 印刷時に選択していない項目を非表示にするラジオボタン
 const noPrintRadioBtn = [
   'sourceDataType',
