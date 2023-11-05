@@ -5,26 +5,10 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-  <!-- proj4js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.min.js"
-    integrity="sha512-Y/B11KRfeaNHAonSdwnF0fvpzsA+W27fqfMPmfkxRAwuySCcA7aT9LfJcWz5fi32McMI02jngFYj7LYT1z+VVg=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <!-- jspreadsheet -->
-  <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
-  <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
-  <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css" type="text/css" />
-  <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.themes.css" type="text/css" />
-  <script src="https://jsuites.net/v4/jsuites.js"></script>
-  <!-- leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   
   <title>座標の地図表示と座標・緯度経度の変換</title>
-  <script type="module" crossorigin src="./assets/index-903219da.js"></script>
-  <link rel="stylesheet" href="./assets/index-5fb0e568.css">
+  <script type="module" crossorigin src="./assets/index-a1c0da8d.js"></script>
+  <link rel="stylesheet" href="./assets/index-1aa9b8a6.css">
 </head>
 
 <body>
@@ -32,7 +16,7 @@
     <h1 class="text-center">座標の地図表示と座標・緯度経度の変換</h1>
     <!-- https://www.codepel.com/bootstrap/bootstrap-5-nested-accordion/ を元にしてアコーディオンの入れ子を実現-->
     <div class="row">
-      <div class="col-10">
+      <div class="col-lg-10">
         <div class="accordion mb-4 d-print-none" id="userGuideAccordion">
           <div class="accordion-item">
             <h1 class="accordion-header border border-1 border-dark-subtle rounded" id="heading">
@@ -110,7 +94,7 @@
           </div>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-lg-2 pb-2 pb-lg-0">
         <div class="">
           <label class="switch-label" for="printPreviewBtn">
             <p id="printPreviewBtnTitle" class="fs-6 me-3 mb-1">印刷時と同じ見た目にする</p>
@@ -126,9 +110,9 @@
       </div>
     </div>
 
-    <div id="dataInformation" class="row mb-4 pt-3 pb-3 border-top border-bottom border-2 border-dark-subtle">
+    <div id="dataInformation" class="row mb-4 pt-3 pb-3 border-top border-bottom border-2 border-dark-subtle p-3">
       <h3>データ詳細情報</h3>
-      <div class="col border-end border-2 border-dark-subtle">
+      <div class="col-lg-4 border-lg-end border-sm-bottom border-lg-bottom-0 border-bottom border-black py-lg-0 py-sm-2 py-2">
         <p class="mb-1 fs-5">種類</p>
         <div class="form-check">
           <input type="radio" class="form-check-input border border-2 border-dark-subtle" name="sourceDataType"
@@ -141,7 +125,7 @@
           <label class="form-check-label mb-1" for="sourceIsBL">緯度経度</label>
         </div>
       </div>
-      <div class="col border-end border-2 border-dark-subtle">
+      <div class="col-lg-4 border-lg-end border-sm-bottom border-lg-bottom-0 border-bottom border-black py-lg-0 py-sm-2 py-2">
         <p class="mb-1 fs-5">測地系</p>
         <div class="form-check">
           <input id="sourceIsTOKYO" type="radio" class="form-check-input border border-2 border-dark-subtle"
@@ -159,7 +143,7 @@
           <label class="form-check-label mb-1" for="sourceIsJGD2011">世界測地系（JGD2011）</label>
         </div>
         <!-- 測地系の部分 -->
-        <div class="mt-4">
+        <div class="mt-2">
           <button type="button" id="openGeodeticSystemDialog" class="btn btn-info d-print-none">系番号の解説</button>
           <dialog id="geodeticSystem">
             <div class="innerDialog">
@@ -197,7 +181,7 @@
           </dialog>
         </div>
       </div>
-      <div class="col">
+      <div class="col-lg-4 py-lg-0 py-sm-2 py-2">
         <label class="mb-1 fs-5" for="sourceZoneNo">系番号</label>
         <select id="sourceZoneNo" class="form-select border border-2 border-dark-subtle" aria-label="Default select">
           <!-- フォーム初期化の際にXY座標を選択するので、組み合わせ不可の選択肢を使用不可にする -->
@@ -329,7 +313,7 @@
     </div>
 
     <div class="row mb-4 pb-3 border-bottom border-2 border-dark-subtle">
-      <div class="col-3 border-2 border-dark-subtle">
+      <div class="col-lg-3">
         <h3 id="headerDataTable">データテーブル</h3>
         <div id="sourceDataTable"></div>
         <div>
@@ -355,7 +339,7 @@
           </dialog>
         </div>
       </div>
-      <div class="col-9 d-print-grid">
+      <div class="col-lg-9 d-print-grid">
         <!-- 地図とデータ変換部分を切り替えるタブ -->
         <ul class="nav nav-tabs">
           <li class="nav-item">
@@ -377,7 +361,7 @@
           <div id="map-content" class="tab-pane active">
             <div class="tab-content-div p-3 border border-2 border-dark-subtle">
               <div class="row pb-3 border-bottom border-2 border-dark-subtle d-print-none">
-                <div class="col border-end border-2 border-dark-subtle">
+                <div class="col-xl-2 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
                   <label class="mb-1 fs-6" for="selectMarkerIcon">マーカーの種類</label>
                   <select id="selectMarkerIcon" class="form-select border border-2 border-dark-subtle mt-1 mb-1">
                     <option value="redPinMarker">赤色ピン</option>
@@ -385,9 +369,9 @@
                     <option value="yellowPinMarker">黄色ピン</option>
                     <option value="greenPinMarker">緑色ピン</option>
                   </select>
-                  <p class="fs-6">地図に追加するマーカーの色を選択します。</p>
+                  <p class="fs-6 mb-0">地図に追加するマーカーの色を選択します。</p>
                 </div>
-                <div class="col border-end border-2 border-dark-subtle">
+                <div class="col-xl-2 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
                   <label class="mb-1 fs-6" for="selectLineColor">線の有無・色</label>
                   <select id="selectLineColor" class="form-select border border-2 border-dark-subtle mt-1 mb-1">
                     <option value="no">線無し</option>
@@ -396,21 +380,20 @@
                     <option value="yellow">黄線</option>
                     <option value="green">緑線</option>
                   </select>
-                  <p class="fs-6">マーカーを結ぶ線の有無と色を指定します。この色は円の色にも使います。</p>
+                  <p class="fs-6 mb-0">マーカーを結ぶ線の有無と色を指定します。この色は円の色にも使います。</p>
                 </div>
-                <div class="col border-end border-2 border-dark-subtle">
-                  <button id="addMarkerBtn" class="btn btn-primary mt-1 mb-1">マーカー追加</button>
-                  <button id="removeMarkerBtn" class="btn btn-danger mt-1 mb-1">図形を全削除</button>
+                <div class="col-xl-2 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
+                  <button id="addMarkerBtn" class="btn btn-primary my-1">マーカー追加</button>
+                  <button id="removeMarkerBtn" class="btn btn-danger my-1">図形を全削除</button>
                 </div>
-                <div class="col border-end border-2 border-dark-subtle">
-                  <p class="fs-6">地図上でクリックすると円を描画できます。色は、デフォルトの赤 or 左の欄で選んだ色です。クリックして表示される画面で半径を指定します。</p>
+                <div class="col-xl-2 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
+                  <p class="fs-6 mb-0">地図上でクリックすると円を描画できます。色は、デフォルトの赤 or 左の欄で選んだ色です。クリックして表示される画面で半径を指定します。</p>
                 </div>
-                <div id="zoomRangeWrap" class="col border-2 border-dark-subtle">
+                <div id="zoomRangeWrap" class="col-xl-4 py-xl-0 py-sm-2 py-2">
                   <div>
                     <label for="zoomRange" class="mb-2 fs-6">地図を引き伸ばす</label>
                   </div>
-                  <input id="zoomRange" type="range" class="" value="1" min="1" max="3" step="0.2"
-                    list="zoomRangeMarkers">
+                  <input id="zoomRange" type="range" class="" value="1" min="1" max="3" step="0.2" list="zoomRangeMarkers">
                   <output id="zoomRangeValue" for="zoomRange">1x</output>
                   <datalist id="zoomRangeMarkers">
                     <option value="1"></option>
@@ -438,7 +421,7 @@
           <div id="dataConvert" class="tab-pane">
             <div class="tab-content-div p-3 border border-2 border-dark-subtle">
               <div class="row pb-3 border-bottom border-2 border-dark-subtle">
-                <div class="col border-end border-2 border-dark-subtle">
+                <div class="col-lg-4 border-lg-end border-sm-bottom border-lg-bottom-0 border-bottom border-black py-lg-0 py-sm-2 py-2">
                   <p class="mb-1 fs-5">変換先のデータ形式</p>
                   <div class="form-check">
                     <input id="convertToXY" type="radio" class="form-check-input border border-2 border-dark-subtle"
@@ -451,7 +434,7 @@
                     <label class="form-check-label mb-1" for="convertToBL">緯度経度</label>
                   </div>
                 </div>
-                <div class="col border-end border-2 border-dark-subtle">
+                <div class="col-lg-4 border-lg-end border-sm-bottom border-lg-bottom-0 border-bottom border-black py-lg-0 py-sm-2 py-2">
                   <p class="mb-1 fs-5">変換先の測地系</p>
                   <div class="form-check">
                     <input id="convertToTOKYO" type="radio" class="form-check-input border border-2 border-dark-subtle"
@@ -471,7 +454,7 @@
                     <label class="form-check-label mb-1" for="convertToJGD2011">世界測地系（JGD2011）</label>
                   </div>
                 </div>
-                <div class="col">
+                <div class="col-lg-4 py-lg-0 py-sm-0 py-2">
                   <label class="mb-1 fs-5" for="convertZoneNo">変換先の系番号</label>
                   <select id="convertZoneNo" class="form-select border border-2 border-dark-subtle"
                     aria-label="Default select">
@@ -543,18 +526,6 @@
     </div>
   </dialog>
 
-  <!-- Bootstrap5 -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-    crossorigin="anonymous"></script>
-  <!-- leaflet -->
-  <!-- Make sure you put this AFTER Leaflet's CSS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script>
   
 </body>
 
