@@ -1,16 +1,14 @@
-import * as leaflet from 'leaflet'
-
 const getImage = (fileName) => {
   return new URL(`../assets/${fileName}.png`, import.meta.url).href;
 };
 // Google map の航空写真
-// const googlemapHybrid = L.gridLayer.googleMutant({
-// 	type: "hybrid", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-// });
+const googlemapHybrid = L.gridLayer.googleMutant({
+	type: "hybrid", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+});
 // // Google map の通常地図
-// const googlemapRoadmap = L.gridLayer.googleMutant({
-// 	type: "roadmap", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-// });
+const googlemapRoadmap = L.gridLayer.googleMutant({
+	type: "roadmap", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+});
 // 地理院地図の標準地図タイル
 const gsiStandard = L.tileLayer(
   'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', 
@@ -58,8 +56,8 @@ const gsiSatellite1961_1969 = L.tileLayer(
 );
 
 const baseMaps = {
-  // "Google Map (航空写真)": googlemapHybrid,
-  // "Google Map (地図)": googlemapRoadmap,
+  "Google Map (航空写真)": googlemapHybrid,
+  "Google Map (地図)": googlemapRoadmap,
   "地理院地図 (標準地図)": gsiStandard,
   "地理院地図 (淡色地図)": gsiPale,
   "地理院地図 (航空写真)": gsiSatellite,
