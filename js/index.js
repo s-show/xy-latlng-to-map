@@ -1,35 +1,98 @@
+import L, { latLng } from "leaflet";
 import { proj4Defs, geodeticSystems } from './proj4.js';
-import { gsiStandard, baseMaps, pinMarkers, addCircle } from './leaflet.js';
+import { gsiStandard, baseMaps, markers, centerMarkers, lengthIcons } from './leaflet.js';
 import { sourceTable, convertedTable } from './jspreadsheet.js';
 import { transpose } from './tranpose.js';
 import { isValidNumber } from './isvalidNumber.js';
-// Import all of Bootstrap's JS
+import { createMarker } from './marker.js';
 import * as bootstrap from 'bootstrap'
-import L from "leaflet";
 import 'leaflet/dist/leaflet.css';
 import proj4 from 'proj4';
+import 'leaflet-geometryutil';
+import 'leaflet-contextmenu';
+import 'leaflet-arrowheads';
 
+/*---------------------------------------------------------
 // Jspreadsheet のセットアップ
+---------------------------------------------------------*/
 const sourceDataTable = sourceTable;
 const convertedDataTable = convertedTable;
 
+/*---------------------------------------------------------
 // leaflet のセットアップ
 // 初期位置は日本緯度経度原点
-// 日本緯度経度原点
-// 経度 東経 １３９°４４′２８.８８６９”
-// 緯度 北緯 ３５°３９′２９.１５７２”
+// 北緯35度39分29.1572秒, 東経139度44分28.8869秒
+---------------------------------------------------------*/
 let map = L.map('map',
   {
-    renderer: L.canvas(),
-    preferCanvas: true
+    preferCanvas: true,
+    contextmenu: true,
+    contextmenuItems: [
+      {
+        text: '円を追加',
+        callback: openRadiusInputDialog,
+      },
+      {
+        text: 'マーカーを追加',
+        callback: addMarker
+      },
+      {
+        text: 'この地点からの距離を計測',
+        callback: measureFromThisPoint
+      },
+      {
+        text: 'この地点までの距離を計測',
+        callback: measureToThisPoint
+      },
+    ]
   }).setView([35.6580992222, 139.7413574722], 15);
 L.control.layers(baseMaps).addTo(map);
 gsiStandard.addTo(map);
-let circles = [];
 
+// マーカー同士の距離を測るための変数
+let measureStartPoint = null;
+let measureEndPoint = null;
+// 任意の2点間の距離を測るための変数
+let measureStartLocation = null;
+let measureEndLocation = null;
+
+const markerMenuItems = [
+  // items 以外のオプションは `marker.js` で定義済み
+  {
+    text: 'マーカーを削除',
+    callback: removeSelectedMarker
+  },
+  {
+    text: 'このマーカーからの距離を計測',
+    callback: measureFromThisMarker
+  },
+  {
+    text: 'このマーカーまでの距離を計測',
+    callback: measureToThisMarker
+  }
+];
+const circleMenuItems =  [
+  {
+    text: '円を削除',
+    callback: removeCircle,
+  },
+  {
+    text: '円の中心からの距離を計測',
+    callback: measureFromThisCircle
+  },
+  {
+    text: '円の中心までの距離を計測',
+    callback: measureToThisCircle
+  },
+];
+
+/*---------------------------------------------------------
 // proj4js のセットアップ
+---------------------------------------------------------*/
 proj4.defs(proj4Defs);
 
+/*---------------------------------------------------------
+// アプリ実装開始---------------------------------------------------------*/
 // ウィンドウサイズに応じてデータテーブルの大きさを変える
 window.addEventListener('resize', () => {
   const viewPortWidth = Math.max(document.querySelector('.container-fluid').clientWidth, window.innerWidth || 0);
@@ -192,8 +255,6 @@ window.addEventListener("afterprint", (event) => {
 document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
   // 緯度経度テーブルのデータが全て削除されていると blTableValue.length は 1 になる
   if (sourceDataTable.getData(false).length > 1) {
-    const selectMarkerIcon = document.getElementById('selectMarkerIcon');
-    const lineColor = document.getElementById('selectLineColor');
     const formData = collectFormData();
     // マーカーに必要な緯度経度に変換するため、変換先パラメータは緯度経度で決め打ちしている
     const convertParameter = createConvertParameter(formData.sourceGeodeticSystem,
@@ -202,36 +263,23 @@ document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
       '0');
     const sourceData = sourceDataCleansing(sourceDataTable.getJson(false));
     const convertedData = convertData(convertParameter, sourceData);
-    let iconColor = ''
-
-    switch (selectMarkerIcon.value) {
-      case 'redPinMarker':
-        iconColor = pinMarkers.red;
-        break;
-      case 'bluePinMarker':
-        iconColor = pinMarkers.blue;
-        break;
-      case 'yellowPinMarker':
-        iconColor = pinMarkers.yellow;
-        break;
-      default:
-        iconColor = pinMarkers.green;
-        break;
-    }
+    const iconColor = document.getElementById('selectMarkerIcon').value;
+    let lineColor = selectLineColor(false);
 
     convertedData.forEach((data) => {
       try {
-        L.marker([Number(data[0]), Number(data[1])], { icon: iconColor }).addTo(map).on('click', (e) => {
-          e.target.remove()
-        });
+        const marker = createMarker(Number(data[0]), Number(data[1]), iconColor, markerMenuItems);
+        marker.addTo(map);
       } catch (error) {
         displayErrorMessage(error);
       }
       try {
-        if (lineColor.value != 'no') {
-          L.polyline(convertedData, { color: lineColor.value}).addTo(map).on('click', (e) => {
-            e.target.remove()
-          });
+        if (lineColor != 'no') {
+          L.polyline(convertedData,
+            {
+              color: lineColor
+            }
+            ).addTo(map);
         }
       } catch (error) {
         displayErrorMessage(error);
@@ -267,7 +315,6 @@ document.getElementById('removeMarkerBtn').addEventListener('click', (e) => {
       map.removeLayer(layer);
     }
   })
-  map.eachLayer((layer) => console.log(layer));
   e.preventDefault();
 })
 
@@ -393,28 +440,15 @@ function afterPrint() {
   })
 }
 
-// 地図をクリックして円を追加する処理
-// 半径を入力するダイアログを表示する処理
-map.addEventListener('click', (e) => {
-  const dialog = document.getElementById('inputDiameter');
-  dialog.showModal();
-  document.getElementById('radius').select(); 
-  document.getElementById('latitude').value = e.latlng.lat;
-  document.getElementById('longitude').value = e.latlng.lng;
-  dialog.addEventListener('click', (e) => {
-    if (e.target.id === 'inputDiameter') {
-      dialog.close();
-    }
-  })
-})
 // 円の半径を入力するダイアログの「追加」ボタンをクリックしたときの処理
 document.getElementById('addCircleToMap').addEventListener('click', (e) => {
   let latitude = document.getElementById('latitude').value;
   let longitude = document.getElementById('longitude').value;
-  let selectLineColor = document.getElementById('selectLineColor');
-  let lineColor = 'red';
-  if (selectLineColor.value != 'no') {
-    lineColor = selectLineColor.value;
+  // let selectLineColor = ;
+  let lineColor = selectLineColor()
+  let markerColor = document.getElementById('selectLineColor').value;
+  if (markerColor == 'no') {
+    markerColor = 'red';
   }
   let circleRadius = document.getElementById('radius'); 
   let radius = 0;
@@ -427,15 +461,29 @@ document.getElementById('addCircleToMap').addEventListener('click', (e) => {
     opacity: 1.0,
     fill: true,
     fillOpacity: 0.05,
-    // circle はイベントバブリングがデフォルトで有効。
-    // バブリングが有効だと、円を削除するためにクリックした時に、
-    // 円が削除されると同時に新しい円が描画されてしまう。
-    // オプションの説明は https://leafletjs.com/reference.html#circle-bubblingmouseevents 参照
-    bubblingMouseEvents: false
-  }
-  L.circle([Number(latitude), Number(longitude)], circleOption).addTo(map).on('click', (e) => {
+    contextmenu: true,
+    contextmenuInheritItems: false,
+    contextmenuItems: circleMenuItems
+  };
+  let centerMarkerOption = {
+    icon: centerMarkers[markerColor],
+    contextmenu: true,
+    contextmenuInheritItems: false,
+    contextmenuItems: circleMenuItems
+  };
+  L.circle([Number(latitude), Number(longitude)], circleOption).addTo(map);
+  L.marker([Number(latitude), Number(longitude)], centerMarkerOption).addTo(map).on('click', (e) => {
     e.target.remove();
   })
+  const tooltipOption = {
+    offset: L.point(0, 1),
+    direction: 'bottom',
+    permanent: true,
+    content: '半径: ' + radius + 'm',
+    className: 'tooltipVisual',
+    opacity: 1.0
+  }
+  L.tooltip([Number(latitude), Number(longitude)], tooltipOption).addTo(map);
   circleRadius.value = '0';
   document.getElementById('inputDiameter').close();
   e.preventDefault();
@@ -450,6 +498,221 @@ document.getElementById('inputDiameter').addEventListener('close', (e) => {
   document.getElementById('radius').value = '0';
   e.preventDefault();
 })
+
+// 引数の `e` に含まれる情報は「クリックした場所の情報（緯度経度とピクセル情報）と親要素の緯度経度」のみである。
+// そのため、引数だけでは「どの円をクリックしたか」判別できない。
+function removeCircle(e) {
+  // 中心点のマーカーの削除で使う円の緯度経度情報
+  // （中心点の緯度経度は円の中心の緯度経度と同じ）
+  let circleCenter = null;
+  map.eachLayer((layer) => {
+    if (layer._mRadius != undefined) {
+      // クリックした場所から円の中心点の距離を算定
+      const distanceLatLngs = map.distance(e.latlng, layer._latlng);
+      // 上の距離が円の半径以下なら、削除したい円の内側がクリックされたと判断する
+      if (distanceLatLngs <= layer._mRadius) {
+        circleCenter = layer._latlng;
+        layer.remove();
+        if (layer._latlng == measureStartPoint) {
+          measureStartPoint = null;
+        } else if (layer._latlng == measureEndPoint) {
+          measureEndPoint = null;
+        }
+      }
+    }
+    // 円の中心点 marker と半径を示す tooltip の削除
+    if (layer._latlng != undefined && circleCenter != null) {
+      if (layer._latlng.lat == circleCenter.lat && layer._latlng.lng == circleCenter.lng) {
+        layer.remove();
+      }
+    }
+    // 距離計測で描画した polyline の削除
+    if (layer._latlngs != undefined) {
+      layer._latlngs.forEach((latlng) => {
+        console.table(latlng);
+        if (Number(latlng.lat) == circleCenter.lat && Number(latlng.lng) == circleCenter.lng) {
+          layer.remove();
+        }
+      })
+    }
+  })
+}
+
+// 円の中心点からの距離を計測する処理
+function measureFromThisCircle(e) {
+  map.eachLayer((layer) => {
+    if (layer._mRadius != undefined) {
+      const distanceLatLngs = map.distance(e.latlng, layer._latlng);
+      if (distanceLatLngs <= layer._mRadius) {
+        measureStartPoint = layer._latlng;
+      }
+    }
+  })
+  if (measureEndPoint != null) {
+    measureLength('circle');
+  }
+}
+function measureToThisCircle(e) {
+  map.eachLayer((layer) => {
+    if (layer._mRadius != undefined) {
+      const distanceLatLngs = map.distance(e.latlng, layer._latlng);
+      if (distanceLatLngs <= layer._mRadius) {
+        measureEndPoint = layer._latlng;
+      }
+    }
+  })
+  if (measureStartPoint != null) {
+    measureLength('circle');
+  }
+}
+
+// 半径を入力するダイアログを表示する処理
+function openRadiusInputDialog(e) {
+  const dialog = document.getElementById('inputDiameter');
+  dialog.showModal();
+  document.getElementById('radius').select(); 
+  document.getElementById('latitude').value = e.latlng.lat;
+  document.getElementById('longitude').value = e.latlng.lng;
+  dialog.addEventListener('click', (e) => {
+    if (e.target.id === 'inputDiameter') {
+      dialog.close();
+    }
+  })
+}
+
+// 個別にマーカーを追加する処理
+function addMarker(e) {
+  const iconColor = document.getElementById('selectMarkerIcon').value;
+  const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor, markerMenuItems);
+  marker.bindTooltip('緯度経度: ' + Number(e.latlng.lat) + ', ' + e.latlng.lng, {}).openTooltip();
+  marker.addTo(map);
+}
+
+// 任意の2点間の距離を計測する処理
+function measureFromThisPoint(e) {
+  const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), 'length', markerMenuItems);
+  marker.addTo(map);
+  measureStartLocation = marker._latlng;
+  if (measureEndLocation != null) {
+    measureLength('point');
+  }
+}
+function measureToThisPoint(e) {
+  const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), 'length', markerMenuItems);
+  marker.addTo(map);
+  measureEndLocation = marker._latlng;
+  if (measureStartLocation != null) {
+    measureLength('point');
+  }
+}
+
+// 選択したマーカーを削除する処理
+function removeSelectedMarker(e) {
+  const selectedMarkerId = e.relatedTarget._leaflet_id;
+  let markerLatLng = null;
+  map.eachLayer((layer) => {
+    if (layer._leaflet_id == selectedMarkerId) {
+      // これから削除するマーカーにかかる距離計測で描画した
+      // Polyline の緯度経度は削除するマーカーと同じため、
+      // Polyline を削除するために緯度経度情報を控えておく。
+      markerLatLng = layer._latlng;
+      layer.remove();
+      if (layer._latlng == measureStartPoint) {
+        measureStartPoint = null;
+      } else if (layer._latlng == measureEndPoint) {
+        measureEndPoint = null;
+      }
+    }
+    if (layer._latlngs != undefined) {
+      layer._latlngs.forEach((latlng) => {
+        if (Number(latlng.lat) == markerLatLng.lat && Number(latlng.lng) == markerLatLng.lng ) {
+          layer.remove();
+        }
+      })
+    }
+  })
+}
+
+// マーカー同士の距離計測の準備
+function measureFromThisMarker(e) {
+  // 選択したマーカーを判別するために `leaflet_id` を取得
+  const startMarkerId = e.relatedTarget._leaflet_id;
+  map.eachLayer((layer) => {
+    if (layer._leaflet_id == startMarkerId) {
+      measureStartPoint = layer._latlng;
+    }
+  })
+  if (measureEndPoint != null) {
+    measureLength('marker');
+  }
+}
+function measureToThisMarker(e) {
+  const endMarkerId = e.relatedTarget._leaflet_id;
+  map.eachLayer((layer) => {
+    if (layer._leaflet_id == endMarkerId) {
+      measureEndPoint = layer._latlng;
+    }
+  })
+  if (measureStartPoint != null) {
+    measureLength('marker');
+  }
+}
+
+// 2点間の距離計測処理
+function measureLength(referrer) {
+  let measureStart = null;
+  let measureEnd = null;
+  if (referrer == 'marker' || referrer == 'circle') {
+    measureStart = measureStartPoint;
+    measureEnd = measureEndPoint;
+  } else {
+    measureStart = measureStartLocation;
+    measureEnd = measureEndLocation;
+  }
+  const startLatLng = L.latLng(Number(measureStart.lat), Number(measureStart.lng));
+  const endLatLng = L.latLng(Number(measureEnd.lat), Number(measureEnd.lng));
+  const polyline = L.polyline([startLatLng, endLatLng], {
+    renderer: L.svg(),
+    weight: 4,
+    color: '#696969',
+  });
+  polyline.arrowheads(
+  {
+    yawn: 45,
+    size: '25px',
+  });
+  polyline.addTo(map);
+  const polylineTooltip = L.tooltip(polyline.getCenter(), {
+    content: '距離: ' + Math.round(map.distance(startLatLng, endLatLng)) + 'm',
+    direction: 'center',
+    permanent: true
+  })
+  polyline.bindTooltip(polylineTooltip);
+}
+
+// 線の色を選択する処理
+function selectLineColor(shouldReturnDefaultColor=true) {
+  let selectLineColor = document.getElementById('selectLineColor');
+  let lineColor = ''
+  switch (selectLineColor.value) {
+    case 'red':
+      lineColor = '#8b4513';
+      break;
+    case 'blue':
+      lineColor = '#4682b4';
+      break;
+    case 'yellow':
+      lineColor = '#ffd700';
+      break;
+    case 'green':
+      lineColor = '#2e8b57';
+      break;
+    default:
+      lineColor = shouldReturnDefaultColor ? '#8b4513' : 'no'
+      break;
+  }
+  return lineColor;
+};
 
 window.onerror = function myErrorHandler(errorMsg) {
   document.getElementById('errorMessage').innerText = errorMsg;

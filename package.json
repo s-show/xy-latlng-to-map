@@ -19,6 +19,9 @@
     "bootstrap": "^5.3.2",
     "jspreadsheet-ce": "^4.13.4",
     "leaflet": "^1.9.4",
+    "leaflet-arrowheads": "^1.4.0",
+    "leaflet-contextmenu": "^1.4.0",
+    "leaflet-geometryutil": "^0.10.3",
     "proj4": "^2.9.2"
   }
 }

@@ -28,21 +28,21 @@
               <div class="accordion-body">
                 <div class="accordion" id="userGuideDetail">
                   <div class="accordion-item">
-                    <h1 class="accordion-header border border-1 border-dark-subtle rounded" id="addMarkerToMapGuide">
+                    <h1 class="accordion-header border border-1 border-dark-subtle rounded" id="addMarkersToMapGuide">
                       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#addMarkerToMapGuideDetail" aria-expanded="false"
-                        aria-controls="addMarkerToMapGuideDetail">
-                        地図にマーカーを表示
+                        data-bs-target="#addMarkersToMapGuideDetail" aria-expanded="false"
+                        aria-controls="addMarkersToMapGuideDetail">
+                        XY座標 or 緯度経度のリストから一括してマーカーを追加する方法
                       </button>
                     </h1>
-                    <div id="addMarkerToMapGuideDetail" class="accordion-collapse collapse"
+                    <div id="addMarkersToMapGuideDetail" class="accordion-collapse collapse"
                       data-bs-parent="#userGuideDetail">
                       <div class="accordion-body border border-2 border-dark-subtle rounded">
                         <ol class="userGuide">
-                          <li>用意したXY座標または緯度経度の詳細な情報を選択します</li>
-                          <li>データテーブルに用意したXY座標または緯度経度を入力します</li>
-                          <li>「地図加工」タブの「マーカーの色」から好きな色を選択します</li>
-                          <li>「地図加工」タブの「マーカー追加」ボタンをクリックします</li>
+                          <li>使用するXY座標 or 緯度経度の詳細な情報を「データ詳細情報」の欄で選択します</li>
+                          <li>データテーブルに使用するXY座標 or 緯度経度を入力するか貼り付けします</li>
+                          <li>「地図加工」タブの「マーカーの色」で色を選択します。マーカー同士を線で繋ぐ場合、「線の有無・色」で色を選択します。</li>
+                          <li>「地図加工」タブの「マーカーの一括追加」ボタンをクリックします</li>
                         </ol>
                       </div>
                     </div>
@@ -52,15 +52,92 @@
                       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#addCircleToMapGuideDetail" aria-expanded="false"
                         aria-controls="addCircleToMapGuideDetail">
-                        地図の指定した場所を中心とした円を表示
+                        地図の指定した場所に円を追加する方法
                       </button>
                     </h1>
                     <div id="addCircleToMapGuideDetail" class="accordion-collapse collapse"
                       data-bs-parent="#userGuideDetail">
                       <div class="accordion-body border border-2 border-dark-subtle rounded">
                         <ol class="userGuide">
-                          <li>地図を動かして円を追加したい場所を表示してその場所をクリックします。</li>
-                          <li>半径を入力する画面が表示されたら、半径を入力して追加ボタンをクリックします。</li>
+                          <li>地図を動かして円を追加したい場所を表示します</li>
+                          <li>円を追加したい場所で右クリックして、表示されるメニューから「円を追加」をクリックします。</li>
+                          <li>半径を入力する画面が表示されたら、半径（メートル単位）を入力して追加ボタンをクリックします。</li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h1 class="accordion-header border border-1 border-dark-subtle rounded" id="addMarkerToMapGuide">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#addMarkerToMapGuideDetail" aria-expanded="false"
+                        aria-controls="addMarkerToMapGuideDetail">
+                        地図の指定した場所にマーカーを追加する方法
+                      </button>
+                    </h1>
+                    <div id="addMarkerToMapGuideDetail" class="accordion-collapse collapse"
+                      data-bs-parent="#userGuideDetail">
+                      <div class="accordion-body border border-2 border-dark-subtle rounded">
+                        <ol class="userGuide">
+                          <li>地図を動かしてマーカーを追加したい場所を表示します</li>
+                          <li>マーカーを追加したい場所で右クリックして、表示されるメニューから「マーカーを追加」をクリックします。マーカーの色は、「地図加工」タブの「マーカーの色」で選択した色になります。</li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h1 class="accordion-header border border-1 border-dark-subtle rounded" id="measureDistance2Points">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#measureDistance2PointsDetail" aria-expanded="false"
+                        aria-controls="measureDistance2PointsDetail">
+                        地図の任意の2点間の距離を計測する方法
+                      </button>
+                    </h1>
+                    <div id="measureDistance2PointsDetail" class="accordion-collapse collapse"
+                      data-bs-parent="#userGuideDetail">
+                      <div class="accordion-body border border-2 border-dark-subtle rounded">
+                        <ol class="userGuide">
+                          <li>地図を動かして距離を計測したい場所を表示します</li>
+                          <li>最初の計測地点で右クリックして表示されるメニューから「この地点からの距離を計測」をクリックします。</li>
+                          <li>2つ目の計測地点で右クリックして表示されるメニューから「この地点までの距離を計測」をクリックします。</li>
+                          <li>計測地点を増やしたい場合、計測地点に加えたい場所で右クリックして表示されるメニューから「この地点から（まで）の距離を計測」をクリックして、計測地点を増やしていきます。</li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h1 class="accordion-header border border-1 border-dark-subtle rounded" id="measureDistanceMarkers">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#measureDistanceMarkersDetail" aria-expanded="false"
+                        aria-controls="measureDistanceMarkersDetail">
+                        マーカーや円の中心点からの距離を計測する方法
+                      </button>
+                    </h1>
+                    <div id="measureDistanceMarkersDetail" class="accordion-collapse collapse"
+                      data-bs-parent="#userGuideDetail">
+                      <div class="accordion-body border border-2 border-dark-subtle rounded">
+                        <ol class="userGuide">
+                          <li>地図を動かして距離を計測したいマーカーや円を表示します</li>
+                          <li>最初の計測地点となるマーカー or 円を右クリックして表示されるメニューから「このマーカーからの距離を計測」or「円の中心からの距離を計測」をクリックします。</li>
+                          <li>2つ目の計測地点となるマーカー or 円を右クリックして表示されるメニューから「このマーカーまでの距離を計測」or「円の中心までの距離を計測」をクリックします。</li>
+                          <li>計測地点を増やしたい場合、計測地点に加えたいマーカー or 円を右クリックして表示されるメニューから「このマーカーから（まで）の距離を計測」or「円の中心から（まで）の距離を計測」をクリックして、計測地点を増やしていきます。</li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h1 class="accordion-header border border-1 border-dark-subtle rounded" id="deleteMarker">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#deleteMarkerDetail" aria-expanded="false"
+                        aria-controls="deleteMarkerDetail">
+                        マーカーや円を削除する方法
+                      </button>
+                    </h1>
+                    <div id="deleteMarkerDetail" class="accordion-collapse collapse"
+                      data-bs-parent="#userGuideDetail">
+                      <div class="accordion-body border border-2 border-dark-subtle rounded">
+                        <ol class="userGuide">
+                          <li>削除したいマーカーや円の上で右クリックします</li>
+                          <li>右クリックして表示されるメニューから「マーカーを削除」or「円を削除」をクリックします。</li>
                         </ol>
                       </div>
                     </div>
@@ -122,6 +199,7 @@
             value="BL" id="sourceIsBL">
           <label class="form-check-label mb-1" for="sourceIsBL">緯度経度</label>
         </div>
+        <p class="d-print-none">使用するデータの種類を選択してください。</p>
       </div>
       <div class="col-lg-4 border-lg-end border-sm-bottom border-lg-bottom-0 border-bottom border-black py-lg-0 py-sm-2 py-2">
         <p class="mb-1 fs-5">測地系</p>
@@ -140,6 +218,7 @@
             name="sourceGeodeticSystem" value="JGD2011">
           <label class="form-check-label mb-1" for="sourceIsJGD2011">世界測地系（JGD2011）</label>
         </div>
+        <p class="d-print-none">使用するデータの測地系を選択してください。測地系の解説は以下のボタンで開きます。</p>
         <!-- 測地系の部分 -->
         <div class="mt-2">
           <button type="button" id="openGeodeticSystemDialog" class="btn btn-info d-print-none">系番号の解説</button>
@@ -314,6 +393,7 @@
       <div class="col-lg-3">
         <h3 id="headerDataTable">データテーブル</h3>
         <div id="sourceDataTable"></div>
+        <p>使用するデータを入力または貼り付けしてください。</p>
         <div>
           <button id="clearSourceDataTableBtn" type="button" class="btn btn-danger mb-3 d-print-none">データを削除</button>
           <button id="openConsiderationsDialog" type="button" class="btn btn-secondary mb-3 d-print-none">注意事項を確認</button>
@@ -360,12 +440,12 @@
             <div class="tab-content-div p-3 border border-2 border-dark-subtle">
               <div class="row pb-3 border-bottom border-2 border-dark-subtle d-print-none">
                 <div class="col-xl-2 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
-                  <label class="mb-1 fs-6" for="selectMarkerIcon">マーカーの種類</label>
+                  <label class="mb-1 fs-6" for="selectMarkerIcon">マーカーの色</label>
                   <select id="selectMarkerIcon" class="form-select border border-2 border-dark-subtle mt-1 mb-1">
-                    <option value="redPinMarker">赤色ピン</option>
-                    <option value="bluePinMarker">青色ピン</option>
-                    <option value="yellowPinMarker">黄色ピン</option>
-                    <option value="greenPinMarker">緑色ピン</option>
+                    <option value="red">赤</option>
+                    <option value="blue">青</option>
+                    <option value="yellow">黄</option>
+                    <option value="green">緑</option>
                   </select>
                   <p class="fs-6 mb-0">地図に追加するマーカーの色を選択します。</p>
                 </div>
@@ -373,21 +453,30 @@
                   <label class="mb-1 fs-6" for="selectLineColor">線の有無・色</label>
                   <select id="selectLineColor" class="form-select border border-2 border-dark-subtle mt-1 mb-1">
                     <option value="no">線無し</option>
-                    <option value="red">赤線</option>
-                    <option value="blue">青線</option>
-                    <option value="yellow">黄線</option>
-                    <option value="green">緑線</option>
+                    <option value="red">赤</option>
+                    <option value="blue">青</option>
+                    <option value="yellow">黄</option>
+                    <option value="green">緑</option>
                   </select>
-                  <p class="fs-6 mb-0">マーカーを結ぶ線の有無と色を指定します。この色は円の色にも使います。</p>
+                  <p class="fs-6 mb-0">マーカーを結ぶ線の有無や色を指定します。この色は円の色にも使います。</p>
                 </div>
                 <div class="col-xl-2 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
-                  <button id="addMarkerBtn" class="btn btn-primary my-1">マーカー追加</button>
-                  <button id="removeMarkerBtn" class="btn btn-danger my-1">図形を全削除</button>
+                  <button id="addMarkerBtn" class="btn btn-primary my-1">マーカーの一括追加</button>
+                  <button id="removeMarkerBtn" class="btn btn-danger my-1">全図形を削除</button>
                 </div>
-                <div class="col-xl-2 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
-                  <p class="fs-6 mb-0">地図上でクリックすると円を描画できます。色は、デフォルトの赤 or 左の欄で選んだ色です。クリックして表示される画面で半径を指定します。</p>
+                <div class="col-xl-4 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
+                  <p class="fs-6 mb-0">地図上で右クリックして表示されるメニューから次のことができます。</p>
+                  <ul>
+                    <li>円やマーカーを地図に追加。色は左の欄で選んだ色になります。</li>
+                    <li>任意の2点間の距離を計測</li>
+                  </ul>
+                  <p class="fs-6 mb-0">円やマーカー上で右クリックして表示されるメニューから次のことができます。</p>
+                  <ul>
+                    <li>円の中心点やマーカーからの距離を計測</li>
+                    <li>円やマーカーを削除</li>
+                  </ul>
                 </div>
-                <div id="zoomRangeWrap" class="col-xl-4 py-xl-0 py-sm-2 py-2">
+                <div id="zoomRangeWrap" class="col-xl-2 py-xl-0 py-sm-2 py-2">
                   <div>
                     <label for="zoomRange" class="mb-2 fs-6">地図を引き伸ばす</label>
                   </div>
@@ -402,7 +491,6 @@
                   </datalist>
                 </div>
               </div>
-              <p id="iconInformation" class="mt-2 d-print-none">マーカー、線および円はクリックして消せます。地図が表示されない時は縮尺を変えてみてください。</p>
               <div class="mapContainer">
                 <div id="map" class="mb-2 map"></div>
               </div>

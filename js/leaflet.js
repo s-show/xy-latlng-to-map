@@ -1,14 +1,23 @@
-const getImage = (fileName) => {
-  return new URL(`../assets/${fileName}.png`, import.meta.url).href;
+const getImage = (fileName, fileType='png') => {
+  if (fileType == 'jpg') {
+    return new URL(`../assets/${fileName}.jpg`, import.meta.url).href;
+  } else if (fileType == 'jpeg') {
+    return new URL(`../assets/${fileName}.jpeg`, import.meta.url).href;
+  } else if (fileType == 'svg') {
+    return new URL(`../assets/${fileName}.svg`, import.meta.url).href;
+  } else {
+    return new URL(`../assets/${fileName}.png`, import.meta.url).href;
+  }
 };
+
 // Google map の航空写真
-const googlemapHybrid = L.gridLayer.googleMutant({
-	type: "hybrid", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-});
+// const googlemapHybrid = L.gridLayer.googleMutant({
+// 	type: "hybrid", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+// });
 // // Google map の通常地図
-const googlemapRoadmap = L.gridLayer.googleMutant({
-	type: "roadmap", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-});
+// const googlemapRoadmap = L.gridLayer.googleMutant({
+// 	type: "roadmap", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+// });
 // 地理院地図の標準地図タイル
 const gsiStandard = L.tileLayer(
   'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', 
@@ -56,8 +65,8 @@ const gsiSatellite1961_1969 = L.tileLayer(
 );
 
 const baseMaps = {
-  "Google Map (航空写真)": googlemapHybrid,
-  "Google Map (地図)": googlemapRoadmap,
+  // "Google Map (航空写真)": googlemapHybrid,
+  // "Google Map (地図)": googlemapRoadmap,
   "地理院地図 (標準地図)": gsiStandard,
   "地理院地図 (淡色地図)": gsiPale,
   "地理院地図 (航空写真)": gsiSatellite,
@@ -65,36 +74,81 @@ const baseMaps = {
   "地理院地図 (航空写真・1961-69年)": gsiSatellite1961_1969,
 }
 
-const redPinMarker = L.icon({
-  iconUrl: getImage('redPinMarker'),
-  iconSize:     [30, 30], // size of the icon
-  iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
+const markerSize = [30, 30]
+const markerAnchor = [15, 30]
+const redMarker = L.icon({
+  iconUrl: getImage('redPinMarker', 'svg'),
+  iconSize: markerSize,
+  iconAnchor: markerAnchor
 });
-const bluePinMarker = L.icon({
-  iconUrl: getImage('bluePinMarker'),
-  iconSize:     [30, 30], // size of the icon
-  iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
+const blueMarker = L.icon({
+  iconUrl: getImage('bluePinMarker', 'svg'),
+  iconSize: markerSize,
+  iconAnchor: markerAnchor
 });
-const yellowPinMarker = L.icon({
-  iconUrl: getImage('yellowPinMarker'),
-  iconSize:     [30, 30], // size of the icon
-  iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
+const yellowMarker = L.icon({
+  iconUrl: getImage('yellowPinMarker', 'svg'),
+  iconSize: markerSize,
+  iconAnchor: markerAnchor
 });
-const greenPinMarker = L.icon({
-  iconUrl: getImage('greenPinMarker'),
-  iconSize:     [30, 30], // size of the icon
-  iconAnchor:   [15, 30], // point of the icon which will correspond to marker's location
+const greenMarker = L.icon({
+  iconUrl: getImage('greenPinMarker', 'svg'),
+  iconSize: markerSize,
+  iconAnchor: markerAnchor
 });
-
-const pinMarkers = {
-  'red': redPinMarker,
-  'blue': bluePinMarker,
-  'yellow': yellowPinMarker,
-  'green': greenPinMarker,
+const lengthMarker = L.icon({
+  iconUrl: getImage('lengthIcon', 'svg'),
+  iconSize: markerSize,
+  iconAnchor: markerAnchor,
+  className: 'lengthStartIcon'
+})
+const markers = {
+  'red': redMarker,
+  'blue': blueMarker,
+  'yellow': yellowMarker,
+  'green': greenMarker,
+  'length': lengthMarker,
 }
 
-function addCircle(latLng, diameter) {
-  console.log(latLng);
+const centerMarkerSize = [30, 30] // size of the icon
+const centerMarkerAnchor = [15, 15] // point of the icon which will correspond to marker's location
+const redCenterMarker = L.icon({
+  iconUrl: getImage('redCenterMarker', 'svg'),
+  iconSize: centerMarkerSize,
+  iconAnchor: centerMarkerAnchor,
+});
+const blueCenterMarker = L.icon({
+  iconUrl: getImage('blueCenterMarker', 'svg'),
+  iconSize: centerMarkerSize,
+  iconAnchor: centerMarkerAnchor,
+});
+const yellowCenterMarker = L.icon({
+  iconUrl: getImage('yellowCenterMarker', 'svg'),
+  iconSize: centerMarkerSize,
+  iconAnchor: centerMarkerAnchor,
+});
+const greenCenterMarker = L.icon({
+  iconUrl: getImage('greenCenterMarker', 'svg'),
+  iconSize: centerMarkerSize,
+  iconAnchor: centerMarkerAnchor,
+});
+const centerMarkers = {
+  'red': redCenterMarker,
+  'blue': blueCenterMarker,
+  'yellow': yellowCenterMarker,
+  'green': greenCenterMarker,
 }
 
-export { gsiStandard, baseMaps, pinMarkers, addCircle }
+const lengthIconSize = [30, 30] // size of the icon
+const lengthIconAnchor = [15, 30] // point of the icon which will correspond to marker's location
+const lengthStartIcon = L.icon({
+  iconUrl: getImage('lengthIcon', 'svg'),
+  iconSize: centerMarkerSize,
+  iconAnchor: lengthIconAnchor,
+  className: 'lengthStartIcon'
+})
+const lengthIcons = {
+  'start': lengthStartIcon,
+}
+
+export { gsiStandard, baseMaps, markers, centerMarkers, lengthIcons }
