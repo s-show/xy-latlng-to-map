@@ -1,18 +1,29 @@
 import { isValidNumber } from "./isvalidNumber";
 import { zen2han } from "./zen2han";
+import { dms2deg } from "../js/DMSLatLngParser.js";
 import "jsuites/dist/jsuites.js";
 import "jsuites/dist/jsuites.css";
 import "jspreadsheet-ce/dist/jspreadsheet.css";
 import jspreadsheet from "jspreadsheet-ce";
 
-// 変換できるのは数値だけなので、数値以外は無視するようにしている。
-// ただし、桁区切りで使われる `,` を取り除けば数値とみなせる値は受け入れている。
+/* 
+ * 入力値または貼り付け値を事前確認して不適当なデータを無視する処理。
+ * 入力値または貼り付け値に「度 or °」が含まれていなければ、
+ * 十進数形式の緯度経度かXY座標と判断して数値以外は無視している。
+ * ただし、桁区切りの `,` を取り除けば数値とみなせる値は受け入れる。
+ * 入力値または貼り付け値に「度 or °」が含まれていれば、
+ * 度分秒形式の緯度経度を十進数形式の緯度経度に変換している。
+*/
 const beforechange = (instance, cell, x, y, value) => {
-  value = value.replace(',', '');
-  if (isValidNumber(zen2han(value))) {
-    return zen2han(value);
+  if (value.match(/度|°/) == null) {
+    value = value.replace(',', '');
+    if (isValidNumber(zen2han(value))) {
+      return zen2han(value);
+    } else {
+      return '';
+    }
   } else {
-    return '';
+    return dms2deg(value);
   }
 }
 

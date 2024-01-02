@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "big.js": "^6.2.1",
     "bootstrap": "^5.3.2",
     "jspreadsheet-ce": "^4.13.4",
     "leaflet": "^1.9.4",

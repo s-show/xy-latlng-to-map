@@ -32,15 +32,15 @@
                       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#addMarkersToMapGuideDetail" aria-expanded="false"
                         aria-controls="addMarkersToMapGuideDetail">
-                        XY座標 or 緯度経度のリストから一括してマーカーを追加する方法
+                        XY座標または緯度経度のリストから一括してマーカーを追加する方法
                       </button>
                     </h1>
                     <div id="addMarkersToMapGuideDetail" class="accordion-collapse collapse"
                       data-bs-parent="#userGuideDetail">
                       <div class="accordion-body border border-2 border-dark-subtle rounded">
                         <ol class="userGuide">
-                          <li>使用するXY座標 or 緯度経度の詳細な情報を「データ詳細情報」の欄で選択します</li>
-                          <li>データテーブルに使用するXY座標 or 緯度経度を入力するか貼り付けします</li>
+                          <li>使用するXY座標または緯度経度の詳細な情報を「データ詳細情報」の欄で選択します</li>
+                          <li>使用するXY座標または緯度経度をデータテーブルに入力するか貼り付けします</li>
                           <li>「地図加工」タブの「マーカーの色」で色を選択します。マーカー同士を線で繋ぐ場合、「線の有無・色」で色を選択します。</li>
                           <li>「地図加工」タブの「マーカーの一括追加」ボタンをクリックします</li>
                         </ol>
@@ -154,11 +154,11 @@
                       data-bs-parent="#userGuideDetail">
                       <div class="accordion-body border border-2 border-dark-subtle rounded">
                         <ol class="userGuide">
-                          <li>変換元データのデータの詳細な情報を選択します</li>
-                          <li>データテーブルに変換元データを入力します</li>
+                          <li>変換したいデータの詳細な情報を「データ詳細情報」の欄で選択します</li>
+                          <li>変換したいデータをデータテーブルに入力するか貼り付けします</li>
                           <li>「データ変換」タブで変換先のXY座標または緯度経度の詳細な情報を選択します</li>
                           <li>「データ変換」タブの「変換」ボタンをクリックします</li>
-                          <li>変換後のデータは、テーブル上で右クリックして「コピー」をクリックすればコピーできます</li>
+                          <li>変換後のデータは、テーブル上で右クリックして「コピー」を選択すればコピーできます</li>
                         </ol>
                       </div>
                     </div>
@@ -424,17 +424,16 @@
           <dialog id="considerationsDialog">
             <div class="innerDialog">
               <ul class="">
-                <li class="">数値のみ入力できます。</li>
-                <li class="">Excelから貼り付けられます。</li>
+                <li class="">入力できる値の形式は次のとおりです。</li>
+                <ul>
+                  <li>XY座標</li>
+                  <li>度分秒形式の緯度経度（例: 35度39分29.1572秒、35°39′29.1572″、北緯35度39分29秒1572）</li>
+                  <li>十進数形式の緯度経度（例: 35.658099）</li>
+                </ul>
+                <li class="">Excelから貼り付けられます。また、タブ区切りのテキストも貼り付けられます。</li>
                 <li class="">空白行は無視して処理します。</li>
                 <li class="">行の削除は、セルの上で右クリックして「選択した行を削除」をクリックします。</li>
-                <li>「36度6分16.60秒」の度分秒の形式の緯度経度は「36.104611」の10進数に変換して入力します。変換式は以下のとおりです</li>
-                <dl class="dl-inline same-width">
-                  <dt>変換式</dt>
-                  <dd>度 + (分÷60) + (秒÷3600)</dd>
-                  <dt>実例</dt>
-                  <dd>36 + (6 / 60) + (16.60 / 3600) = 36.1046111111</dd>
-                </dl>
+                <li>「35度39分29.1572秒」の度分秒形式の緯度経度を貼り付けると自動的に「35.658099」の10進数形式に変換されます。</li>
               </ul>
               <button type="button" id="closeConsiderationsDialog" class="btn btn-secondary">閉じる</button>
             </div>
