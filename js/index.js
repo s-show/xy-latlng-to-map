@@ -129,6 +129,33 @@ window.addEventListener('resize', () => {
   }
 })
 
+// 測地系と系番号の説明画面から該当する項目を選択できるようにする処理 
+window.addEventListener('load', () => {
+  // 測地系の説明画面の処理
+  const geodeticSystemSelectBtn = document.querySelectorAll('[data-geodeticSystem]')
+  const geodeticSystemRadioBtn = document.getElementsByName('sourceGeodeticSystem');
+  geodeticSystemSelectBtn.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      geodeticSystemRadioBtn.forEach((radioBtn) => {
+        if (e.target.getAttribute('data-geodeticSystem') == radioBtn.value) {
+          radioBtn.checked = true;
+        }
+      })
+      document.getElementById('geodeticSystemDialog').close();
+    })
+  })
+  // 系番号の説明画面の処理
+  const zoneNoSelectBtn = document.querySelectorAll('[data-zone-no]')
+  const sourceZoneNo = document.getElementById('sourceZoneNo');
+  zoneNoSelectBtn.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      sourceZoneNo.value = e.target.getAttribute('data-zone-no');
+      sourceZoneNo.options[0].disabled = true;
+      document.getElementById('zoneNoDialog').close();
+    })
+  })
+});
+
 // 印刷時に選択していない項目を非表示にするラジオボタン
 const noPrintRadioBtn = [
   'sourceDataType',
@@ -141,7 +168,7 @@ const noPrintRadioBtn = [
 document.getElementsByName('sourceDataType').forEach((selectedBtn) => {
   selectedBtn.addEventListener('input', (e) => {
     const sourceZoneNo = document.getElementById('sourceZoneNo');
-    if (e.target.value === 'BL') {
+    if (e.target.value === 'latlng') {
       sourceZoneNo.options[0].selected = true;
       sourceZoneNo.disabled = true;
     } else {
@@ -156,7 +183,7 @@ document.getElementsByName('sourceDataType').forEach((selectedBtn) => {
 document.getElementsByName('convertToDataType').forEach((selectedBtn) => {
   selectedBtn.addEventListener('input', (e) => {
     const sourceZoneNo = document.getElementById('convertZoneNo');
-    if (e.target.value === 'BL') {
+    if (e.target.value === 'latlng') {
       sourceZoneNo.options[0].selected = true;
       sourceZoneNo.disabled = true;
     } else {
@@ -170,20 +197,40 @@ document.getElementsByName('convertToDataType').forEach((selectedBtn) => {
 
 // 座標系の説明ダイアログ表示処理
 document.getElementById('openGeodeticSystemDialog').addEventListener('click', () => {
-  const dialog = document.getElementById('geodeticSystem')
+  const dialog = document.getElementById('geodeticSystemDialog')
   dialog.showModal();
   dialog.addEventListener('click', (e) => {
-    if (e.target.id === 'geodeticSystem') {
+    if (e.target.id === 'geodeticSystemDialog') {
       dialog.close();
     }
   })
 })
 document.getElementById('closeGeodeticSystemDialog').addEventListener('click', () => {
-  document.getElementById('geodeticSystem').close();
+  document.getElementById('geodeticSystemDialog').close();
 })
 
 // 系番号の説明ダイアログ表示処理
 document.getElementById('openZoneNoDialog').addEventListener('click', () => {
+  const dataTypeRadioBtn = document.getElementsByName('sourceDataType');
+  const zoneNoSelectBtns = document.querySelectorAll('[data-zone-no]')
+  let dataType = null;
+  dataTypeRadioBtn.forEach((radioBtn) => {
+    if (radioBtn.checked && radioBtn.value == 'XY') {
+      dataType = 'XY'
+    } else if (radioBtn.checked && radioBtn.value == 'latlng'){
+      dataType = 'latlng'
+    }
+  })
+  zoneNoSelectBtns.forEach((btn) => {
+    if (dataType == 'XY') {
+      btn.parentElement.classList.remove('d-none');
+      btn.classList.remove('d-none');
+    } else {
+      btn.parentElement.classList.add('d-none');
+      btn.classList.add('d-none');
+    }
+  })
+
   const dialog = document.getElementById('zoneNoDialog')
   dialog.showModal();
   dialog.addEventListener('click', (e) => {
@@ -253,15 +300,16 @@ window.addEventListener("afterprint", (event) => {
 
 // マーカー追加ボタンクリック時の動作
 document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
-  // 緯度経度テーブルのデータが全て削除されていると blTableValue.length は 1 になる
-  if (sourceDataTable.getData(false).length > 1) {
+    const sourceData = sourceDataCleansing(sourceDataTable.getJson(false));
+  // 緯度経度テーブルのデータが全て削除されていると blTableValue.length は 0 になる
+  // if (sourceDataTable.getData(false).length > 1) {
+  if (sourceDataTable.getData(false).length > 0) {
     const formData = collectFormData();
     // マーカーに必要な緯度経度に変換するため、変換先パラメータは緯度経度で決め打ちしている
     const convertParameter = createConvertParameter(formData.sourceGeodeticSystem,
       'JGD2011',
       formData.sourceZoneNo,
       '0');
-    const sourceData = sourceDataCleansing(sourceDataTable.getJson(false));
     const convertedData = convertData(convertParameter, sourceData);
     const iconColor = document.getElementById('selectMarkerIcon').value;
     let lineColor = selectLineColor(false);
