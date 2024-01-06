@@ -236,3 +236,43 @@ dialog {
     border-bottom: 1px solid #ccc;
     margin: 5px 0;
 }
+
+#userGuide {
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#userGuide > #userGuideTitle {
+  display: revert;
+}
+
+#userGuide:hover > #userGuideTitle {
+  background-color: rgba(153, 204, 204, 0.25);
+}
+
+#userGuide[open] > #userGuideTitle {
+  background-color: rgba(153, 204, 204, 0.25);
+}
+
+.userGuideDetails {
+  border-top: 1px solid #aaa;
+}
+
+.userGuideTitle {
+  padding: 0.25em;
+}
+
+.userGuideDetails:hover > .userGuideTitle {
+  background-color: rgba(204, 255, 255, 0.25);
+}
+
+.userGuideDetails[open] > .userGuideTitle {
+  background-color: rgba(204, 255, 255, 0.25);
+}
+
+.userGuideText {
+  margin: 0.1em;
+}
