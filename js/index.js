@@ -519,9 +519,7 @@ document.getElementById('addCircleToMap').addEventListener('click', (e) => {
     contextmenuItems: circleMenuItems
   };
   L.circle([Number(latitude), Number(longitude)], circleOption).addTo(map);
-  L.marker([Number(latitude), Number(longitude)], centerMarkerOption).addTo(map).on('click', (e) => {
-    e.target.remove();
-  })
+  L.marker([Number(latitude), Number(longitude)], centerMarkerOption).addTo(map);
   const tooltipOption = {
     offset: L.point(0, 1),
     direction: 'bottom',
@@ -550,7 +548,7 @@ document.getElementById('inputDiameter').addEventListener('close', (e) => {
 // そのため、引数だけでは「どの円をクリックしたか」判別できない。
 function removeCircle(e) {
   // 中心点のアイコンの削除で使う円の緯度経度情報
-  // （中心点の緯度経度は円の中心の緯度経度と同じ）
+  // （中心点のアイコンの緯度経度は円の中心の緯度経度と同じ）
   let circleCenter = null;
   map.eachLayer((layer) => {
     if (layer._mRadius != undefined) {
