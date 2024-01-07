@@ -48,11 +48,9 @@
 
 .mapContainer {
   overflow: hidden;
-  padding-top: 10px;
 }
 
 .map {
-  /* height: calc(100vh - 240px); */
   height: calc(100vw / 12 * 6);
   border: solid 0.1em black;
 }

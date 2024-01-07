@@ -22,3 +22,4 @@
 - [Placeholder Map Pointer Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/186038/placeholder-map-pointer)
 - [Location Poi Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/399145/location-poi)
 - [Cross Vector SVG Icon (109) - SVG Repo](https://www.svgrepo.com/svg/475147/cross)
+- [Help 2 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/502697/help-2)

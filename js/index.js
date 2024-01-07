@@ -33,7 +33,7 @@ let map = L.map('map',
         callback: openRadiusInputDialog,
       },
       {
-        text: 'マーカーを追加',
+        text: 'アイコンを追加',
         callback: addMarker
       },
       {
@@ -49,7 +49,7 @@ let map = L.map('map',
 L.control.layers(baseMaps).addTo(map);
 gsiStandard.addTo(map);
 
-// マーカー同士の距離を測るための変数
+// アイコン同士の距離を測るための変数
 let measureStartPoint = null;
 let measureEndPoint = null;
 // 任意の2点間の距離を測るための変数
@@ -59,15 +59,15 @@ let measureEndLocation = null;
 const markerMenuItems = [
   // items 以外のオプションは `marker.js` で定義済み
   {
-    text: 'マーカーを削除',
+    text: 'アイコンを削除',
     callback: removeSelectedMarker
   },
   {
-    text: 'このマーカーからの距離を計測',
+    text: 'このアイコンからの距離を計測',
     callback: measureFromThisMarker
   },
   {
-    text: 'このマーカーまでの距離を計測',
+    text: 'このアイコンまでの距離を計測',
     callback: measureToThisMarker
   }
 ];
@@ -298,14 +298,13 @@ window.addEventListener("afterprint", (event) => {
   afterPrint();
 });
 
-// マーカー追加ボタンクリック時の動作
+// アイコン一括追加ボタンクリック時の動作
 document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
     const sourceData = sourceDataCleansing(sourceDataTable.getJson(false));
-  // 緯度経度テーブルのデータが全て削除されていると blTableValue.length は 0 になる
-  // if (sourceDataTable.getData(false).length > 1) {
+  // 緯度経度テーブルのデータが空の状態だと blTableValue.length は 0 になる
   if (sourceDataTable.getData(false).length > 0) {
     const formData = collectFormData();
-    // マーカーに必要な緯度経度に変換するため、変換先パラメータは緯度経度で決め打ちしている
+    // アイコンに必要な緯度経度に変換するため、変換先パラメータを緯度経度に固定している
     const convertParameter = createConvertParameter(formData.sourceGeodeticSystem,
       'JGD2011',
       formData.sourceZoneNo,
@@ -347,7 +346,7 @@ document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
   e.preventDefault();
 })
 
-// マーカー全削除
+// アイコン全削除
 document.getElementById('removeMarkerBtn').addEventListener('click', (e) => {
   map.eachLayer((layer) => {
     // `layer._icon` が定義されていれば Marker レイヤーと判定している。
@@ -550,7 +549,7 @@ document.getElementById('inputDiameter').addEventListener('close', (e) => {
 // 引数の `e` に含まれる情報は「クリックした場所の情報（緯度経度とピクセル情報）と親要素の緯度経度」のみである。
 // そのため、引数だけでは「どの円をクリックしたか」判別できない。
 function removeCircle(e) {
-  // 中心点のマーカーの削除で使う円の緯度経度情報
+  // 中心点のアイコンの削除で使う円の緯度経度情報
   // （中心点の緯度経度は円の中心の緯度経度と同じ）
   let circleCenter = null;
   map.eachLayer((layer) => {
@@ -628,7 +627,7 @@ function openRadiusInputDialog(e) {
   })
 }
 
-// 個別にマーカーを追加する処理
+// 個別にアイコンを追加する処理
 function addMarker(e) {
   const iconColor = document.getElementById('selectMarkerIcon').value;
   const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor, markerMenuItems);
@@ -654,14 +653,14 @@ function measureToThisPoint(e) {
   }
 }
 
-// 選択したマーカーを削除する処理
+// 選択したアイコンを削除する処理
 function removeSelectedMarker(e) {
   const selectedMarkerId = e.relatedTarget._leaflet_id;
   let markerLatLng = null;
   map.eachLayer((layer) => {
     if (layer._leaflet_id == selectedMarkerId) {
-      // これから削除するマーカーにかかる距離計測で描画した
-      // Polyline の緯度経度は削除するマーカーと同じため、
+      // これから削除するアイコンにかかる距離計測で描画した
+      // Polyline の緯度経度は削除するアイコンと同じため、
       // Polyline を削除するために緯度経度情報を控えておく。
       markerLatLng = layer._latlng;
       layer.remove();
@@ -681,9 +680,9 @@ function removeSelectedMarker(e) {
   })
 }
 
-// マーカー同士の距離計測の準備
+// アイコン同士の距離計測の準備
 function measureFromThisMarker(e) {
-  // 選択したマーカーを判別するために `leaflet_id` を取得
+  // 選択したアイコンを判別するために `leaflet_id` を取得
   const startMarkerId = e.relatedTarget._leaflet_id;
   map.eachLayer((layer) => {
     if (layer._leaflet_id == startMarkerId) {
