@@ -1,4 +1,4 @@
-import L, { latLng } from "leaflet";
+import L, { latLng, layerGroup } from "leaflet";
 import { proj4Defs, geodeticSystems } from './proj4.js';
 import { gsiStandard, baseMaps, markers, centerMarkers, lengthIcons } from './leaflet.js';
 import { sourceTable, convertedTable } from './jspreadsheet.js';
@@ -349,16 +349,21 @@ document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
 // アイコン全削除
 document.getElementById('removeMarkerBtn').addEventListener('click', (e) => {
   map.eachLayer((layer) => {
-    // `layer._icon` が定義されていれば Marker レイヤーと判定している。
+    // `layer._icon` が定義済み = Marker レイヤー
     if (layer._icon != undefined) {
       map.removeLayer(layer);
     }
-    // `layer._bounds` が定義されていれば Marker レイヤーと判定している。
+    // `layer._bounds` が定義済み = Marker レイヤー & Polyline レイヤー
     if (layer._bounds != undefined) {
       map.removeLayer(layer);
     }
-    // `layer._mRadius` が定義されていれば Circle レイヤーと判定している。
+    // `layer._mRadius` が定義済み = Circle レイヤー
     if (layer._mRadius != undefined) {
+      map.removeLayer(layer);
+    }
+    // `layer._content` が定義済み = tooltip レイヤー
+    // （円の半径を示すために表示している tooltip）
+    if (layer._content != undefined) {
       map.removeLayer(layer);
     }
   })
