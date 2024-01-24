@@ -23,3 +23,5 @@
 - [Location Poi Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/399145/location-poi)
 - [Cross Vector SVG Icon (109) - SVG Repo](https://www.svgrepo.com/svg/475147/cross)
 - [Help 2 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/502697/help-2)
+- [Github 142 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/512317/github-142)
+- [About Vector SVG Icon (6) - SVG Repo](https://www.svgrepo.com/svg/486929/about)

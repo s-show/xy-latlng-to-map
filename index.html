@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="XY座標や緯度経度の示す場所にアイコンを追加したり、地図に半径を指定した円を表示したり、任意の地点間の距離を計測できるサイトです。">
     <link rel="stylesheet" href="./css/style.scss">
-    <title>座標の地図表示と座標・緯度経度の変換</title>
+    <title>座標の地図表示と座標・緯度経度の変換 - メインページ</title>
   </head>
   <body>
-    <nav class="navbar sticky-top bg-primary p-3" data-bs-theme="dark">
+    <nav id="header" class="navbar sticky-top p-3">
       <div class="container-fluid">
         <p class="navbar-brand h1 flex-grow-1">座標の地図表示と座標・緯度経度の変換</p>
         <div class="border border-white rounded me-3 p-1">
@@ -22,9 +23,9 @@
             <p id="printPreviewBtnTitle" class="text-white fs-6 ms-2 me-3 mt-1 mb-1">印刷時と同じ見た目にする</p>
           </label>
         </div>
-        <div class="d-flex align-items-center border border-white rounded bg-info d-print-none">
-          <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling" class="btn btn-info">
-            <img src="./assets/help.svg" height="24"> 使い方を表示 </butｔton>
+        <div class="d-flex align-items-center border border-white rounded d-print-none">
+          <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling" class="dialog-open">
+            <img src="./assets/help.svg" height="24"> 使い方を表示 </buttton>
         </div>
       </div>
     </nav>
@@ -62,7 +63,7 @@
               <p class="d-print-none">使用するデータの測地系を選択してください。測地系の解説は以下のボタンで開きます。</p>
               <!-- 測地系の部分 -->
               <div class="mt-2">
-                <button type="button" id="openGeodeticSystemDialog" class="btn btn-info d-print-none">測地系の解説</button>
+                <button type="button" id="openGeodeticSystemDialog" class="dialog-open d-print-none">測地系の解説</button>
                 <dialog id="geodeticSystemDialog">
                   <div class="innerDialog">
                     <h1 class="fs-5" id="geodeticSystemLabel">測地系の解説</h1>
@@ -131,7 +132,8 @@
               <p id="zoneNoAdditionalDescription" class="mt-2 d-print-none"> データの種類がXY座標の場合、地域に応じた系番号を選択します。緯度経度の場合、系番号は「緯度経度用」を選択します。</p>
               <!-- 測地系の系番号の解説部分 -->
               <div class="mt-2">
-                <button id="openZoneNoDialog" type="button" class="btn btn-info d-print-none">地域別の系番号</button>
+                <!-- <button id="openZoneNoDialog" type="button" class="btn btn-info d-print-none">地域別の系番号</button> -->
+                <button id="openZoneNoDialog" type="button" class="dialog-open d-print-none">地域別の系番号</button>
                 <dialog id="zoneNoDialog">
                   <div class="innerDialog">
                     <h1 class="fs-5" id="zoneNoLabel">地域別の系番号</h1>
@@ -290,8 +292,8 @@
             <div id="sourceDataTable"></div>
             <p class="d-print-none">使用するデータを入力または貼り付けしてください。</p>
             <div>
-              <button id="clearSourceDataTableBtn" type="button" class="btn btn-danger mb-3 d-print-none">データを削除</button>
-              <button id="openConsiderationsDialog" type="button" class="btn btn-secondary mb-3 d-print-none">注意事項を確認</button>
+              <button id="clearSourceDataTableBtn" type="button" class="danger-btn d-print-none">データを削除</button>
+              <button id="openConsiderationsDialog" type="button" class="dialog-open d-print-none">注意事項を確認</button>
               <dialog id="considerationsDialog">
                 <div class="innerDialog">
                   <ul class="">
@@ -353,7 +355,7 @@
                   <div class="col-xl-2 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
                     <button id="addMarkerBtn" class="btn btn-primary my-1">アイコンの一括追加</button>
                     <p>データテーブルのデータに基づいてアイコンを追加します。</p>
-                    <button id="removeMarkerBtn" class="btn btn-danger my-1">全図形を削除</button>
+                    <button id="removeMarkerBtn" class="danger-btn my-1">全図形を削除</button>
                   </div>
                   <div class="col-xl-4 border-xl-end border-xl-bottom-0 border-sm-bottom border-bottom border-black py-xl-0 py-sm-2 py-2">
                     <p class="fs-6 mb-0">地図を右クリックすると次のことができます。</p>
@@ -457,7 +459,7 @@
                     </div>
                     <div id="convertedDataTable" class="mb-3"></div>
                     <div>
-                      <button id="clearConvertedDataTableBtn" type="button" class="btn btn-danger mb-3 d-print-none">データを削除</button>
+                      <button id="clearConvertedDataTableBtn" type="button" class="danger-btn mb-3 d-print-none">データを削除</button>
                     </div>
                   </div>
                 </div>
@@ -471,7 +473,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
           <div class="offcanvas-body">
-            <details class="userGuideDetails">
+            <details class="userGuideDetails" name="userGuideDetails">
               <summary id="XYorLatLngToMarker" class="userGuideTitle">XY座標または緯度経度のリストから一括してアイコンを追加する</summary>
               <ol class="userGuideText">
                 <li>使用するXY座標または緯度経度の詳細な情報を「データ詳細情報」の欄で選択します</li>
@@ -480,21 +482,21 @@
                 <li>「地図加工」タブの「アイコンの一括追加」ボタンをクリックします</li>
               </ol>
             </details>
-            <details class="userGuideDetails">
+            <details class="userGuideDetails" name="userGuideDetails">
               <summary id="addCircleAnyPoint" class="userGuideTitle">地図の指定した場所に円を追加する</summary>
               <ol class="userGuideText">
                 <li>地図を動かして円を追加したい場所を表示します</li>
                 <li>円を追加したい場所で右クリックして、表示されるメニューから「円を追加」をクリックします。円の線の色は、「地図加工」タブの「線の有無・色」で選択した色になります。</li>
               </ol>
             </details>
-            <details class="userGuideDetails">
+            <details class="userGuideDetails" name="userGuideDetails">
               <summary id="addMarkerAnyPoint" class="userGuideTitle">地図の指定した場所にアイコンを追加する</summary>
               <ol class="userGuideText">
                 <li>地図を動かしてアイコンを追加したい場所を表示します</li>
                 <li>アイコンを追加したい場所で右クリックして、表示されるメニューから「アイコンを追加」をクリックします。アイコンの色は、「地図加工」タブの「アイコンの色」で選択した色になります。</li>
               </ol>
             </details>
-            <details class="userGuideDetails">
+            <details class="userGuideDetails" name="userGuideDetails">
               <summary id="measureBetweenAnyPoint" class="userGuideTitle">地図の任意の2点間の距離を計測する</summary>
               <ol class="userGuideText">
                 <li>地図を動かして距離を計測したい場所を表示します</li>
@@ -503,7 +505,7 @@
                 <li>計測地点を増やしたい場合、計測地点に加えたい場所で右クリックして表示されるメニューから「この地点から（まで）の距離を計測」をクリックして、計測地点を増やしていきます。</li>
               </ol>
             </details>
-            <details class="userGuideDetails">
+            <details class="userGuideDetails" name="userGuideDetails">
               <summary id="measureFromMarkerOrCircle" class="userGuideTitle">アイコンや円の中心点からの距離を計測する</summary>
               <ol class="userGuideText">
                 <li>地図を動かして距離を計測したいアイコンや円を表示します</li>
@@ -512,14 +514,14 @@
                 <li>計測地点を増やしたい場合、計測地点に加えたいアイコン or 円を右クリックして表示されるメニューから「このアイコンから（まで）の距離を計測」or「円の中心から（まで）の距離を計測」をクリックして、計測地点を増やしていきます。</li>
               </ol>
             </details>
-            <details class="userGuideDetails">
+            <details class="userGuideDetails" name="userGuideDetails">
               <summary id="removeMarkerAndCircle" class="userGuideTitle">アイコンや円を削除する</summary>
               <ol class="userGuideText">
                 <li>削除したいアイコンや円の上で右クリックします</li>
                 <li>右クリックして表示されるメニューから「アイコンを削除」or「円を削除」をクリックします。</li>
               </ol>
             </details>
-            <details class="userGuideDetails">
+            <details class="userGuideDetails" name="userGuideDetails">
               <summary id="convertXYLatLng" class="userGuideTitle">XY座標 or 緯度経度を相互変換</summary>
               <ol class="userGuideText">
                 <li>変換したいデータの詳細な情報を「データ詳細情報」の欄で選択します</li>
@@ -533,17 +535,25 @@
         </div>
         <div class="col-9"></div>
       </div>
-      <div class="row">
-        <div class="col text-center m-3">
-          <!-- Githubのロゴは https://github.com/logos から入手 -->
-          <a class="me-3 ms-3" href="https://github.com/s-show/xy-latlng-to-map" target="_blank">
-            <img src="/assets/GitHub_Logo.png" alt="github icon" width="100">
-          </a>
-          <strong class="">License: </strong>
+    </div>
+    <nav id="footer" class="navbar sticky-top border-top py-2 ps-4 d-print-none">
+      <div class="container-fluid">
+        <p class="flex-grow-1 fs-6">License: 
           <a href="https://licenses.opensource.jp/MIT/MIT.html" target="_blank">MIT</a>
+        </p>
+        <div class="d-flex">
+          <div class="px-4 border-x border-dark border-2">
+            <img src="./assets/github-mark.svg" height="24">
+            <a href="http://github.com/s-show/xy-latlng-to-map">このサイトのソースコード</a>  
+          </div>
+          <div class="ms-4 me-2">
+            <img src="./assets/about.svg" height="24">
+            <a href="about.html">このサイトについて</a>
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
+
     <dialog id="inputDiameter" class="modalDialog">
       <div class="innerDialog">
         <form action="">
