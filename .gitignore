@@ -142,3 +142,4 @@ dist
 
 # vite build output
 .public
+.dist/
