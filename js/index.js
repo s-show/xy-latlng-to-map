@@ -4,6 +4,7 @@ import { gsiStandard, baseMaps, markers, centerMarkers, lengthIcons } from './le
 import { sourceTable, convertedTable } from './jspreadsheet.js';
 import { transpose } from './tranpose.js';
 import { isValidNumber } from './isvalidNumber.js';
+import { exportCSV } from "./exportCSV.js";
 import { createMarker } from './marker.js';
 import * as bootstrap from 'bootstrap'
 import 'leaflet/dist/leaflet.css';
@@ -267,7 +268,7 @@ document.getElementById('dataConvertBtn').addEventListener('click', (e) => {
   const sourceData = sourceDataCleansing(sourceDataTable.getJson(false));
   const convertedData = convertData(convertParameter, sourceData);
   convertedTable.setData(JSON.stringify(convertedData));
-  e.preventDefault();
+    e.preventDefault();
 })
 
 // 変換元データの表のデータクリア
@@ -547,6 +548,21 @@ document.getElementById('cancelAddCircle').addEventListener('click', (e) => {
 document.getElementById('inputDiameter').addEventListener('close', (e) => {
   document.getElementById('radius').value = '0';
   e.preventDefault();
+})
+
+// 変換後のデータをCSVでexportする
+document.getElementById('exportCSVBtn').addEventListener('click', (e) => {
+  const csvData = exportCSV(convertedTable.getData());
+  const objUrl = URL.createObjectURL(csvData);
+  const link = document.createElement('a');
+  link.setAttribute('href', objUrl);
+  link.setAttribute('download', 'data.csv');
+  link.textContent = 'Click to Download';
+
+  document.getElementById('exportBtnArea').appendChild(link);
+  link.click();
+  document.getElementById('exportBtnArea').removeChild(link);
+  URL.revokeObjectURL(objUrl);
 })
 
 // 引数の `e` に含まれる情報は「クリックした場所の情報（緯度経度とピクセル情報）と親要素の緯度経度」のみである。
