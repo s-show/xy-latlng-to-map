@@ -8,7 +8,10 @@ function arrayToCSV(array) {
   return csvData;
 }
 
-function exportCSV(tableData) {
+function exportCSV(tableData, header=null) {
+  if (getArrayDepth(header) == 1) {
+    tableData.unshift(header)
+  }
   if (getArrayDepth(tableData) >= 2) {
     const blob = new Blob([arrayToCSV(tableData)], { type: 'text/csv;charset=utf-8,' })
     return blob;
