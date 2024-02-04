@@ -9,11 +9,19 @@ function arrayToCSV(array) {
 }
 
 function exportCSV(tableData, header=null) {
-  if (getArrayDepth(header) == 1) {
-    tableData.unshift(header)
+  if (getArrayDepth(header) == 2) {
+    header.reverse().forEach((value) => {
+      tableData.unshift(value)
+    });
   }
   if (getArrayDepth(tableData) >= 2) {
-    const blob = new Blob([arrayToCSV(tableData)], { type: 'text/csv;charset=utf-8,' })
+    const blob = new Blob(
+      [
+        new Uint8Array([0xEF, 0xBB, 0xBF]), // UTF-8のBOM無しだとExcelで文字化けする
+        arrayToCSV(tableData)
+      ],
+      { type: 'text/csv;charset=utf-8,' }
+    )
     return blob;
   } else {
     return false;

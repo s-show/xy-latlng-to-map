@@ -550,17 +550,12 @@ document.getElementById('inputDiameter').addEventListener('close', (e) => {
   e.preventDefault();
 })
 
-// 変換後のデータをCSVでexportする
+// 変換前後のデータをCSVでexportする
 document.getElementById('exportCSVBtn').addEventListener('click', (e) => {
-  let headerText = [];
-  document.getElementsByName('convertToDataType').forEach((input) => {
-    if (input.checked && input.value == 'XY') {
-      headerText.push('X', 'Y')
-    } else if (input.checked && input.value == 'latlng') {
-      headerText.push('緯度', '経度')
+    headerText[3].push(String(params.convert.zoneNo) + '系', String(params.convert.zoneNo) + '系')
     }
-  });
-  const csvData = exportCSV(convertedTable.getData(), headerText);
+  let sourceData = sourceDataTable.getData();
+    data.push(convertData[index]);
   const objUrl = URL.createObjectURL(csvData);
   const link = document.createElement('a');
   link.setAttribute('href', objUrl);
