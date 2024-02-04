@@ -2,7 +2,6 @@ import L, { latLng, layerGroup } from "leaflet";
 import { proj4Defs, geodeticSystems } from './proj4.js';
 import { gsiStandard, baseMaps, markers, centerMarkers, lengthIcons } from './leaflet.js';
 import { sourceTable, convertedTable } from './jspreadsheet.js';
-import { transpose } from './tranpose.js';
 import { isValidNumber } from './isvalidNumber.js';
 import { exportCSV } from "./exportCSV.js";
 import { createMarker } from './marker.js';
@@ -146,11 +145,11 @@ window.addEventListener('load', () => {
     })
   })
   // 系番号の説明画面の処理
-  const zoneNoSelectBtn = document.querySelectorAll('[data-zone-no]')
+  const zoneNoSelectBtn = document.querySelectorAll('[data-zone-no-btn]')
   const sourceZoneNo = document.getElementById('sourceZoneNo');
   zoneNoSelectBtn.forEach((btn) => {
     btn.addEventListener('click', (e) => {
-      sourceZoneNo.value = e.target.getAttribute('data-zone-no');
+      sourceZoneNo.value = e.target.getAttribute('data-zone-no-btn');
       sourceZoneNo.options[0].disabled = true;
       document.getElementById('zoneNoDialog').close();
     })
@@ -192,7 +191,6 @@ document.getElementsByName('convertToDataType').forEach((selectedBtn) => {
       sourceZoneNo.options[1].selected = true;
       sourceZoneNo.options[0].disabled = true;
     }
-    console.debug(e.target.value);
   })
 })
 
@@ -213,7 +211,7 @@ document.getElementById('closeGeodeticSystemDialog').addEventListener('click', (
 // 系番号の説明ダイアログ表示処理
 document.getElementById('openZoneNoDialog').addEventListener('click', () => {
   const dataTypeRadioBtn = document.getElementsByName('sourceDataType');
-  const zoneNoSelectBtns = document.querySelectorAll('[data-zone-no]')
+  const zoneNoSelectBtns = document.querySelectorAll('[data-zone-no-btn]')
   let dataType = null;
   dataTypeRadioBtn.forEach((radioBtn) => {
     if (radioBtn.checked && radioBtn.value == 'XY') {
@@ -260,19 +258,21 @@ document.getElementById('closeConsiderationsDialog').addEventListener('click', (
 
 // データ変換
 document.getElementById('dataConvertBtn').addEventListener('click', (e) => {
-  const formData = collectFormData();
-  const convertParameter = createConvertParameter(formData.sourceGeodeticSystem,
-    formData.convertToGeodeticSystem,
-    formData.sourceZoneNo,
-    formData.convertZoneNo);
-  const sourceData = sourceDataCleansing(sourceDataTable.getJson(false));
+  const params = getParams()
+  const convertParameter = createConvertParameter(
+    params.source.geodeticSystem,
+    params.convert.geodeticSystem,
+    params.source.zoneNo,
+    params.convert.zoneNo
+  );
+  const sourceData = dataCleansing(sourceDataTable.getJson(false));
   const convertedData = convertData(convertParameter, sourceData);
   convertedTable.setData(JSON.stringify(convertedData));
     e.preventDefault();
 })
 
 // 変換元データの表のデータクリア
-document.getElementById('clearSourceDataTableBtn').addEventListener('click', (e) => {
+document.getElementById('clearSourceTableBtn').addEventListener('click', (e) => {
   const tableData = [
     [,],
   ];
@@ -301,14 +301,14 @@ window.addEventListener("afterprint", (event) => {
 
 // アイコン一括追加ボタンクリック時の動作
 document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
-    const sourceData = sourceDataCleansing(sourceDataTable.getJson(false));
+  const sourceData = dataCleansing(sourceDataTable.getJson(false));
+  const params = getParams();
   // 緯度経度テーブルのデータが空の状態だと blTableValue.length は 0 になる
   if (sourceDataTable.getData(false).length > 0) {
-    const formData = collectFormData();
     // アイコンに必要な緯度経度に変換するため、変換先パラメータを緯度経度に固定している
-    const convertParameter = createConvertParameter(formData.sourceGeodeticSystem,
+    const convertParameter = createConvertParameter(params.source.geodeticSystem,
       'JGD2011',
-      formData.sourceZoneNo,
+      params.source.zoneNo,
       '0');
     const convertedData = convertData(convertParameter, sourceData);
     const iconColor = document.getElementById('selectMarkerIcon').value;
@@ -333,14 +333,14 @@ document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
         displayErrorMessage(error);
       }
     })
-    let temp1 = [];
-    convertedData.forEach((data) => {
-      let tempArray = [data[0], data[1]];
-      temp1.push(tempArray);
-    })
-    let temp2 = transpose(temp1);
-    const southWestPoint = L.latLng([Math.min(...temp2[0]), Math.min(...temp2[1])]);
-    const northEastPoint = L.latLng([Math.max(...temp2[0]), Math.max(...temp2[1])]);
+    const southWestPoint = L.latLng([
+      convertedData.reduce((x, y) => (x[0] < y[0]) ? x : y)[0],
+      convertedData.reduce((x, y) => (x[1] < y[1]) ? x : y)[1],
+    ]);
+    const northEastPoint = L.latLng([
+      convertedData.reduce((x, y) => (x[0] > y[0]) ? x : y)[0],
+      convertedData.reduce((x, y) => (x[1] > y[1]) ? x : y)[1],
+    ]);
     const bounds = L.latLngBounds(southWestPoint, northEastPoint);
     map.fitBounds(bounds);
   }
@@ -387,48 +387,55 @@ document.getElementById('zoomRange').addEventListener('input', (e) => {
 })
 
 // ユーザーが設定したデータの詳細情報を取得
-function collectFormData() {
-  const sourceDataTypeNodeList = document.getElementsByName('sourceDataType');
-  const convertToDataTypeNodeList = document.getElementsByName('convertToDataType');
-  const sourceGeodeticSystemNodeList = document.getElementsByName('sourceGeodeticSystem');
-  const convertToGeodeticSystemNodeList = document.getElementsByName('convertToGeodeticSystem');
-  let formData = {};
+function getParams() {
+  let params = {
+    'source': {
+      'type': null,
+      'geodeticSystem': null,
+      'zoneNo': null
+    },
+    'convert': {
+      'type': null,
+      'geodeticSystem': null,
+      'zoneNo': null
+    }
+  };
 
-  sourceDataTypeNodeList.forEach((currentNode) => {
+  document.getElementsByName('sourceDataType').forEach((currentNode) => {
     if (currentNode.checked) {
-      formData['sourceDataType'] = currentNode.value;
+      params['source']['type'] = currentNode.value;
     }
   });
-  convertToDataTypeNodeList.forEach((currentNode) => {
+  document.getElementsByName('convertDataType').forEach((currentNode) => {
     if (currentNode.checked) {
-      formData['convertToDataType'] = currentNode.value;
+      params['convert']['type'] = currentNode.value;
     }
   });
-  sourceGeodeticSystemNodeList.forEach((currentNode) => {
+  document.getElementsByName('sourceGeodeticSystem').forEach((currentNode) => {
     if (currentNode.checked) {
-      formData['sourceGeodeticSystem'] = currentNode.value;
+      params['source']['geodeticSystem'] = currentNode.value;
     }
   });
-  convertToGeodeticSystemNodeList.forEach((currentNode) => {
+  document.getElementsByName('convertToGeodeticSystem').forEach((currentNode) => {
     if (currentNode.checked) {
-      formData['convertToGeodeticSystem'] = currentNode.value;
+      params['convert']['geodeticSystem'] = currentNode.value;
     }
   });
-  formData['sourceZoneNo'] = document.getElementById('sourceZoneNo').value;
-  formData['convertZoneNo'] = document.getElementById('convertZoneNo').value;
-  return formData;
+  params['source']['zoneNo'] = document.getElementById('sourceZoneNo').value;
+  params['convert']['zoneNo'] = document.getElementById('convertZoneNo').value;
+  return params;
 }
 
 // フォームの入力データを使って `proj4.js` で定義した測地系データを取り出す
-function createConvertParameter(sourceGeodeticSystem, convertToGeodeticSystem, sourceZoneNo, convertZoneNo) {
+function createConvertParameter(sourceGeodeticSystem, convertGeodeticSystem, sourceZoneNo, convertZoneNo) {
   let convertParameter = {}
   convertParameter.fromProjection = geodeticSystems[sourceGeodeticSystem][sourceZoneNo];
-  convertParameter.toProjection = geodeticSystems[convertToGeodeticSystem][convertZoneNo];
+  convertParameter.toProjection = geodeticSystems[convertGeodeticSystem][convertZoneNo];
   return convertParameter;
 }
 
 // 変換元テーブルに入力された値のチェック
-function sourceDataCleansing(sourceData) {
+function dataCleansing(sourceData) {
   let result = [];
   sourceData.forEach((data) => {
     if (isValidNumber(data.x_latitude) && isValidNumber(data.y_longitude)) {
@@ -552,10 +559,50 @@ document.getElementById('inputDiameter').addEventListener('close', (e) => {
 
 // 変換前後のデータをCSVでexportする
 document.getElementById('exportCSVBtn').addEventListener('click', (e) => {
+  let headerText = [
+    ['変換元','変換元','変換後','変換後']
+  ];
+  const params = getParams();
+  if (params.source.type == 'XY') {
+    headerText.push([ 'X', 'Y' ])
+  } else {
+    headerText.push([ '緯度', '経度' ])
+  }
+  if (params.convert.type == 'XY') {
+    headerText[1].push('X', 'Y')
+  } else {
+    headerText[1].push('緯度', '経度')
+  }
+  if (params.source.geodeticSystem == 'TOKYO') {
+    headerText.push(['日本測地系', '日本測地系'])
+  } else if (params.source.geodeticSystem == 'JGD2000') {
+    headerText.push(['世界測地系（JGD2000）', '世界測地系（JGD2000）'])
+  } else {
+    headerText.push(['世界測地系（JGD2011）', '世界測地系（JGD2011）'])
+  }
+  if (params.convert.geodeticSystem == 'TOKYO') {
+    headerText[2].push('日本測地系', '日本測地系')
+  } else if (params.convert.geodeticSystem == 'JGD2000') {
+    headerText[2].push('世界測地系（JGD2000）', '世界測地系（JGD2000）')
+  } else {
+    headerText[2].push('世界測地系（JGD2011）', '世界測地系（JGD2011）')
+  }
+  if (params.source.zoneNo != '0') {
+    headerText.push([String(params.source.zoneNo) + '系', String(params.source.zoneNo) + '系'])
+  } else {
+    headerText.push(['', ''])
+  };
+  if (params.convert.zoneNo != '0') {
     headerText[3].push(String(params.convert.zoneNo) + '系', String(params.convert.zoneNo) + '系')
-    }
+  } else {
+    headerText[3].push('', '')
+  }
   let sourceData = sourceDataTable.getData();
+  const convertData = convertedTable.getData();
+  sourceData.forEach((data, index) => {
     data.push(convertData[index]);
+  })
+  const csvData = exportCSV(sourceData, headerText);
   const objUrl = URL.createObjectURL(csvData);
   const link = document.createElement('a');
   link.setAttribute('href', objUrl);
