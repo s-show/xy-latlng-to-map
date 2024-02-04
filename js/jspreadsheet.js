@@ -14,7 +14,7 @@ import jspreadsheet from "jspreadsheet-ce";
  * 入力値または貼り付け値に「度 or °」が含まれていれば、
  * 度分秒形式の緯度経度を十進数形式の緯度経度に変換している。
 */
-const beforechange = (instance, cell, x, y, value) => {
+const beforechangeSourceTable = (instance, cell, x, y, value) => {
   if (value.match(/度|°/) == null) {
     value = value.replace(',', '');
     if (isValidNumber(zen2han(value))) {
@@ -27,29 +27,55 @@ const beforechange = (instance, cell, x, y, value) => {
   }
 }
 
-// 行削除とコピー以外のメニューは不要なので表示させていない
-const contextMenuItems = (obj, x, y, e) => {
+/*
+ * 結果を表示する表への貼り付けは禁止する。
+ * コードは https://bossanova.uk/jspreadsheet/v4/docs/most-common-questions-and-answers を参照
+*/
+const beforePasteConvertedTable = () => {
+  return false;
+}
+
+// 行削除・貼り付けのみ表示するようにしている
+// メニューの設定は [ce/src/index.js at master · jspreadsheet/ce](https://github.com/jspreadsheet/ce/blob/master/src/index.js)
+// のコードをコピペしている。
+const sourceTableContextMenuItems = (obj, x, y, e) => {
   let items = [];
-  if (y != null) {
-    if (obj.options.allowDeleteRow == true) {
-      items.push({
-        title: obj.options.text.deleteSelectedRows,
-        onclick: function() {
-            obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+  if (obj.options.allowDeleteRow == true) {
+    items.push({
+      title: obj.options.text.deleteSelectedRows,
+      onclick: function() {
+          obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+      }
+    });
+    items.push({
+      title:obj.options.text.paste,
+      shortcut:'Ctrl + V',
+      onclick: function() {
+        if (obj.selectedCell) {
+          navigator.clipboard.readText().then(function(text) {
+            if (text) {
+              jspreadsheet.current.paste(obj.selectedCell[0], obj.selectedCell[1], text);
+            }
+          });
         }
-      });
-      items.push({
-        title: obj.options.text.copy,
-        // icon: 'content_copy',
-        shortcut: 'Ctrl + C',
-        onclick: function() {
-            obj.copy();
-        }
-      });
-    }
+      }
+    });
   }
-  // Line
-  items.push({ type:'line' });
+  return items;
+}
+// コピーのみ表示するようにしている
+// メニューの設定は上記と同じ
+const convertedTableContextMenuItems = (obj, x, y, e) => {
+  let items = [];
+  if (obj.options.allowDeleteRow == true) {
+    items.push({
+      title: obj.options.text.copy,
+      shortcut: 'Ctrl + C',
+      onclick: function() {
+          obj.copy();
+      }
+    });
+  }
   return items;
 }
 
@@ -70,6 +96,7 @@ const beforeInsertColumn = (instance, cell, x, y, value) => {
 const text = {
   deleteSelectedRows: '選択した行を削除',
   copy: '表の値をコピー',
+  paste: '表に値を貼り付け',
 }
 
 const initTableData = [
@@ -86,8 +113,8 @@ const columnsConfig = [
 const sourceTable = jspreadsheet(document.getElementById('sourceDataTable'), {
   data: initTableData,
   columns: columnsConfig,
-  onbeforechange: beforechange,
-  contextMenu: contextMenuItems,
+  onbeforechange: beforechangeSourceTable,
+  contextMenu: sourceTableContextMenuItems,
   onbeforedeletecolumn: beforeDeleteColumn,
   onbeforeinsertcolumn: beforeInsertColumn,
   text: text,
@@ -97,8 +124,8 @@ const sourceTable = jspreadsheet(document.getElementById('sourceDataTable'), {
 const convertedTable = jspreadsheet(document.getElementById('convertedDataTable'), {
   data: initTableData,
   columns: columnsConfig,
-  onbeforechange: beforechange,
-  contextMenu: contextMenuItems,
+  onbeforepaste: beforePasteConvertedTable,
+  contextMenu: convertedTableContextMenuItems,
   onbeforedeletecolumn: beforeDeleteColumn,
   onbeforeinsertcolumn: beforeInsertColumn,
   text: text,
