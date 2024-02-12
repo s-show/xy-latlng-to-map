@@ -140,7 +140,7 @@
                     <table id="zoneNoTable" class="table table-striped">
                       <thead>
                         <tr>
-                          <th scope="col" data-zone-no="header">選択</th>
+                          <th scope="col" data-zone-no-btn="header">選択</th>
                           <th scope="col">系番号</th>
                           <th scope="col">適用区域</th>
                         </tr>
@@ -293,8 +293,8 @@
             <p class="d-print-none">使用するデータを入力または貼り付けしてください。空白セルがある行は無視して処理します。</p>
             <div>
               <button id="clearSourceTableBtn" type="button" class="danger-btn d-print-none">データを削除</button>
-              <button id="openConsiderationsDialog" type="button" class="dialog-open d-print-none">表の補足情報</button>
-              <dialog id="considerationsDialog">
+              <button id="openAcceptableDataDialog" type="button" class="dialog-open d-print-none">入力可能なデータについて</button>
+              <dialog id="acceptableDataDialog">
                 <div class="innerDialog">
                   <ul class="">
                     <li class="">入力できる値の形式は次のとおりです。</li>
@@ -307,7 +307,7 @@
                     <li class="">行の削除は、セルの上で右クリックして「選択した行を削除」をクリックします。</li>
                     <li>「35度39分29.1572秒」の度分秒形式の緯度経度を貼り付けると自動的に「35.658099」の10進数形式に変換されます。</li>
                   </ul>
-                  <button type="button" id="closeConsiderationsDialog" class="btn btn-secondary">閉じる</button>
+                  <button type="button" id="closeAcceptableDataDialog" class="btn btn-secondary">閉じる</button>
                 </div>
               </dialog>
             </div>
@@ -401,26 +401,26 @@
                   <div class="col-lg-4 border-lg-end border-sm-bottom border-lg-bottom-0 border-bottom border-black py-lg-0 py-sm-2 py-2">
                     <p class="mb-1 fs-5">変換先のデータ形式</p>
                     <div class="form-check">
-                      <input id="convertToXY" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToDataType" value="XY" checked>
+                      <input id="convertToXY" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertDataType" value="XY" checked>
                       <label class="form-check-label mb-1" for="convertToXY">XY座標</label>
                     </div>
                     <div class="form-check">
-                      <input id="convertTolatlng" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToDataType" value="latlng">
+                      <input id="convertTolatlng" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertDataType" value="latlng">
                       <label class="form-check-label mb-1" for="convertTolatlng">緯度経度</label>
                     </div>
                   </div>
                   <div class="col-lg-4 border-lg-end border-sm-bottom border-lg-bottom-0 border-bottom border-black py-lg-0 py-sm-2 py-2">
                     <p class="mb-1 fs-5">変換先の測地系</p>
                     <div class="form-check">
-                      <input id="convertToTOKYO" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToGeodeticSystem" value="TOKYO" checked>
+                      <input id="convertToTOKYO" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertGeodeticSystem" value="TOKYO" checked>
                       <label class="form-check-label mb-1" for="convertToTOKYO">日本測地系</label>
                     </div>
                     <div class="form-check">
-                      <input id="convertToJGD2000" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToGeodeticSystem" value="JGD2000">
+                      <input id="convertToJGD2000" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertGeodeticSystem" value="JGD2000">
                       <label class="form-check-label mb-1" for="convertToJGD2000">世界測地系（JGD2000）</label>
                     </div>
                     <div class="form-check">
-                      <input id="convertToJGD2011" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertToGeodeticSystem" value="JGD2011">
+                      <input id="convertToJGD2011" type="radio" class="form-check-input border border-2 border-dark-subtle" name="convertGeodeticSystem" value="JGD2011">
                       <label class="form-check-label mb-1" for="convertToJGD2011">世界測地系（JGD2011）</label>
                     </div>
                   </div>
@@ -459,7 +459,7 @@
                     <div id="convertedDataTable"></div>
                     <p class="mb-3">表を右クリックして表示されるメニューからデータをコピーできます</p>
                     <div>
-                      <button id="clearConvertedDataTableBtn" type="button" class="btn danger-btn mb-3 d-print-none">データを削除</button>
+                      <button id="clearConvertedTableBtn" type="button" class="btn danger-btn mb-3 d-print-none">データを削除</button>
                       <button id="exportCSVBtn" type="button" class="btn btn-primary mb-3 d-print-none">CSV形式でダウンロード</button>
                       <div id="exportBtnArea"></div>
                     </div>
@@ -479,7 +479,7 @@
               <summary id="XYorLatLngToMarker" class="userGuideTitle">XY座標または緯度経度のリストから一括してアイコンを追加する</summary>
               <ol class="userGuideText">
                 <li>使用するXY座標または緯度経度の詳細な情報を「データ詳細情報」の欄で選択します</li>
-                <li>使用するXY座標または緯度経度をデータテーブルに入力するか貼り付けします</li>
+                <li>使用するXY座標または緯度経度をデータテーブルに入力するか貼り付け（右クリックメニュー）します</li>
                 <li>「地図加工」タブの「アイコンの色」で色を選択します。アイコン同士を線で繋ぐ場合、「線の有無・色」で色を選択します。</li>
                 <li>「地図加工」タブの「アイコンの一括追加」ボタンをクリックします</li>
               </ol>
@@ -504,7 +504,7 @@
                 <li>地図を動かして距離を計測したい場所を表示します</li>
                 <li>最初の計測地点で右クリックして表示されるメニューから「この地点からの距離を計測」をクリックします。</li>
                 <li>2つ目の計測地点で右クリックして表示されるメニューから「この地点までの距離を計測」をクリックします。</li>
-                <li>計測地点を増やしたい場合、計測地点に加えたい場所で右クリックして表示されるメニューから「この地点から（まで）の距離を計測」をクリックして、計測地点を増やしていきます。</li>
+                <li>計測地点を増やしたい場合、上記の作業を繰り返してください。</li>
               </ol>
             </details>
             <details class="userGuideDetails" name="userGuideDetails">
@@ -513,7 +513,7 @@
                 <li>地図を動かして距離を計測したいアイコンや円を表示します</li>
                 <li>最初の計測地点となるアイコン or 円を右クリックして表示されるメニューから「このアイコンからの距離を計測」or「円の中心からの距離を計測」をクリックします。</li>
                 <li>2つ目の計測地点となるアイコン or 円を右クリックして表示されるメニューから「このアイコンまでの距離を計測」or「円の中心までの距離を計測」をクリックします。</li>
-                <li>計測地点を増やしたい場合、計測地点に加えたいアイコン or 円を右クリックして表示されるメニューから「このアイコンから（まで）の距離を計測」or「円の中心から（まで）の距離を計測」をクリックして、計測地点を増やしていきます。</li>
+                <li>計測地点を増やしたい場合、上記の作業を繰り返してください。</li>
               </ol>
             </details>
             <details class="userGuideDetails" name="userGuideDetails">
@@ -531,6 +531,7 @@
                 <li>「データ変換」タブで変換先のXY座標または緯度経度の詳細な情報を選択します</li>
                 <li>「データ変換」タブの「変換」ボタンをクリックします</li>
                 <li>変換後のデータは、テーブル上で右クリックして「コピー」を選択すればコピーできます</li>
+                <li>また、「CSV形式でダウンロード」をクリックすれば変換前後のデータをダウンロードできます</li>
               </ol>
             </details>
           </div>

@@ -12,16 +12,21 @@
 
 本アプリは、次のライブラリやフリー素材を利用しています。
 
-- [Leaflet - a JavaScript library for interactive maps](https://leafletjs.com/)
-- [slutske22/leaflet-arrowheads: A small plugin for leaflet to quickly draw arrowheads on polylines for vector visualization](https://github.com/slutske22/leaflet-arrowheads)
-- [makinacorpus/Leaflet.GeometryUtil: Leaflet utility function on geometries](https://github.com/makinacorpus/Leaflet.GeometryUtil)
-- [aratcliffe/Leaflet.contextmenu: A context menu for Leaflet.](https://github.com/aratcliffe/Leaflet.contextmenu)
-- [PROJ4JS | Proj4js](http://proj4js.org/)
-- [The javascript spreadsheet](https://bossanova.uk/jspreadsheet/v4/)
-- [Bootstrap · The most popular HTML, CSS, and JS library in the world.](https://getbootstrap.com/)
-- [Placeholder Map Pointer Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/186038/placeholder-map-pointer)
-- [Location Poi Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/399145/location-poi)
-- [Cross Vector SVG Icon (109) - SVG Repo](https://www.svgrepo.com/svg/475147/cross)
-- [Help 2 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/502697/help-2)
-- [Github 142 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/512317/github-142)
-- [About Vector SVG Icon (6) - SVG Repo](https://www.svgrepo.com/svg/486929/about)
+- ライブラリ
+  - [Leaflet - a JavaScript library for interactive maps](https://leafletjs.com/)
+  - [slutske22/leaflet-arrowheads: A small plugin for leaflet to quickly draw arrowheads on polylines for vector visualization](https://github.com/slutske22/leaflet-arrowheads)
+  - [makinacorpus/Leaflet.GeometryUtil: Leaflet utility function on geometries](https://github.com/makinacorpus/Leaflet.GeometryUtil)
+  - [aratcliffe/Leaflet.contextmenu: A context menu for Leaflet.](https://github.com/aratcliffe/Leaflet.contextmenu)
+  - [mad-gooze/Leaflet.Arc: Leaflet.js plugin for drawing Great Circle arcs using arc.js](https://github.com/MAD-GooZe/Leaflet.Arc)
+  - [PROJ4JS | Proj4js](http://proj4js.org/)
+  - [The javascript spreadsheet](https://bossanova.uk/jspreadsheet/v4/)
+  - [Bootstrap · The most popular HTML, CSS, and JS library in the world.](https://getbootstrap.com/)
+  - [yonda-yonda/geo4326](https://github.com/yonda-yonda/geo4326)
+
+- アイコンなど
+  - [Placeholder Map Pointer Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/186038/placeholder-map-pointer)
+  - [Location Poi Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/399145/location-poi)
+  - [Cross Vector SVG Icon (109) - SVG Repo](https://www.svgrepo.com/svg/475147/cross)
+  - [Help 2 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/502697/help-2)
+  - [Github 142 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/512317/github-142)
+  - [About Vector SVG Icon (6) - SVG Repo](https://www.svgrepo.com/svg/486929/about)

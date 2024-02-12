@@ -1,6 +1,10 @@
-// 厳密な数値型判定ではなく、アプリ内で使える数値か否かの確認に留めている。
-// そのため、0をfalseと判定している。
-function isValidNumber(data) {
+/**
+ * 表に入力されている値がアプリ内で使える値か否かを確認する関数
+ * 厳密な数値型判定は必要ないため、0 は false として扱っている。
+ * @param {string} data 確認すべき値
+ * @return {boolean} アプリ内で使える値なら true、そうでなければ false
+ */
+export function isValidNumber(data) {
   if (data == '') {
     return false
   } else if (isNaN(Number(data))) {
@@ -11,5 +15,3 @@ function isValidNumber(data) {
     return true
   }
 }
-
-export { isValidNumber }
