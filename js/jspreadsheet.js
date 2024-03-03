@@ -35,6 +35,15 @@ const beforePasteConvertedTable = () => {
   return false;
 };
 
+
+/**
+ * 結果を表示する表への入力を無効化する。
+ * 入力前の値を返すことで、入力前の値が入力後の値となる。
+ */
+const beforeChangeConvertedTable = (instance, cell, x, y, value) => {
+  return instance.jspreadsheet.getValueFromCoords(x, y);
+};
+
 /**
  * 変換元テーブルにデータを貼り付けて空行がなくなったら行を追加する
  * キーボードから入力する場合、行は自動的に追加される。
@@ -140,6 +149,7 @@ export const sourceTable = jspreadsheet(document.getElementById('sourceDataTable
 export const convertedTable = jspreadsheet(document.getElementById('convertedDataTable'), {
   data: initTableData,
   columns: columnsConfig,
+  onbeforechange: beforeChangeConvertedTable,
   onbeforepaste: beforePasteConvertedTable,
   contextMenu: convertedTableContextMenuItems,
   onbeforedeletecolumn: beforeDeleteColumn,
