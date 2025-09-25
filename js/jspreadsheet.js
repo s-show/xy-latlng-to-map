@@ -15,6 +15,7 @@ import jspreadsheet from 'jspreadsheet-ce';
  * 度分秒形式の緯度経度を十進数形式の緯度経度に変換している。
  */
 const beforechangeSourceTable = (instance, cell, x, y, value) => {
+  console.info(isValidNumber(zen2han(value)))
   if (value.match(/度|°/) == null) {
     value = value.replace(',', '');
     if (isValidNumber(zen2han(value))) {
@@ -35,7 +36,6 @@ const beforePasteConvertedTable = () => {
   return false;
 };
 
-
 /**
  * 結果を表示する表への入力を無効化する。
  * 入力前の値を返すことで、入力前の値が入力後の値となる。
@@ -49,10 +49,12 @@ const beforeChangeConvertedTable = (instance, cell, x, y, value) => {
  * キーボードから入力する場合、行は自動的に追加される。
  */
 const afterPaste = (instance) => {
-  const tableRows = sourceTable.options.data.length; // テーブルの行数を格納
-  const lastRowData = sourceTable.options.data[tableRows - 1];
+  const tableRows = sourceTable[0].options.data.length; // テーブルの行数を格納
+  const lastRowData = sourceTable[0].options.data[tableRows - 1];
   if (lastRowData[0] != '' && lastRowData[1] != '') {
-    instance.jspreadsheet.insertRow(1);
+    console.info(instance)
+    // instance.jspreadsheet.insertRow(1);
+    instance.insertRow(1);
   }
 };
 
@@ -130,13 +132,17 @@ const initTableData = [
 ];
 
 const columnsConfig = [
-  { type: 'numeric', title: 'X(緯度)', width: 180, name: 'x_latitude' },
-  { type: 'numeric', title: 'Y(経度)', width: 180, name: 'y_longitude' },
+  { type: 'numeric', title: 'X(緯度)', width: 110, name: 'x_latitude' },
+  { type: 'numeric', title: 'Y(経度)', width: 110, name: 'y_longitude' },
 ];
 
 export const sourceTable = jspreadsheet(document.getElementById('sourceDataTable'), {
-  data: initTableData,
-  columns: columnsConfig,
+  worksheets: [
+    {
+      data: initTableData,
+      options: columnsConfig,
+    }
+  ],
   onbeforechange: beforechangeSourceTable,
   contextMenu: sourceTableContextMenuItems,
   onbeforedeletecolumn: beforeDeleteColumn,
@@ -147,8 +153,12 @@ export const sourceTable = jspreadsheet(document.getElementById('sourceDataTable
 });
 
 export const convertedTable = jspreadsheet(document.getElementById('convertedDataTable'), {
-  data: initTableData,
-  columns: columnsConfig,
+  worksheets: [
+    {
+      data: initTableData,
+      columns: columnsConfig,
+    }
+  ],
   onbeforechange: beforeChangeConvertedTable,
   onbeforepaste: beforePasteConvertedTable,
   contextMenu: convertedTableContextMenuItems,
@@ -162,9 +172,9 @@ export const convertedTable = jspreadsheet(document.getElementById('convertedDat
 export function clearTable(e, tableName) {
   const tableData = [[,]];
   if (tableName == 'source') {
-    sourceTable.setData(tableData);
+    sourceTable[0].setData(tableData);
   } else {
-    convertedTable.setData(tableData);
+    convertedTable[0].setData(tableData);
   }
   e.preventDefault();
 }
@@ -173,32 +183,24 @@ export function resizeTable(viewPortWidth) {
   // viewPortWidth <= 992 で col-lg-* が適用される
   // viewPortWidth < 992 でデータテーブルと地図が縦並びになるのでテーブルの幅を戻している。
   if (viewPortWidth < 992) {
-    sourceTable.setWidth(0, 180);
-    sourceTable.setWidth(1, 180);
-    sourceTable.showIndex();
-    convertedTable.setWidth(0, 180);
-    convertedTable.setWidth(1, 180);
-    convertedTable.showIndex();
+    sourceTable[0].setWidth([0, 1], [180, 180]);
+    sourceTable[0].hideIndex();
+    convertedTable[0].setWidth([0, 1], [180, 180]);
+    convertedTable[0].hideIndex();
   } else if (viewPortWidth <= 1400) {
-    sourceTable.setWidth(0, 110);
-    sourceTable.setWidth(1, 110);
-    sourceTable.hideIndex();
-    convertedTable.setWidth(0, 110);
-    convertedTable.setWidth(1, 110);
-    convertedTable.hideIndex();
+    sourceTable[0].setWidth([0, 1], [110, 110]);
+    sourceTable[0].hideIndex();
+    convertedTable[0].setWidth([0, 1], [110, 110]);
+    convertedTable[0].hideIndex();
   } else if (viewPortWidth <= 1800) {
-    sourceTable.setWidth(0, 110);
-    sourceTable.setWidth(1, 110);
-    sourceTable.showIndex();
-    convertedTable.setWidth(0, 110);
-    convertedTable.setWidth(1, 110);
-    convertedTable.showIndex();
+    sourceTable[0].setWidth([0, 1], [110, 110]);
+    sourceTable[0].showIndex();
+    convertedTable[0].setWidth([0, 1], [110, 110]);
+    convertedTable[0].showIndex();
   } else {
-    sourceTable.setWidth(0, 180);
-    sourceTable.setWidth(1, 180);
-    sourceTable.showIndex();
-    convertedTable.setWidth(0, 180);
-    convertedTable.setWidth(1, 180);
-    convertedTable.showIndex();
+    sourceTable[0].setWidth([0, 1], [180, 180]);
+    sourceTable[0].showIndex();
+    convertedTable[0].setWidth([0, 1], [180, 180]);
+    convertedTable[0].showIndex();
   }
 }

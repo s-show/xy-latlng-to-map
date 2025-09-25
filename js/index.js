@@ -130,8 +130,8 @@ document.getElementById('dataConvertBtn').addEventListener('click', (e) => {
     params.source.zoneNo,
     params.convert.zoneNo
   );
-  const sourceData = dataCleansing(sourceTable.getJson(false));
-  convertedTable.setData(JSON.stringify(convertData(convertParameter, sourceData)));
+  const sourceData = dataCleansing(sourceTable[0].getData(false, false, false, true));
+  convertedTable[0].setData(convertData(convertParameter, sourceData));
   e.preventDefault();
 })
 
@@ -146,7 +146,7 @@ document.getElementById('clearConvertedTableBtn').addEventListener('click', (e) 
 
 // アイコン一括追加ボタンクリック時の動作
 document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
-  const sourceData = dataCleansing(sourceTable.getJson(false));
+  const sourceData = dataCleansing(sourceTable[0].getData(false, false, false, true));
   const params = getParams();
   // 緯度経度テーブルに有効なデータが無い場合 sourceData.length は 0 になる
   if (sourceData.length > 0) {
@@ -162,14 +162,16 @@ document.getElementById('addMarkerBtn').addEventListener('click', (e) => {
     const lineColor = selectLineColor(false);
 
     convertedData.forEach((data, index) => {
-      createMarker(data[0], data[1], iconColor).addTo(map);
-      if (lineColor != 'no' && convertedData[index+1] != undefined) {
-        L.polyline([convertedData[index], convertedData[index+1]],
+      if (iconColor != 'none') {
+        createMarker(data[0], data[1], iconColor).addTo(map);
+      }
+      if (lineColor != 'no' && convertedData[index + 1] != undefined) {
+        L.polyline([convertedData[index], convertedData[index + 1]],
           {
             attribution: 'markerPolyline',
             color: lineColor
           }
-          ).addTo(map);
+        ).addTo(map);
       }
     })
     const southWestPoint = L.latLng([
@@ -286,7 +288,7 @@ function getEspgCodes(sourceGeodeticSystem, convertGeodeticSystem, sourceZoneNo,
  */
 function dataCleansing(sourceData) {
   return sourceData.filter((data) => {
-    if (isValidNumber(data.x_latitude) && isValidNumber(data.y_longitude)) {
+    if (isValidNumber(data[0]) && isValidNumber(data[1])) {
       return data;
     }
   })
@@ -304,12 +306,12 @@ function convertData(convertParameter, sourceData) {
       convertParameter.fromProjection,
       convertParameter.toProjection,
       [
-        Number(data.y_longitude),
-        Number(data.x_latitude)
+        Number(data[1]),
+        Number(data[0])
       ]
     );
     // proj4 で変換された値は「経度・緯度」の順番になっているので、「緯度・経度」に並べ替える
-    return [ Number(temp[1]), Number(temp[0]) ];
+    return [Number(temp[1]), Number(temp[0])];
   });
 };
 
@@ -317,16 +319,16 @@ function convertData(convertParameter, sourceData) {
  * 印刷しないパーツを非表示にする処理
  */
 function preparePrint() {
-  sourceTable.setWidth(0, 110);
-  sourceTable.setWidth(1, 110);
-  sourceTable.hideIndex();
+  sourceTable[0].setWidth(0, 110);
+  sourceTable[0].setWidth(1, 110);
+  sourceTable[0].hideIndex();
   const notPrintDoms = document.querySelectorAll('.d-print-none');
   notPrintDoms.forEach((notPrintDom) => {
     notPrintDom.classList.add('d-none');
   })
   noPrintRadioBtn.forEach((radioBtn) => {
     document.getElementsByName(radioBtn).forEach((radioBtn) => {
-      if (!radioBtn.checked) { 
+      if (!radioBtn.checked) {
         radioBtn.parentElement.classList.add('d-none')
       }
     })
@@ -337,16 +339,16 @@ function preparePrint() {
  * 非表示にした印刷しないパーツを表示する処理
  */
 function afterPrint() {
-  sourceTable.setWidth(0, 180);
-  sourceTable.setWidth(1, 180);
-  sourceTable.showIndex();
+  sourceTable[0].setWidth(0, 180);
+  sourceTable[0].setWidth(1, 180);
+  sourceTable[0].showIndex();
   const notPrintDoms = document.querySelectorAll('.d-print-none');
   notPrintDoms.forEach((notPrintDom) => {
     notPrintDom.classList.remove('d-none');
   })
   noPrintRadioBtn.forEach((radioBtn) => {
     document.getElementsByName(radioBtn).forEach((radioBtn) => {
-      if (!radioBtn.checked) { 
+      if (!radioBtn.checked) {
         radioBtn.parentElement.classList.remove('d-none')
       }
     })
@@ -364,7 +366,7 @@ document.getElementById('addCircleToMap').addEventListener('click', (e) => {
   if (markerColor == 'no') {
     markerColor = 'red';
   }
-  const circleRadius = document.getElementById('radius'); 
+  const circleRadius = document.getElementById('radius');
   let radius = 0;
   if (Number(circleRadius.value) >= 0) {
     radius = Number(circleRadius.value);
@@ -391,13 +393,13 @@ document.getElementById('inputDiameter').addEventListener('close', (e) => {
 // 変換前後のデータをCSVでexportする
 document.getElementById('exportCSVBtn').addEventListener('click', (e) => {
   let headerText = [
-    ['変換元','変換元','変換後','変換後']
+    ['変換元', '変換元', '変換後', '変換後']
   ];
   const params = getParams();
   if (params.source.type == 'XY') {
-    headerText.push([ 'X', 'Y' ])
+    headerText.push(['X', 'Y'])
   } else {
-    headerText.push([ '緯度', '経度' ])
+    headerText.push(['緯度', '経度'])
   }
   if (params.convert.type == 'XY') {
     headerText[1].push('X', 'Y')
@@ -447,7 +449,7 @@ document.getElementById('exportCSVBtn').addEventListener('click', (e) => {
 })
 
 // 線の色を選択する処理
-function selectLineColor(shouldReturnDefaultColor=true) {
+function selectLineColor(shouldReturnDefaultColor = true) {
   let selectLineColor = document.getElementById('selectLineColor');
   let lineColor = ''
   switch (selectLineColor.value) {

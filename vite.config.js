@@ -15,4 +15,11 @@ export default defineConfig({
       },
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: ['mixed-decls', 'color-functions', 'global-builtin', 'import']
+      },
+    }
+  },
 });
