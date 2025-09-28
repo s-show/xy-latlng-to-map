@@ -118,13 +118,7 @@ const redCenterMarker = L.icon({
 });
 const blueCenterMarker = L.icon({
   iconUrl: getImage('blueCenterMarker', 'svg'),
-  iconSize: centerMarkerSize,
-  iconAnchor: centerMarkerAnchor,
-});
-const yellowCenterMarker = L.icon({
-  iconUrl: getImage('yellowCenterMarker', 'svg'),
-  iconSize: centerMarkerSize,
-  iconAnchor: centerMarkerAnchor,
+  iconSize: centerMarkerSize, iconAnchor: centerMarkerAnchor, }); const yellowCenterMarker = L.icon({ iconUrl: getImage('yellowCenterMarker', 'svg'), iconSize: centerMarkerSize, iconAnchor: centerMarkerAnchor,
 });
 const greenCenterMarker = L.icon({
   iconUrl: getImage('greenCenterMarker', 'svg'),

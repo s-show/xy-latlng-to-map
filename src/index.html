@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="jp" data-bs-theme="light">
+
+<head>
+  <%- include("./partials/head.ejs", { subtitle: 'メインページ' }) %>
+</head>
+
+<body>
+  <%- include("./partials/header.ejs", { page: 'toppage' }) %>
+  <div class="container-fluid content-wrapper-toppage">
+    <div class="row flex-nowrap">
+      <div id="menu_column" class="col-lg-3">
+        <div id="dataInformation" class="p-2">
+          <h3>データ詳細情報</h3>
+          <%- include("./partials/dataTypeSelect.ejs", { dataType: 'source' }) %>
+          <hr class="border-2">
+          <%- include("./partials/geodeticSystem.ejs", { dataType: 'source' }) %>
+          <%- include("./partials/geodeticSystemDialog.ejs") -%>
+          <hr class="border-2">
+          <%- include("./partials/zoneNoSelect.ejs", { select_id: "sourceZoneNo" }) %>
+          <%- include("./partials/zoneNoDialog.ejs") -%>
+          <hr class="border-2">
+          <h3 id="headerDataTable" class="p-0">データテーブル</h3>
+          <div id="sourceDataTable"></div>
+          <p class="d-print-none">使用するデータを入力または貼り付けしてください。空白セルがある行は無視して処理します。右クリックからの貼り付けが成功しない場合、"ctrl-v" で貼り付けしてください。</p>
+          <button id="clearSourceTableBtn" type="button" class="button button--danger mb-sm-2 d-print-none">データを削除</button>
+          <button id="openAcceptableDataDialog" type="button" class="button button--dialog-open d-print-none">入力可能なデータについて</button>
+          <%- include("./partials/dataTableDialog.ejs") -%>
+        </div>
+        <hr class="border-2">
+        <!-- 地図とデータ変換部分を切り替えるタブ -->
+        <ul class="nav nav-tabs px-2">
+          <li class="nav-item d-print-none">
+            <a class="nav-link border-dark-subtle border-2 border-start border-top border-end active"
+              href="#map-content" data-bs-toggle="tab">地図加工</a>
+          </li>
+          <li class="nav-item d-print-none">
+            <a class="nav-link border-dark-subtle border-2 border-start border-top border-end" href="#dataConvert"
+              data-bs-toggle="tab">データ変換</a>
+          </li>
+        </ul>
+        <!-- 地図加工のタブ -->
+        <div class="tab-content px-2 d-print-none">
+          <div id="map-content" class="tab-pane active">
+            <div class="tab-content-div p-2 mb-2 border border-2 border-dark-subtle">
+              <div class="border-bottom border-dark-subtle border-2 mx-0 py-2 row align-items-center">
+                <label class="fs-6 col-4 col-form-label" for="selectMarkerIcon">地図に追加するアイコンの色</label>
+                <div class="col-8">
+                  <select id="selectMarkerIcon" class="form-select border border-1 border-dark-subtle">
+                    <option value="none">なし</option>
+                    <option value="red">赤</option>
+                    <option value="blue">青</option>
+                    <option value="yellow">黄</option>
+                    <option value="green">緑</option>
+                  </select>
+                </div>
+              </div>
+              <div class="border-bottom border-dark-subtle border-2 mx-0 py-2 row align-items-center">
+                <label class="fs-6 col-4 col-form-label" for="selectLineColor">地図に追加する線の有無と色</label>
+                <div class="col-8">
+                  <select id="selectLineColor" class="form-select border border-1 border-dark-subtle">
+                    <option value="no">線無し</option>
+                    <option value="red">赤</option>
+                    <option value="blue">青</option>
+                    <option value="yellow">黄</option>
+                    <option value="green">緑</option>
+                  </select>
+                </div>
+              </div>
+              <div class="border-bottom border-black py-2">
+                <button id="addMarkerBtn" class="btn btn-primary my-1">アイコンの一括追加</button>
+                <p class="mb-1">データテーブルのデータに基づいてアイコンを追加します。</p>
+              </div>
+              <div class="border-bottom border-black py-2">
+                <button id="removeMarkerBtn" class="button button--danger my-1">全図形を削除</button>
+                <p class="mb-1">地図に追加したアイコンなどを全て削除します</p>
+              </div>
+              <div class="border-bottom border-black py-2">
+                <p class="fs-6 mb-0">地図を右クリックすると次のことができます。</p>
+                <ul>
+                  <li>円やアイコンを地図に追加。色は上で選んだ色になります。</li>
+                  <li>任意の2点間の距離を計測</li>
+                </ul>
+                <p class="fs-6 mb-0">円やアイコンを右クリックすると次のことができます。</p>
+                <ul>
+                  <li>円の中心点やアイコン同士の距離を計測</li>
+                  <li>円やアイコンを削除</li>
+                </ul>
+              </div>
+              <div id="zoomRangeWrap" class="py-2">
+                <label for="zoomRange" class="">地図を引き伸ばす</label>
+                <input id="zoomRange" type="range" class="" value="1" min="1" max="3" step="0.2" list="zoomRangeMarkers" class="mt-1">
+                <output id="zoomRangeValue" for="zoomRange">1x</output>
+                <datalist id="zoomRangeMarkers">
+                  <option value="1"></option>
+                  <option value="1.5"></option>
+                  <option value="2"></option>
+                  <option value="2.5"></option>
+                  <option value="3"></option>
+                </datalist>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- データ変換のタブ -->
+        <div class="tab-content">
+          <div id="dataConvert" class="tab-pane">
+            <div class="tab-content-div mb-2 p-3 border border-2 border-dark-subtle">
+              <p>変換条件と変換結果</p>
+              <%- include("./partials/dataTypeSelect.ejs", { dataType: 'convert' }) %>
+              <hr class="border-2">
+              <%- include("./partials/geodeticSystem.ejs", { dataType: 'convert' }) %>
+              <hr class="border-2">
+              <%- include("./partials/zoneNoSelect.ejs", { select_id: "convertZoneNo" }) %>
+              <hr class="border-2">
+              <button id="dataConvertBtn" type="button" class="btn btn-primary mb-3 d-print-none">変換</button>
+              <div id="convertedDataTable"></div>
+              <p class="mb-3">表を右クリックして表示されるメニューからデータをコピーできます</p>
+              <button id="clearConvertedTableBtn" type="button"
+                class="btn button--danger mb-3 d-print-none">データを削除</button>
+              <button id="exportCSVBtn" type="button"
+                class="btn btn-primary mb-3 d-print-none">CSV形式でダウンロード</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="main_content" class="col-lg-9 mt-sm-2">
+        <div class="mapContainer">
+          <div id="map" class="mb-2 map"></div>
+        </div>
+        <div id="errorMessageWrap" class="alert alert-danger visually-hidden" role="alert">
+          <h4 class="alert-heading">エラーメッセージ</h4>
+          <p id="errorMessage"></p>
+        </div>
+      </div>
+    </div>
+    <%- include("./partials/help.ejs") %>
+  </div>
+  <%- include("./partials/footer.ejs", { page: 'toppage' }) %>
+  <%- include("./partials/inputDiameterDialog.ejs") %>
+
+  <script type="module" src="./js/index.js"></script>
+</body>
+
+</html>

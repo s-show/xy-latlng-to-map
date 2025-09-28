@@ -1,0 +1,81 @@
+// ==========================================================================
+// Third-party Library Styles
+// ==========================================================================
+
+// JSpreadsheet Styling
+// --------------------------------------------------------------------------
+:root {
+  --jexcel_header_color: #{$jexcel-header-color};
+  --jexcel_header_color_highlighted: #{$jexcel-header-color-highlighted};
+  --jexcel_header_background: #{$jexcel-header-background};
+  --jexcel_header_background_highlighted: #{$jexcel-header-background-highlighted};
+  --jexcel_content_color: #{$jexcel-content-color};
+  --jexcel_content_color_highlighted: #{$jexcel-content-color-highlighted};
+  --jexcel_content_background: #{$jexcel-content-background};
+  --jexcel_content_background_highlighted: #{$jexcel-content-background-highlighted};
+  --jexcel_menu_background: #{$jexcel-menu-background};
+  --jexcel_menu_background_highlighted: #{$jexcel-menu-background-highlighted};
+  --jexcel_menu_color: #{$jexcel-menu-color};
+  --jexcel_menu_color_highlighted: #{$jexcel-menu-color-highlighted};
+  --jexcel_menu_box_shadow: #{$jexcel-menu-box-shadow};
+  --jexcel_border_color: #{$jexcel-border-color};
+  --jexcel_border_color_highlighted: #{$jexcel-border-color-highlighted};
+  --active_color: #{$jexcel-active-color};
+}
+
+// Leaflet.js Styling
+// --------------------------------------------------------------------------
+.leaflet-contextmenu {
+  display: none;
+  box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
+  -webkit-border-radius: $border-radius-sm;
+  border-radius: $border-radius-sm;
+  padding: $padding-dialog;
+  background-color: $color-white;
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+
+  a.leaflet-contextmenu-item {
+    display: block;
+    color: #222;
+    font-size: medium;
+    line-height: 20px;
+    text-decoration: none;
+    padding: 0.25em 0em 0.25em 0em;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    cursor: default;
+    outline: none;
+
+    &.leaflet-contextmenu-item-disabled {
+      opacity: 0.5;
+
+      &.over {
+        background-color: inherit;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+      }
+    }
+
+    &.over {
+      background-color: #f4f4f4;
+      border-top: 1px solid #f0f0f0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+  }
+}
+
+.leaflet-contextmenu-icon {
+  margin: 2px 8px 0 0;
+  width: 16px;
+  height: 16px;
+  float: left;
+  border: 0;
+}
+
+.leaflet-contextmenu-separator {
+  border-bottom: 1px solid #ccc;
+  margin: 5px 0;
+}

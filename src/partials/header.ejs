@@ -1,0 +1,29 @@
+<nav id="header" class="navbar sticky-top p-3">
+  <div class="container-fluid">
+    <a href="./index.html" class="navbar-brand h1">座標の地図表示と座標・緯度経度の変換</a>
+    <% if (page == 'toppage') { %>
+    <div class="d-flex align-items-stretch">
+      <div id="togglePreview" class="me-3">
+        <div class="border border-white rounded p-2">
+          <label class="switch__label d-flex align-items-center mb-0" for="printPreviewBtn">
+            <div class="switch ms-1">
+              <input id="printPreviewBtn" class="switch__input" type="checkbox">
+              <div class="switch__slider"></div>
+              <div class="switch__circle"></div>
+              <div class="switch__base"></div>
+            </div>
+            <p id="printPreviewBtnTitle" class="text-white fs-6 ms-2 me-3 mb-0">印刷時と同じ見た目にする</p>
+          </label>
+        </div>
+      </div>
+      <div id="openHelp">
+        <div class="border border-white rounded d-print-none">
+          <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"
+            class="button button--dialog-open">
+            <img src="./assets/help.svg" height="24">使い方を表示</button>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</nav>

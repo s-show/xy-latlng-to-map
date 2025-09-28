@@ -64,9 +64,13 @@ function openRadiusInputDialog(e) {
  */
 function addMarker(e) {
   const iconColor = document.getElementById('selectMarkerIcon').value;
-  const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor);
-  marker.bindTooltip('緯度経度: ' + Number(e.latlng.lat) + ', ' + e.latlng.lng, {}).openTooltip();
-  marker.addTo(map);
+  if (iconColor != 'none') {
+    const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor);
+    marker.bindTooltip('緯度経度: ' + Number(e.latlng.lat) + ', ' + e.latlng.lng, {}).openTooltip();
+    marker.addTo(map);
+  } else {
+    window.alert('アイコンの色を選択してください')
+  }
 }
 
 /**

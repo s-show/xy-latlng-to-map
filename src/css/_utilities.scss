@@ -1,0 +1,9 @@
+// ==========================================================================
+// Utility Classes
+// ==========================================================================
+
+// Responsive Border Utilities
+// --------------------------------------------------------------------------
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include responsive-border-utilities($breakpoint, breakpoint-infix($breakpoint, $grid-breakpoints));
+}

@@ -1,0 +1,146 @@
+// ==========================================================================
+// Layout Styles
+// ==========================================================================
+
+// Base Layout
+// --------------------------------------------------------------------------
+body {
+  background-color: $color-white;
+}
+
+#header {
+  background-color: $color-header;
+}
+
+#footer {
+  background-color: $color-footer;
+}
+
+// Content Wrapper
+// --------------------------------------------------------------------------
+@mixin content-wrapper($overflow) {
+  // More precise calculation using CSS variables for maintainability
+  --header-height: #{$header-height}; // Approximate height with padding + safety margin
+  --footer-height: #{$footer-height}; // Approximate height with padding + safety margin
+  height: calc(100vh - var(--header-height) - var(--footer-height));
+  overflow: $overflow;
+
+  >.row {
+    height: 100%;
+  }
+}
+
+.content-wrapper-toppage {
+  @include content-wrapper(hidden)
+}
+.content-wrapper-about {
+  @include content-wrapper(scroll)
+}
+
+// Menu Column
+// --------------------------------------------------------------------------
+#menu_column {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  // カスタムスクロールバー
+  @include custom-scrollbar;
+}
+
+// Main Content Area
+// --------------------------------------------------------------------------
+#main_content {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .mapContainer {
+    flex: 1;
+    position: relative;
+
+    #map {
+      @include absolute-fill;
+      /* height: 98% !important; // Override the calc height */
+      --header-height: #{$header-height}; // Approximate height with padding + safety margin
+      --footer-height: #{$footer-height}; // Approximate height with padding + safety margin
+      height: calc(100vh - var(--header-height) - var(--footer-height) - 10px);
+      margin-bottom: 0;
+    }
+  }
+
+  #errorMessageWrap {
+    flex-shrink: 0;
+  }
+}
+
+// Responsive Layout
+// --------------------------------------------------------------------------
+@include mobile-down {
+
+  // Bootstrap lg breakpoint
+  .content-wrapper {
+    height: auto;
+    overflow: visible;
+
+    >.row {
+      height: auto;
+      flex-wrap: wrap !important;
+    }
+  }
+
+  #menu_column {
+    height: auto;
+    max-height: $map-min-height;
+    overflow-y: auto;
+  }
+
+  #main_content {
+    height: auto;
+    min-height: $map-min-height; // 最小高さを追加
+
+    .mapContainer {
+      min-height: $map-min-height; // コンテナの最小高さ
+      position: relative;
+
+      #map {
+        height: #{$map-min-height} !important; // Fixed height for mobile
+        position: relative; // absolute から relative に変更
+      }
+    }
+  }
+}
+
+// Print Layout
+// --------------------------------------------------------------------------
+@media print {
+  .content-wrapper {
+    height: auto;
+    overflow: visible;
+  }
+
+  #menu_column {
+    height: auto;
+    overflow: visible;
+  }
+
+  #main_content {
+    height: auto;
+    overflow: visible;
+
+    #map {
+      height: calc(100vw / 12 * 6) !important; // Restore original calculation for print
+    }
+  }
+}
+
+// Map Container
+// --------------------------------------------------------------------------
+.mapContainer {
+  overflow: hidden;
+}
+
+.map {
+  border: solid 0.1em $color-black;
+}

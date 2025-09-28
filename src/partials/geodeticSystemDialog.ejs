@@ -1,0 +1,46 @@
+<!-- 測地系の部分 -->
+<button type="button" id="openGeodeticSystemDialog" class="button button--dialog-open d-print-none">測地系の解説</button>
+<dialog id="geodeticSystemDialog" class="dialog">
+  <div class="dialog__inner">
+    <h1 class="fs-5" id="geodeticSystemLabel">測地系の解説</h1>
+    <table id="geodeticSystemTable" class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col" data-geodeticSystem="header">選択</th>
+          <th scope="col">系番号</th>
+          <th scope="col" class="w-75">適用区域</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        <tr>
+          <td>
+            <button data-geodeticSystem="TOKYO">選択</button>
+          </td>
+          <td>日本測地系</td>
+          <td>
+            明治時代に採用された測地系で、2002(H14)年3月31日まで使用されていた。明治時代の測量技術等による制約や採用後の地殻変動でずれが生じていたため、世界測地系に移行することとなった。
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button data-geodeticSystem="JGD2000">選択</button>
+          </td>
+          <td>世界測地系（JGD2000）</td>
+          <td>
+            日本測地系のずれを解消するために採用した世界共通の測地系で、2002(H14)年4月1日～2011(H23)年10月30日まで使用されていた。平成23年（2011年）東北地方太平洋沖地震による地殻変動を受けて、世界測地系（JGD2011）に移行することとなった。
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button data-geodeticSystem="JGD2011">選択</button>
+          </td>
+          <td>世界測地系（JGD2011）</td>
+          <td>
+            平成23年（2011年）東北地方太平洋沖地震による地殻変動に対応した測地系で、2011(H23)年10月31日から使用されている。地殻変動の影響が少ない西日本と北海道では世界測地系（JGD2000）と同じであるが、東日本と北陸4県では世界測地系（JGD2000）から変更されている。
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="button" id="closeGeodeticSystemDialog" class="btn btn-secondary">閉じる</button>
+  </div>
+</dialog>

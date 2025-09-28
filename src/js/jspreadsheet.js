@@ -15,7 +15,6 @@ import jspreadsheet from 'jspreadsheet-ce';
  * 度分秒形式の緯度経度を十進数形式の緯度経度に変換している。
  */
 const beforechangeSourceTable = (instance, cell, x, y, value) => {
-  console.info(isValidNumber(zen2han(value)))
   if (value.match(/度|°/) == null) {
     value = value.replace(',', '');
     if (isValidNumber(zen2han(value))) {
@@ -52,8 +51,6 @@ const afterPaste = (instance) => {
   const tableRows = sourceTable[0].options.data.length; // テーブルの行数を格納
   const lastRowData = sourceTable[0].options.data[tableRows - 1];
   if (lastRowData[0] != '' && lastRowData[1] != '') {
-    console.info(instance)
-    // instance.jspreadsheet.insertRow(1);
     instance.insertRow(1);
   }
 };
@@ -62,47 +59,46 @@ const afterPaste = (instance) => {
  * 行削除・貼り付けのみ表示するようにしている
  * コードは https://github.com/jspreadsheet/ce/blob/master/src/index.js を参照
  */
-const sourceTableContextMenuItems = (obj, x, y, e) => {
-  let items = [];
-  if (obj.options.allowDeleteRow == true) {
-    items.push({
-      title: obj.options.text.deleteSelectedRows,
-      onclick: () => {
-        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
-      },
-    });
-    items.push({
-      title: obj.options.text.paste,
-      shortcut: 'Ctrl + V',
-      onclick: () => {
-        if (obj.selectedCell) {
-          navigator.clipboard.readText().then((text) => {
-            if (text) {
-              jspreadsheet.current.paste(obj.selectedCell[0], obj.selectedCell[1], text);
-            }
-          });
-        }
-      },
-    });
-  }
-  return items;
+const sourceTableContextMenuItems = (obj, x, y, e, items, section) => {
+  console.info(obj);
+  let newItems = [];
+  newItems.push({
+    title: '行を削除',
+    onclick: () => {
+      obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+    },
+  });
+  newItems.push({
+    title: '貼り付け',
+    shortcut: 'Ctrl + V',
+    onclick: () => {
+      navigator.clipboard.readText().then((text) => {
+        sourceTable[0].paste(obj.selectedCell[0], obj.selectedCell[1], text);
+      })
+      .catch(error => {
+        console.error('Clipboard access failed. Please use Ctrl+V instead.', error);
+        alert('クリップボードへのアクセスに失敗しました。Ctrl+Vをお使いください。');
+      });
+    },
+  });
+  return newItems;
 };
 /**
  * コピーのみ表示するようにしている
  * コードは https://github.com/jspreadsheet/ce/blob/master/src/index.js を参照
  */
-const convertedTableContextMenuItems = (obj, x, y, e) => {
-  let items = [];
-  if (obj.options.allowDeleteRow == true) {
-    items.push({
-      title: obj.options.text.copy,
-      shortcut: 'Ctrl + C',
-      onclick: () => {
-        obj.copy();
-      },
-    });
-  }
-  return items;
+const convertedTableContextMenuItems = (obj, x, y, e, items, section) => {
+  let newItems = [];
+  newItems.push({
+    title: 'データを全てコピー',
+    shortcut: 'Ctrl + C',
+    onclick: () => {
+      convertedTable[0].selectAll();
+      convertedTable[0].copy();
+      convertedTable[0].resetSelection();
+    },
+  });
+  return newItems;
 };
 
 // instance.jspreadsheet.colgroup.length は列追加前の列数。

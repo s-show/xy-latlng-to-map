@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="jp" data-bs-theme="light">
+
+<head>
+  <%- include("./partials/head.ejs", { subtitle: 'このサイトについて' }) %>
+</head>
+
+<body>
+  <%- include("./partials/header.ejs", { page: 'about' }) %>
+    <div class="container-fluid content-wrapper-about">
+      <div class="row justify-content-center">
+        <div class="col-6 mt-3">
+          <h2 class="border-top border-bottom border-dark-subtle py-3">このサイトの説明</h2>
+          <p>XY座標や緯度経度の示す場所にアイコンを追加したり、地図に半径を指定した円を表示したり、任意の地点間の距離を計測できるサイトです。</p>
+          <p>
+            業務の中で、XY座標の場所のアイコンを航空写真に表示したり、土地と土砂災害警戒区域のそれぞれのXY座標の場所にアイコンを表示して2つの区域が重なるか調べたり、ある地点に半径1000メートルの円を表示してその範囲内に目的の土地があるか調べたりしたかったので、このサイトを作りました。
+          </p>
+          <h2 class="border-top border-bottom border-dark-subtle py-3">このサイトでできること</h2>
+          <p>このサイトでは、次のことができます。</p>
+          <h3>XY座標または緯度経度のリストから一括してアイコンを追加する</h3>
+          <p>
+            測量成果のXY座標や緯度経度のリストが示す地図上の場所に一括してアイコンを追加する機能です。地図は地理院地図の通常地図に加えて航空写真も使えますので、航空写真に地積測量図のXY座標が示す場所を示したり、地積測量図のXY座標の場所を表示した後に、土砂災害警戒区域の座標値を入力して2つの区域を地図上で重ねて表示したりすることもできます。
+            <a href="./assets/screenshot/multi_icons.png" class="d-block">
+              <img src="./assets/screenshot/multi_icons.png" width="608" alt="" class="p-6">
+            </a>
+          </p>
+          <h3>地図の指定した場所に円を追加する</h3>
+          <p>
+            地図の任意の場所にメートル単位で指定した半径の円を表示する機能です。地理院地図にも円を表示する機能がありますが、あちらはピクセル単位で半径を指定するのに対し、こちらはメートル単位で半径を指定しますので、ある場所から半径1km以内の範囲を調べたい場合はこちらの方が便利なはずです。
+            <a href="./assets/screenshot/circle.png" class="d-block">
+              <img src="./assets/screenshot/circle.png" width="608" alt="" class="p-6">
+            </a>
+          </p>
+          <h3>地図の指定した場所にアイコンを追加する</h3>
+          <p>
+            地図の任意の場所にアイコンを追加できる機能です。地図に目印を設置したいときに使えます。
+            <a href="./assets/screenshot/add_icons.png" class="d-block">
+              <img src="./assets/screenshot/add_icons.png" width="608" alt="" class="p-6">
+            </a>
+          </p>
+          <h3>地図の任意の2点間の距離を計測する</h3>
+          <p>
+            地図上の任意の場所同士の距離を計測できる機能です。駅からの距離などを調べたいときに使えます。
+            <a href="./assets/screenshot/measure_any_points.png" class="d-block">
+              <img src="./assets/screenshot/measure_any_points.png" width="608" alt="" class="p-6">
+            </a>
+          </p>
+          <h3>アイコンや円の中心点からの距離を計測する</h3>
+          <p>
+            アイコンや円の中心点からの距離を計測できる機能です。アイコンは一括して登録したものも任意の場所に追加したものも同じように扱えますので、目印として置いたアイコンから一括して登録したアイコンまでの距離を計測したり、駅の上に表示した半径1000メートルの円の中心から、円の外にある目印アイコンまでの距離を計測したりするときに使えます。
+            <a href="./assets//screenshot/measure_icon_and_circle.png" class="d-block">
+              <img src="./assets/screenshot/measure_icon_and_circle.png" width="608" alt="" class="p-6">
+            </a>
+          </p>
+          <h3>アイコンや円を削除する</h3>
+          <p>
+            追加したアイコンや円は右クリックメニューからいつでも削除できます。
+          </p>
+          <h2 class="border-top border-bottom border-dark-subtle py-3">作者について</h2>
+          <dl>
+            <dt>Blog:</dt>
+            <dd><a href="https://kankodori-blog.com" rel="nofollow">閑古鳥ブログ</a></dd>
+            <dt>Github:</dt>
+            <dd><a href="https://github.com/s-show">s-show</a></dd>
+            <dt>E-Mail:</dt>
+            <dd>kankodori.blog （この後ろは @gmail.com が続きます）</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+    <%- include("./partials/footer.ejs", { page: 'about' }) %>
+      <script type="module" src="./js/about.js"></script>
+</body>
+
+</html>

@@ -63,7 +63,7 @@ function setupDialog() {
 document.getElementsByName('sourceDataType').forEach((selectedBtn) => {
   changeZoneNo(selectedBtn, document.getElementById('sourceZoneNo'));
 })
-document.getElementsByName('convertDataType').forEach((selectedBtn) => {
+document.getElementsByName('convertToDataType').forEach((selectedBtn) => {
   changeZoneNo(selectedBtn, document.getElementById('convertZoneNo'));
 })
 function changeZoneNo(selectedBtn, selectMenu) {
@@ -256,7 +256,7 @@ function getParams() {
       params['source']['geodeticSystem'] = currentNode.value;
     }
   });
-  document.getElementsByName('convertGeodeticSystem').forEach((currentNode) => {
+  document.getElementsByName('convertToGeodeticSystem').forEach((currentNode) => {
     if (currentNode.checked) {
       params['convert']['geodeticSystem'] = currentNode.value;
     }
@@ -430,8 +430,8 @@ document.getElementById('exportCSVBtn').addEventListener('click', (e) => {
   } else {
     headerText[3].push('', '')
   }
-  let sourceData = sourceTable.getData();
-  const convertData = convertedTable.getData();
+  let sourceData = sourceTable[0].getData();
+  const convertData = convertedTable[0].getData();
   sourceData.forEach((data, index) => {
     data.push(convertData[index]);
   })
@@ -442,9 +442,9 @@ document.getElementById('exportCSVBtn').addEventListener('click', (e) => {
   link.setAttribute('download', 'data.csv');
   link.textContent = 'Click to Download';
 
-  document.getElementById('exportBtnArea').appendChild(link);
+  document.getElementById('dataConvert').appendChild(link);
   link.click();
-  document.getElementById('exportBtnArea').removeChild(link);
+  document.getElementById('dataConvert').removeChild(link);
   URL.revokeObjectURL(objUrl);
 })
 

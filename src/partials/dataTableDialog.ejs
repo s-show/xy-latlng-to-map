@@ -1,0 +1,16 @@
+<dialog id="acceptableDataDialog" class="dialog">
+  <div class="dialog__inner">
+    <ul>
+      <li>入力できる値の形式は次のとおりです。</li>
+      <ul>
+        <li>XY座標</li>
+        <li>度分秒形式の緯度経度（例: 35度39分29.1572秒、35°39′29.1572″、北緯35度39分29秒1572）</li>
+        <li>十進数形式の緯度経度（例: 35.658099）</li>
+      </ul>
+      <li>Excelから貼り付けられます。また、タブ区切りのテキストも貼り付けられます。</li>
+      <li>行の削除は、セルの上で右クリックして「選択した行を削除」をクリックします。</li>
+      <li>「35度39分29.1572秒」の度分秒形式の緯度経度を貼り付けると自動的に「35.658099」の10進数形式に変換されます。</li>
+    </ul>
+    <button type="button" id="closeAcceptableDataDialog" class="btn btn-secondary">閉じる</button>
+  </div>
+</dialog>

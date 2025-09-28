@@ -1,0 +1,39 @@
+<% let legendLabel = '' %>
+<% let name = '' %>
+<% let TOKYOId = '' %>
+<% let JGD2000Id = '' %>
+<% let JGD2011Id = '' %>
+<% if (dataType == 'source') { %>
+  <% legendLabel = '測地系' %>
+  <% name = 'sourceGeodeticSystem' %>
+  <% TOKYOId = 'sourceIsTOKYO' %>
+  <% JGD2000Id = 'sourceIsJGD2000' %>
+  <% JGD2011Id = 'sourceIsJGD2011' %>
+<% } else { %>
+  <% legendLabel = '変換先の測地系' %>
+  <% name = 'convertToGeodeticSystem' %>
+  <% TOKYOId = 'convertToTOKYO' %>
+  <% JGD2000Id = 'convertToJGD2000' %>
+  <% JGD2011Id = 'convertToJGD2011' %>
+<% } %>
+
+<fieldset class="row align-items-start">
+  <legend class="py-0 col-4 col-form-label"><%= legendLabel%></legend>
+  <div class="col-8">
+    <div class="form-check">
+      <input id=<%= TOKYOId %> type="radio" class="form-check-input border border-2 border-dark-subtle"
+        name=<%= name %> value="TOKYO" checked>
+      <label class="form-check-label mb-1" for=<%= TOKYOId %>>日本測地系</label>
+    </div>
+    <div class="form-check">
+      <input id=<%= JGD2000Id %> type="radio" class="form-check-input border border-2 border-dark-subtle"
+        name=<%= name %> value="JGD2000">
+      <label class="form-check-label mb-1" for=<%= JGD2000Id %>>世界測地系（JGD2000）</label>
+    </div>
+    <div class="form-check">
+      <input id=<%= JGD2011Id %> type="radio" class="form-check-input border border-2 border-dark-subtle"
+        name=<%= name %> value="JGD2011">
+      <label class="form-check-label mb-1" for=<%= JGD2011Id %>>世界測地系（JGD2011）</label>
+    </div>
+  </div>
+</fieldset>

@@ -1,0 +1,180 @@
+// ==========================================================================
+// UI Components
+// ==========================================================================
+
+// Button Component
+// --------------------------------------------------------------------------
+.button {
+  @include button-base;
+
+  // ダイアログを開くボタンのバリエーション
+  &--dialog-open {
+    background-color: $color-dialog-open;
+    border-color: $color-dialog-open-border;
+    color: $color-black;
+
+    &:hover {
+      background-color: $color-dialog-open-hover;
+    }
+  }
+
+  // 危険な操作用ボタンのバリエーション
+  &--danger {
+    background-color: red;
+    border-color: $color-danger;
+    color: $color-white;
+
+    &:hover {
+      background-color: $color-danger-hover;
+      color: $color-black;
+    }
+  }
+}
+
+// Dialog Component
+// --------------------------------------------------------------------------
+.dialog {
+  margin: auto;
+  max-width: calc(100vw - 12em); // 6em left + 6em right margins
+  border: 1px solid $color-dialog-border;
+  border-radius: $border-radius-lg;
+  @include box-shadow($color-dialog-shadow);
+
+  &__inner {
+    max-height: calc(100vh * 0.6);
+    overflow-y: scroll;
+    padding-top: 0px;
+
+    #zoneNoTable th {
+      position: sticky;
+      top: 0;
+      z-index: $z-index-sticky;
+      background-color: $color-white;
+    }
+  }
+
+  // モーダルダイアログのバリエーション
+  &--modal {
+    // HTML dialogタグ用の中央配置設定
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+}
+
+// Switch Component
+// --------------------------------------------------------------------------
+.switch {
+  position: relative;
+
+  &__label {
+    @include flex-center;
+  }
+
+  &__input {
+    position: absolute;
+    width: 0;
+    height: 0;
+
+    &:checked ~ .switch__base {
+      background-color: $color-switch-active;
+      transition: $transition-fast;
+    }
+
+    &:checked ~ .switch__circle {
+      transform: translateX(100%);
+      background-color: $color-switch-active-circle;
+    }
+  }
+
+  &__base {
+    width: 40px;
+    border-radius: $border-radius-xl;
+    height: 24px;
+    background-color: $color-switch-base;
+  }
+
+  &__circle {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background-color: $color-switch-circle;
+  }
+
+  &__slider {
+    // スライダーのスタイル（必要に応じて追加）
+  }
+}
+
+// Navigation Tabs
+// --------------------------------------------------------------------------
+.nav-tabs {
+  .nav-item {
+    .nav-link {
+      color: $color-black;
+      background-color: $color-white;
+
+      &.active {
+        color: $color-white;
+        background-color: $color-primary;
+      }
+    }
+  }
+}
+
+// User Guide Component
+// --------------------------------------------------------------------------
+.user-guide {
+  // メインのユーザーガイドコンテナスタイル（必要に応じて追加）
+
+  &__details {
+    border-top: 1px solid $color-guide-border;
+
+    // hover と [open] のとき子要素のタイトルの背景色を変更
+    &:hover > .user-guide__title,
+    &[open] > .user-guide__title {
+      background-color: $color-guide-hover;
+    }
+  }
+
+  &__title {
+    padding: 0.25em;
+  }
+
+  &__text {
+    margin: 0.1em;
+  }
+}
+
+// 旧#userGuideのスタイル（後方互換性のため保持）
+#userGuide {
+  border: 1px solid $color-guide-border;
+  border-radius: $border-radius-sm;
+  margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+
+  // 子要素 #userGuideTitle に関するスタイル
+  > #userGuideTitle {
+    display: revert;
+
+    // hover と [open] のとき同じ背景色を適用
+    &:hover,
+    &[open] {
+      background-color: $color-guide-open;
+    }
+  }
+}
+
+// Offcanvas
+// --------------------------------------------------------------------------
+.offcanvas.offcanvas-end.show {
+  @include box-shadow(rgba(0, 0, 0, 0.5), -3px, 3px, 3px, 1px);
+}

@@ -88,7 +88,6 @@ function removeCircle(e) {
       (attribution == 'measurementPolyline' || attribution == 'measurementPolyline') &&
       circleCenter != null
     ) {
-      console.table(layer._latlng);
       layer._latlngs.forEach((latlng) => {
         if (
           isNearlyEqual(latlng.lat, circleCenter.lat) &&

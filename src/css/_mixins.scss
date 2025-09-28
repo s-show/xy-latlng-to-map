@@ -1,0 +1,121 @@
+// ==========================================================================
+// Mixins
+// ==========================================================================
+
+// Scrollbar Styling Mixin
+// --------------------------------------------------------------------------
+@mixin custom-scrollbar($width: $scrollbar-width, $track-color: $color-scrollbar-track, $thumb-color: $color-scrollbar-thumb, $thumb-hover: $color-scrollbar-thumb-hover) {
+  &::-webkit-scrollbar {
+    width: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: $border-radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: $thumb-hover;
+  }
+}
+
+// Button Base Mixin
+// --------------------------------------------------------------------------
+@mixin button-base($padding: $padding-btn, $border-radius: $border-radius-md, $font-size: 1em) {
+  padding: $padding;
+  border-radius: $border-radius;
+  font-size: $font-size;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all $transition-fast;
+}
+
+// Box Shadow Mixin
+// --------------------------------------------------------------------------
+@mixin box-shadow($color: $color-dialog-shadow, $offset-x: 0px, $offset-y: 0px, $blur: 5px, $spread: 1px) {
+  box-shadow: $offset-x $offset-y $blur $spread $color;
+}
+
+// Responsive Border Utilities Mixin
+// --------------------------------------------------------------------------
+@mixin responsive-border-utilities($breakpoint, $infix: '') {
+  @include media-breakpoint-up($breakpoint) {
+    .border#{$infix}-top {
+      border-top: $border-width solid;
+    }
+
+    .border#{$infix}-end {
+      border-right: $border-width solid;
+    }
+
+    .border#{$infix}-bottom {
+      border-bottom: $border-width solid;
+    }
+
+    .border#{$infix}-start {
+      border-left: $border-width solid;
+    }
+
+    .border#{$infix}-top-0 {
+      border-top: 0 !important;
+    }
+
+    .border#{$infix}-end-0 {
+      border-right: 0 !important;
+    }
+
+    .border#{$infix}-bottom-0 {
+      border-bottom: 0 !important;
+    }
+
+    .border#{$infix}-start-0 {
+      border-left: 0 !important;
+    }
+
+    .border#{$infix}-x {
+      border-left: $border-width solid $border-color;
+      border-right: $border-width solid $border-color;
+    }
+
+    .border#{$infix}-y {
+      border-top: $border-width solid $border-color;
+      border-bottom: $border-width solid $border-color;
+    }
+  }
+}
+
+// Media Query Helpers
+// --------------------------------------------------------------------------
+@mixin mobile-down {
+  @media (max-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin tablet-up {
+  @media (min-width: #{$breakpoint-lg + 1px}) {
+    @content;
+  }
+}
+
+// Flexbox Center Mixin
+// --------------------------------------------------------------------------
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Absolute Fill Mixin
+// --------------------------------------------------------------------------
+@mixin absolute-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}

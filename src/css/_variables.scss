@@ -1,0 +1,90 @@
+// ==========================================================================
+// Variables
+// ==========================================================================
+
+// Color Palette
+// --------------------------------------------------------------------------
+$color-primary: #0d6efd;
+$color-white: #ffffff;
+$color-black: #000000;
+
+// Header & Footer Colors
+$color-header: #7EA0CC;
+$color-footer: #DEE6F2;
+
+// Button Colors
+$color-dialog-open: #9AB5D7;
+$color-dialog-open-border: #96B1D5;
+$color-dialog-open-hover: #BACCE4;
+$color-danger: #FF0800;
+$color-danger-hover: #FF8F8F;
+
+// Switch Colors
+$color-switch-active: rgb(219, 234, 254);
+$color-switch-active-circle: #003366;
+$color-switch-base: #ddd;
+$color-switch-circle: #333333;
+
+// User Guide Colors
+$color-guide-border: #aaa;
+$color-guide-hover: rgba(204, 255, 255, 0.25);
+$color-guide-open: rgba(153, 204, 204, 0.25);
+
+// Dialog Colors
+$color-dialog-border: rgba(169, 169, 169, 1);
+$color-dialog-shadow: rgba(0, 0, 0, 0.5);
+
+// Scrollbar Colors
+$color-scrollbar-track: #f1f1f1;
+$color-scrollbar-thumb: #888;
+$color-scrollbar-thumb-hover: #555;
+
+// Layout Dimensions
+// --------------------------------------------------------------------------
+$header-height: 80px;
+$footer-height: 60px;
+$map-min-height: 600px;
+$scrollbar-width: 8px;
+
+// Border Radius
+// --------------------------------------------------------------------------
+$border-radius-sm: 4px;
+$border-radius-md: 6px;
+$border-radius-lg: 1em;
+$border-radius-xl: 15px;
+
+// Spacing
+// --------------------------------------------------------------------------
+$padding-btn: 6px 15px;
+$padding-dialog: 0.75em;
+
+// Transitions
+// --------------------------------------------------------------------------
+$transition-fast: 0.1s;
+
+// Z-index
+// --------------------------------------------------------------------------
+$z-index-sticky: 2;
+
+// Breakpoints (Bootstrap compatible)
+// --------------------------------------------------------------------------
+$breakpoint-lg: 991.98px;
+
+// JSpreadsheet Variables
+// --------------------------------------------------------------------------
+$jexcel-header-color: #000;
+$jexcel-header-color-highlighted: #000;
+$jexcel-header-background: #f3f3f3;
+$jexcel-header-background-highlighted: #dcdcdc;
+$jexcel-content-color: #000;
+$jexcel-content-color-highlighted: #000;
+$jexcel-content-background: #fff;
+$jexcel-content-background-highlighted: rgba(0, 0, 0, 0.05);
+$jexcel-menu-background: #fff;
+$jexcel-menu-background-highlighted: #ebebeb;
+$jexcel-menu-color: #555;
+$jexcel-menu-color-highlighted: #555;
+$jexcel-menu-box-shadow: 2px 2px 2px 0px rgba(143, 144, 145, 1);
+$jexcel-border-color: #ccc;
+$jexcel-border-color-highlighted: #000;
+$jexcel-active-color: #007aff;
