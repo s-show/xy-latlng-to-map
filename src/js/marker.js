@@ -3,16 +3,18 @@ import { map, measureMarkers } from './map.js';
 import { measureLength } from './measurement.js';
 import 'leaflet-contextmenu';
 import { isNearlyEqual } from './nearlyEqual.js';
+import { Util } from 'leaflet';
 
 // 選択したアイコンを削除する処理
 function removeSelectedMarker(e) {
   const selectedMarkerId = e.relatedTarget._leaflet_id;
   let markerLatlng = null;
   map.eachLayer((layer) => {
-    if (layer._leaflet_id == selectedMarkerId) {
+    if (Util.stamp(layer) == selectedMarkerId) {
       // これから削除するアイコンにかかる距離計測で描画した
       // Polyline の緯度経度は削除するアイコンと同じため、
       // Polyline を削除するために緯度経度情報を控えておく。
+      console.info(layer.getLatLng())
       markerLatlng = layer._latlng;
       layer.remove();
       if (layer._latlng == measureMarkers.start) {
@@ -28,6 +30,7 @@ function removeSelectedMarker(e) {
       (attribution == 'markerPolyline' || attribution == 'measurementPolyline') &&
       markerLatlng != null
     ) {
+      console.info(layer.getLatLngs())
       layer._latlngs.forEach((latlng) => {
         // Leaflet.Arc は polyline を描画する際、与えられた緯度経度とわずかに違う緯度経度に変換して描画することがある。
         // そのため、2つの地点の緯度経度がほぼ同じであれば等しいと判定する関数 isNearyEqual を自作している。

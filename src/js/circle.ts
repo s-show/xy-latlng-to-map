@@ -4,7 +4,7 @@ import { centerMarkers } from './leaflet';
 import 'leaflet-contextmenu';
 import { spheroid } from 'geo4326';
 import { isNearlyEqual } from './nearlyEqual';
-import L, { Direction, Events, LatLng } from 'leaflet'
+import L, { Direction, LatLng } from 'leaflet'
 import { ContextMenuEvent } from './interface';
 import { hasLatLng, hasLatLngs } from './util';
 

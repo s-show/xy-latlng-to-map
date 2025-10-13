@@ -89,6 +89,7 @@ function removeCircle(e) {
       circleCenter != null
     ) {
       layer._latlngs.forEach((latlng) => {
+        console.info(layer.getLatLngs()[0].lat)
         if (
           isNearlyEqual(latlng.lat, circleCenter.lat) &&
           isNearlyEqual(latlng.lng, circleCenter.lng)

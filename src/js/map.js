@@ -35,13 +35,13 @@ gsiStandard.addTo(map);
 
 // アイコン同士の距離を測るための変数
 export let measureMarkers = {
-  start: null,
-  end: null,
+  start: L.LatLng,
+  end: L.LatLng,
 };
 // 任意の2点間の距離を測るための変数
 export let measureLocations = {
-  start: null,
-  end: null,
+  start: L.LatLng,
+  end: L.LatLng,
 };
 
 // 半径を入力するダイアログを表示する処理

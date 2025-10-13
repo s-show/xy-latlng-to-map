@@ -1,14 +1,11 @@
-function arrayToCSV(array) {
-  if (getArrayDepth(array) < 2) {
-    return false;
-  }
+function arrayToCSV(array: string[][]) {
   let csvData = array.flatMap((row) => {
     return row.join(',');
   }).join('\n');
   return csvData;
 }
 
-function exportCSV(tableData) {
+function exportCSV(tableData: string[][]): false | Blob {
   if (getArrayDepth(tableData) >= 2) {
     const blob = new Blob(
       [
@@ -24,10 +21,14 @@ function exportCSV(tableData) {
 }
 
 // https://stackoverflow.com/a/55420461/20038726
-function getArrayDepth(value) {
-  return Array.isArray(value) ?
-    1 + Math.max(0, ...value.map(getArrayDepth)) :
-    0;
+type NestedArray<T> = T | NestedArray<T>[];
+
+function getArrayDepth<T>(value: NestedArray<T>): number {
+  if (!Array.isArray(value)) {
+    return 0;
+  }
+
+  return 1 + Math.max(0, ...value.map((item) => getArrayDepth(item)));
 }
 
 export { arrayToCSV, exportCSV, getArrayDepth }

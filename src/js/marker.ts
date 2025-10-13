@@ -4,14 +4,14 @@ import { measureLength } from './measurement.js';
 import 'leaflet-contextmenu';
 import { isNearlyEqual } from './nearlyEqual.js';
 import { contextMenuControls } from 'jspreadsheet-ce';
-import L from 'leaflet'
+import L, { Marker } from 'leaflet'
 import { hasLatLng, hasLatLngs } from './util.js';
 
 // 選択したアイコンを削除する処理
-function removeSelectedMarker(e: contextMenuControls) {
+function removeSelectedMarker(e: contextMenuControls): void {
   const selectedMarkerId: number = e.relatedTarget._leaflet_id;
   let markerLatlng: L.LatLng;
-  map.eachLayer((layer) => {
+  map.eachLayer((layer): void => {
     if (hasLatLng(layer)) {
       if (L.Util.stamp(layer) == selectedMarkerId) {
         // これから削除するアイコンにかかる距離計測で描画した
@@ -27,7 +27,7 @@ function removeSelectedMarker(e: contextMenuControls) {
       }
     }
   });
-  map.eachLayer((layer) => {
+  map.eachLayer((layer): void => {
     const attribution = layer.options.attribution;
     if (
       (attribution == 'markerPolyline' || attribution == 'measurementPolyline') &&
@@ -51,10 +51,10 @@ function removeSelectedMarker(e: contextMenuControls) {
 }
 
 // アイコン同士の距離計測の準備
-function measureFromThisMarker(e: contextMenuControls) {
+function measureFromThisMarker(e: contextMenuControls): void {
   // 選択したアイコンを判別するために `leaflet_id` を取得
   const startMarkerId: number = e.relatedTarget._leaflet_id;
-  map.eachLayer((layer) => {
+  map.eachLayer((layer): void => {
     if (L.Util.stamp(layer) == startMarkerId) {
       if (hasLatLng(layer)) {
         measureMarkers.start = layer.getLatLng();
@@ -65,9 +65,9 @@ function measureFromThisMarker(e: contextMenuControls) {
     measureLength('marker');
   }
 }
-function measureToThisMarker(e: contextMenuControls) {
+function measureToThisMarker(e: contextMenuControls): void {
   const endMarkerId: number = e.relatedTarget._leaflet_id;
-  map.eachLayer((layer) => {
+  map.eachLayer((layer): void => {
     if (L.Util.stamp(layer) == endMarkerId) {
       if (hasLatLng(layer)) {
         measureMarkers.end = layer.getLatLng()
@@ -83,7 +83,7 @@ export function createMarker(
   lat: number,
   lng: number,
   color: 'red' | 'blue' | 'yellow' | 'green'
-) {
+): Marker {
   const markerOptions = {
     icon: markers[color],
     attribution: 'marker',

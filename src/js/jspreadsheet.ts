@@ -4,7 +4,8 @@ import { dms2deg } from '../js/DMSLatLngParser.js';
 import 'jsuites/dist/jsuites.js';
 import 'jsuites/dist/jsuites.css';
 import 'jspreadsheet-ce/dist/jspreadsheet.css';
-import jspreadsheet from 'jspreadsheet-ce';
+import jspreadsheet, { WorksheetInstance, ContextMenuItem, ContextMenuRole } from 'jspreadsheet-ce';
+import { CellValue } from 'jspreadsheet-ce';
 
 /*
  * 入力値または貼り付け値を事前確認して不適当なデータを無視する処理。
@@ -14,43 +15,35 @@ import jspreadsheet from 'jspreadsheet-ce';
  * 入力値または貼り付け値に「度 or °」が含まれていれば、
  * 度分秒形式の緯度経度を十進数形式の緯度経度に変換している。
  */
-const beforechangeSourceTable = (instance, cell, x, y, value) => {
-  if (value.match(/度|°/) == null) {
+const beforechangeSourceTable = (
+  _instance: WorksheetInstance,
+  _cell: HTMLTableCellElement,
+  _x: string | number,
+  _y: string | number,
+  value: CellValue
+) => {
+  if (typeof value === 'string' && value !== null && value.match(/度|°/) == null) {
+    // 桁区切りのカンマを取り除く
     value = value.replace(',', '');
     if (isValidNumber(zen2han(value))) {
       return zen2han(value);
     } else {
       return '';
     }
-  } else {
+  } else if (typeof value === 'string') {
     return dms2deg(value);
   }
-};
-
-/**
- * 結果を表示する表への貼り付けは禁止する。
- * コードは https://bossanova.uk/jspreadsheet/v4/docs/most-common-questions-and-answers を参照
- */
-const beforePasteConvertedTable = () => {
-  return false;
-};
-
-/**
- * 結果を表示する表への入力を無効化する。
- * 入力前の値を返すことで、入力前の値が入力後の値となる。
- */
-const beforeChangeConvertedTable = (instance, cell, x, y, value) => {
-  console.info(instance)
-  return instance.getValueFromCoords(x, y);
+  return value;
 };
 
 /**
  * 変換元テーブルにデータを貼り付けて空行がなくなったら行を追加する
  * キーボードから入力する場合、行は自動的に追加される。
  */
-const afterPaste = (instance) => {
-  const tableRows = sourceTable[0].options.data.length; // テーブルの行数を格納
-  const lastRowData = sourceTable[0].options.data[tableRows - 1];
+const afterPaste = (instance: WorksheetInstance): void => {
+  const tableData: CellValue[][] = instance.getData()
+  const tableRows: number = tableData.length; // テーブルの行数を格納
+  const lastRowData: CellValue[] = tableData[tableRows - 1];
   if (lastRowData[0] != '' && lastRowData[1] != '') {
     instance.insertRow(1);
   }
@@ -60,27 +53,38 @@ const afterPaste = (instance) => {
  * 行削除・貼り付けのみ表示するようにしている
  * コードは https://github.com/jspreadsheet/ce/blob/master/src/index.js を参照
  */
-const sourceTableContextMenuItems = (obj, x, y, e, items, section) => {
+const sourceTableContextMenuItems = (
+  obj: WorksheetInstance,
+  x: string | number | null,
+  y: string | number | null,
+  _e: PointerEvent,
+  _items: ContextMenuItem[], // 本来のコンテキストメニューのメニュー群
+  _section: ContextMenuRole // 右クリックした場所の情報
+) => {
   console.info(obj);
   let newItems = [];
   newItems.push({
     title: '行を削除',
     onclick: () => {
-      obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+      if (y !== null && y !== undefined) {
+        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y.toString()));
+      }
     },
   });
   newItems.push({
     title: '貼り付け',
     shortcut: 'Ctrl + V',
     onclick: () => {
-      navigator.clipboard.readText().then((text) => {
-        sourceTable[0].paste(obj.selectedCell[0], obj.selectedCell[1], text);
-      })
-      .catch(error => {
-        console.error('Clipboard access failed. Please use Ctrl+V instead.', error);
-        alert('クリップボードへのアクセスに失敗しました。Ctrl+Vをお使いください。');
-      });
-    },
+      if (x !== null && x !== undefined && y !== null && y !== undefined) {
+        navigator.clipboard.readText().then((text) => {
+          obj.paste(+x, +y, text);
+        })
+          .catch(error => {
+            console.error('Clipboard access failed. Please use Ctrl+V instead.', error);
+            alert('クリップボードへのアクセスに失敗しました。Ctrl+Vをお使いください。');
+          });
+      }
+    }
   });
   return newItems;
 };
@@ -88,39 +92,33 @@ const sourceTableContextMenuItems = (obj, x, y, e, items, section) => {
  * コピーのみ表示するようにしている
  * コードは https://github.com/jspreadsheet/ce/blob/master/src/index.js を参照
  */
-const convertedTableContextMenuItems = (obj, x, y, e, items, section) => {
+const convertedTableContextMenuItems = (
+  obj: WorksheetInstance,
+  _x: string | number | null,
+  _y: string | number | null,
+  _e: PointerEvent,
+  _items: ContextMenuItem[], // 本来のコンテキストメニューのメニュー群
+  _section: ContextMenuRole // 右クリックした場所の情報
+) => {
   let newItems = [];
   newItems.push({
     title: 'データを全てコピー',
     shortcut: 'Ctrl + C',
     onclick: () => {
-      convertedTable[0].selectAll();
-      convertedTable[0].copy();
-      convertedTable[0].resetSelection();
+      obj.selectAll();
+      obj.copy();
+      obj.resetSelection();
     },
   });
   return newItems;
 };
 
-// instance.jspreadsheet.colgroup.length は列追加前の列数。
-// 列数が2なら列追加・列削除の必要は無いので false を返してキャンセルする
-const beforeDeleteColumn = (instance, cell, x, y, value) => {
-  if (instance.jspreadsheet.colgroup.length == 2) {
-    return false;
-  }
-};
-const beforeInsertColumn = (instance, cell, x, y, value) => {
-  if (instance.jspreadsheet.colgroup.length == 2) {
-    return false;
-  }
-};
-
 // コンテキストメニューに表示するメニューの日本語訳
-const text = {
-  deleteSelectedRows: '選択した行を削除',
-  copy: '表の値をコピー',
-  paste: '表に値を貼り付け',
-};
+jspreadsheet.setDictionary({
+  'deleteSelectedRows': '選択した行を削除',
+  'copy': '表の値をコピー',
+  'paste': '表に値を貼り付け',
+});
 
 const initTableData = [
   [110.1, 51.1],
@@ -128,51 +126,59 @@ const initTableData = [
   [130.3, 53.3],
 ];
 
+const worksheetConfig = {
+  data: initTableData,
+  allowInsertColumn: false,
+  allowManualInsertColumn: false,
+  allowDeleteColumn: false,
+  freezeColumns: 2,
+};
+
 const columnsConfig = [
-  { type: 'numeric', title: 'X(緯度)', width: 110, name: 'x_latitude' },
-  { type: 'numeric', title: 'Y(経度)', width: 110, name: 'y_longitude' },
+  {
+    // `as const` 演算子を使って `type` の型を `'numeric'` という文字列リテラル型に変換している。
+    // こうしないと `Column` 型の定義に合致しなくなってしまう。
+    type: 'numeric' as const,
+    title: 'X(緯度)',
+    width: 110,
+    name: 'x_latitude',
+  },
+  {
+    type: 'numeric' as const,
+    title: 'Y(経度)',
+    width: 110,
+    name: 'y_longitude',
+  },
 ];
 
-const columnsConfig2 = [
-  { type: 'numeric', title: 'X(緯度)', width: 110, name: 'x_latitude', readOnly: true },
-  { type: 'numeric', title: 'Y(経度)', width: 110, name: 'y_longitude', readOnly: true },
-];
+// convertedTable用に readonly を追加
+const readonlyColumnsConfig = columnsConfig.map(col => ({ ...col, readOnly: true }));
 
-export const sourceTable = jspreadsheet(document.getElementById('sourceDataTable'), {
+export const sourceTable = jspreadsheet(document.getElementById('sourceDataTable') as HTMLDivElement, {
   worksheets: [
+    worksheetConfig,
     {
-      data: initTableData,
-      options: columnsConfig,
-    }
+      columns: columnsConfig,
+    },
   ],
   onbeforechange: beforechangeSourceTable,
   contextMenu: sourceTableContextMenuItems,
-  onbeforedeletecolumn: beforeDeleteColumn,
-  onbeforeinsertcolumn: beforeInsertColumn,
   onpaste: afterPaste,
-  text: text,
-  freezeColumns: 2,
 });
 
-export const convertedTable = jspreadsheet(document.getElementById('convertedDataTable'), {
+export const convertedTable = jspreadsheet(document.getElementById('convertedDataTable') as HTMLDivElement, {
   worksheets: [
+    worksheetConfig,
     {
-      data: initTableData,
-      columns: columnsConfig2,
-    }
+      columns: readonlyColumnsConfig,
+    },
   ],
-  // onbeforechange: beforeChangeConvertedTable,
-  // onbeforepaste: beforePasteConvertedTable,
   contextMenu: convertedTableContextMenuItems,
-  // onbeforedeletecolumn: beforeDeleteColumn,
-  // onbeforeinsertcolumn: beforeInsertColumn,
-  text: text,
-  freezeColumns: 2,
 });
 
 // テーブルのデータを削除する関数
-export function clearTable(e, tableName) {
-  const tableData = [[,]];
+export function clearTable(e: PointerEvent, tableName: string): void {
+  const tableData: CellValue[][] = [['','']];
   if (tableName == 'source') {
     sourceTable[0].setData(tableData);
   } else {
@@ -181,7 +187,7 @@ export function clearTable(e, tableName) {
   e.preventDefault();
 }
 
-export function resizeTable(viewPortWidth) {
+export function resizeTable(viewPortWidth: number): void {
   // viewPortWidth <= 992 で col-lg-* が適用される
   // viewPortWidth < 992 でデータテーブルと地図が縦並びになるのでテーブルの幅を戻している。
   if (viewPortWidth < 992) {

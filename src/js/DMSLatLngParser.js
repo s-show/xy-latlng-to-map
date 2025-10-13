@@ -10,11 +10,11 @@ function extractNumber(latlngStr) {
   const array = tempStr3.match(reg);
   // 「北緯35度39分29秒1572」の形式だと [35, 39, 29, 1572] となるので、
   // 3番目の値を「29.1572」に変換する。
-  if (array.length == 4) {
-    const temp = array[2] + '.' + array[3];
-    array[2] = temp;
-    array.pop();
-  }
+  // if (array.length == 4) {
+  //   const temp = array[2] + '.' + array[3];
+  //   array[2] = temp;
+  //   array.pop();
+  // }
   const result = array.map(x => Number(x));
   return result;
 }
