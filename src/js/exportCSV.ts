@@ -1,11 +1,13 @@
-function arrayToCSV(array: string[][]) {
+import { CellValue } from "jspreadsheet-ce";
+
+function arrayToCSV(array: CellValue[][]) {
   let csvData = array.flatMap((row) => {
     return row.join(',');
   }).join('\n');
   return csvData;
 }
 
-function exportCSV(tableData: string[][]): false | Blob {
+function exportCSV(tableData: CellValue[][]): false | Blob {
   if (getArrayDepth(tableData) >= 2) {
     const blob = new Blob(
       [
