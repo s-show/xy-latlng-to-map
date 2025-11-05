@@ -32,8 +32,13 @@ export function addCircle(
   latlng: LatLng,
   radius: number,
   lineColor: string,
-  markerColor: 'red' | 'blue' | 'yellow' | 'green'
+  markerColor: string
 ) {
+  // 有効な色かチェックし、無効な場合はredをデフォルトとして使用
+  const validColor = ['red', 'blue', 'yellow', 'green'].includes(markerColor) 
+    ? (markerColor as 'red' | 'blue' | 'yellow' | 'green')
+    : 'red';
+
   const circleOption = {
     radius: radius,
     color: lineColor,
@@ -46,7 +51,7 @@ export function addCircle(
     contextmenuItems: circleMenuItems,
   };
   const centerMarkerOption = {
-    icon: centerMarkers[markerColor],
+    icon: centerMarkers[validColor],
     attribution: 'centerMarker',
     contextmenu: true,
     contextmenuInheritItems: false,
