@@ -246,7 +246,10 @@ const proj4Defs: [string, string][] = [
   ],
 ];
 
-const geodeticSystems = {
+type GeodeticSystemName = 'TOKYO' | 'JGD2000' | 'JGD2011';
+type GeodeticSystems = Readonly<Record<GeodeticSystemName, readonly string[]>>;
+
+const geodeticSystems: GeodeticSystems = {
   // 日本測地系
   TOKYO: [
     // JGD2000 - 緯度経度
@@ -327,3 +330,4 @@ const geodeticSystems = {
 proj4.defs(proj4Defs);
 
 export { proj4Defs, geodeticSystems };
+export type { GeodeticSystemName };
