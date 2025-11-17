@@ -92,7 +92,7 @@ document.querySelectorAll<HTMLInputElement>('[name="sourceDataType"]').forEach((
     changeZoneNo(selectedBtn, sourceZoneNo);
   }
 })
-document.querySelectorAll<HTMLInputElement>('[name="convertDataType"]').forEach((selectedBtn) => {
+document.querySelectorAll<HTMLInputElement>('[name="convertToDataType"]').forEach((selectedBtn) => {
   const convertZoneNo = document.querySelector<HTMLSelectElement>('#convertZoneNo')
   if (isElement(convertZoneNo)) {
     changeZoneNo(selectedBtn, convertZoneNo);
@@ -192,7 +192,7 @@ function showDialog(dialog: HTMLDialogElement, dialogId: string) {
 }
 
 // データ変換
-const dataConvertBtn = document.querySelector<HTMLButtonElement>('#dataConvertBtn')
+const dataConvertBtn = document.querySelector<HTMLButtonElement>('#data-convertBtn')
 if (dataConvertBtn !== null) {
   dataConvertBtn.addEventListener('click', (e) => {
     const params = getParams()
