@@ -246,7 +246,7 @@ function getParams() {
       params['source']['type'] = currentNode.value;
     }
   });
-  document.getElementsByName('convertDataType').forEach((currentNode) => {
+  document.getElementsByName('convertToDataType').forEach((currentNode) => {
     if (currentNode.checked) {
       params['convert']['type'] = currentNode.value;
     }
@@ -263,6 +263,7 @@ function getParams() {
   });
   params['source']['zoneNo'] = document.getElementById('sourceZoneNo').value;
   params['convert']['zoneNo'] = document.getElementById('convertZoneNo').value;
+  console.info(params)
   return params;
 }
 

@@ -123,15 +123,13 @@ jspreadsheet.setDictionary({
 const initTableData = [
   [110.1, 51.1],
   [120.2, 52.2],
-  [130.3, 53.3],
+  [30.3, 53.3],
 ];
 
 const worksheetConfig = {
-  data: initTableData,
   allowInsertColumn: false,
   allowManualInsertColumn: false,
   allowDeleteColumn: false,
-  freezeColumns: 2,
 };
 
 const columnsConfig = [
@@ -155,30 +153,32 @@ const columnsConfig = [
 const readonlyColumnsConfig = columnsConfig.map(col => ({ ...col, readOnly: true }));
 
 export const sourceTable = jspreadsheet(document.getElementById('sourceDataTable') as HTMLDivElement, {
-  worksheets: [
-    worksheetConfig,
-    {
-      columns: columnsConfig,
-    },
-  ],
+  worksheets: [{
+    ...worksheetConfig,
+    data: initTableData,
+    columns: [
+      ...columnsConfig
+    ]
+  }],
   onbeforechange: beforechangeSourceTable,
   contextMenu: sourceTableContextMenuItems,
   onpaste: afterPaste,
 });
 
 export const convertedTable = jspreadsheet(document.getElementById('convertedDataTable') as HTMLDivElement, {
-  worksheets: [
-    worksheetConfig,
-    {
-      columns: readonlyColumnsConfig,
-    },
-  ],
+  worksheets: [{
+    ...worksheetConfig,
+    data: initTableData,
+    columns: [
+      ...readonlyColumnsConfig
+    ]
+  }],
   contextMenu: convertedTableContextMenuItems,
 });
 
 // テーブルのデータを削除する関数
 export function clearTable(e: PointerEvent, tableName: string): void {
-  const tableData: CellValue[][] = [['','']];
+  const tableData: CellValue[][] = [['', '']];
   if (tableName == 'source') {
     sourceTable[0].setData(tableData);
   } else {
