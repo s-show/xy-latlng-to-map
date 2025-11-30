@@ -83,32 +83,32 @@ interface markers {
   length?: L.Icon
 }
 
-const markerSize = L.point(30, 30);
-const markerAnchor = L.point(15, 30);
+const markerSize = L.point(25, 25);
+const markerAnchor = L.point(12.5, 12.5);
 const redMarker = L.icon({
-  iconUrl: getImage('redPinMarker', 'svg'),
+  iconUrl: getImage('circle_icon_red', 'svg'),
   iconSize: markerSize,
   iconAnchor: markerAnchor,
 });
 const blueMarker = L.icon({
-  iconUrl: getImage('bluePinMarker', 'svg'),
+  iconUrl: getImage('circle_icon_blue', 'svg'),
   iconSize: markerSize,
   iconAnchor: markerAnchor,
 });
 const yellowMarker = L.icon({
-  iconUrl: getImage('yellowPinMarker', 'svg'),
+  iconUrl: getImage('circle_icon_yellow', 'svg'),
   iconSize: markerSize,
   iconAnchor: markerAnchor,
 });
 const greenMarker = L.icon({
-  iconUrl: getImage('greenPinMarker', 'svg'),
+  iconUrl: getImage('circle_icon_green', 'svg'),
   iconSize: markerSize,
   iconAnchor: markerAnchor,
 });
 const lengthMarker = L.icon({
-  iconUrl: getImage('lengthIcon', 'svg'),
-  iconSize: markerSize,
-  iconAnchor: markerAnchor,
+  iconUrl: getImage('length_pin_icon', 'svg'),
+  iconSize: L.point(30, 30),
+  iconAnchor: L.point(15, 30),
   className: 'lengthStartIcon',
 });
 const markers: markers = {
@@ -119,8 +119,8 @@ const markers: markers = {
   length: lengthMarker,
 };
 
-const centerMarkerSize = L.point(30, 30); // size of the icon
-const centerMarkerAnchor = L.point(15, 15); // point of the icon which will correspond to marker's location
+const centerMarkerSize = L.point(30, 30);
+const centerMarkerAnchor = L.point(15, 15);
 const redCenterMarker = L.icon({
   iconUrl: getImage('redCenterMarker', 'svg'),
   iconSize: centerMarkerSize,
@@ -128,9 +128,13 @@ const redCenterMarker = L.icon({
 });
 const blueCenterMarker = L.icon({
   iconUrl: getImage('blueCenterMarker', 'svg'),
-  iconSize: centerMarkerSize, iconAnchor: centerMarkerAnchor,
-}); const yellowCenterMarker = L.icon({
-  iconUrl: getImage('yellowCenterMarker', 'svg'), iconSize: centerMarkerSize, iconAnchor: centerMarkerAnchor,
+  iconSize: centerMarkerSize,
+  iconAnchor: centerMarkerAnchor,
+});
+const yellowCenterMarker = L.icon({
+  iconUrl: getImage('yellowCenterMarker', 'svg'),
+  iconSize: centerMarkerSize,
+  iconAnchor: centerMarkerAnchor,
 });
 const greenCenterMarker = L.icon({
   iconUrl: getImage('greenCenterMarker', 'svg'),
@@ -145,15 +149,4 @@ const centerMarkers: markers = {
   green: greenCenterMarker,
 };
 
-const lengthIconAnchor = L.point(15, 30); // point of the icon which will correspond to marker's location
-const lengthStartIcon = L.icon({
-  iconUrl: getImage('lengthIcon', 'svg'),
-  iconSize: centerMarkerSize,
-  iconAnchor: lengthIconAnchor,
-  className: 'lengthStartIcon',
-});
-const lengthIcons = {
-  start: lengthStartIcon,
-};
-
-export { gsiStandard, baseMaps, markers, centerMarkers, lengthIcons };
+export { gsiStandard, baseMaps, markers, centerMarkers };
