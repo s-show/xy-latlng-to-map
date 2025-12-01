@@ -1,5 +1,5 @@
-import { gsiStandard, baseMaps, markers, centerMarkers, lengthIcons } from './leaflet.js';
-import { createMarker } from './marker.js';
+import { gsiStandard, baseMaps } from './leaflet.js';
+import { createMarker, MarkerColor } from './marker.js';
 import { measureLength } from './measurement.js';
 import 'leaflet-contextmenu';
 import L from 'leaflet';
@@ -74,13 +74,16 @@ function openRadiusInputDialog(e: ContextMenuEvent) {
  * @param {object} e クリックした場所の緯度経度、ピクセル形式の場所情報、親要素のピクセル形式の場所情報
  */
 function addMarker(e: ContextMenuEvent) {
-  const iconColor = document.querySelector<HTMLSelectElement>('#selectMarkerIcon')?.value;
-  if (iconColor != 'none') {
-    const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor);
-    marker.bindTooltip('緯度経度: ' + Number(e.latlng.lat) + ', ' + e.latlng.lng, {}).openTooltip();
-    marker.addTo(map);
-  } else {
-    window.alert('アイコンの色を選択してください')
+  const selectMarkerIcon = document.querySelector<HTMLSelectElement>('#selectMarkerIcon');
+  if (selectMarkerIcon !== null) {
+    const iconColor = selectMarkerIcon.value;
+    if (iconColor !== 'none' && iconColor !== null) {
+      const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor as MarkerColor);
+      marker.bindTooltip('緯度経度: ' + Number(e.latlng.lat) + ', ' + e.latlng.lng, {}).openTooltip();
+      marker.addTo(map);
+    } else {
+      window.alert('アイコンの色を選択してください')
+    }
   }
 }
 
@@ -91,7 +94,7 @@ function addMarker(e: ContextMenuEvent) {
 function measureFromThisPoint(e: ContextMenuEvent) {
   const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), 'length');
   marker.addTo(map);
-  measureLocations.start = marker._latlng;
+  measureLocations.start = marker.getLatLng();
   if (measureLocations.end != null) {
     measureLength('point');
   }
@@ -103,7 +106,7 @@ function measureFromThisPoint(e: ContextMenuEvent) {
 function measureToThisPoint(e: ContextMenuEvent) {
   const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), 'length');
   marker.addTo(map);
-  measureLocations.end = marker._latlng;
+  measureLocations.end = marker.getLatLng();
   if (measureLocations.start != null) {
     measureLength('point');
   }

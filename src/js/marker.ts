@@ -3,13 +3,12 @@ import { map, measureMarkers } from './map.js';
 import { measureLength } from './measurement.js';
 import 'leaflet-contextmenu';
 import { isNearlyEqual } from './nearlyEqual.js';
-import { contextMenuControls } from 'jspreadsheet-ce';
-import L, { Marker } from 'leaflet'
+import L, { Marker, ContextMenuItemClickEvent } from 'leaflet'
 import { hasLatLng, hasLatLngs } from './util.js';
 
 // 選択したアイコンを削除する処理
-function removeSelectedMarker(e: contextMenuControls): void {
-  const selectedMarkerId: number = e.relatedTarget._leaflet_id;
+function removeSelectedMarker(e: ContextMenuItemClickEvent): void {
+  const selectedMarkerId: number = L.stamp(e.relatedTarget);
   let markerLatlng: L.LatLng;
   map.eachLayer((layer): void => {
     if (hasLatLng(layer)) {
@@ -51,9 +50,10 @@ function removeSelectedMarker(e: contextMenuControls): void {
 }
 
 // アイコン同士の距離計測の準備
-function measureFromThisMarker(e: contextMenuControls): void {
+function measureFromThisMarker(e: ContextMenuItemClickEvent): void {
   // 選択したアイコンを判別するために `leaflet_id` を取得
-  const startMarkerId: number = e.relatedTarget._leaflet_id;
+  // const startMarkerId: number = e.relatedTarget._leaflet_id;
+  const startMarkerId: number = L.stamp(e.relatedTarget)
   map.eachLayer((layer): void => {
     if (L.Util.stamp(layer) == startMarkerId) {
       if (hasLatLng(layer)) {
@@ -65,8 +65,9 @@ function measureFromThisMarker(e: contextMenuControls): void {
     measureLength('marker');
   }
 }
-function measureToThisMarker(e: contextMenuControls): void {
-  const endMarkerId: number = e.relatedTarget._leaflet_id;
+function measureToThisMarker(e: ContextMenuItemClickEvent): void {
+  // const endMarkerId: number = e.relatedTarget._leaflet_id;
+  const endMarkerId: number = L.stamp(e.relatedTarget)
   map.eachLayer((layer): void => {
     if (L.Util.stamp(layer) == endMarkerId) {
       if (hasLatLng(layer)) {
@@ -79,10 +80,11 @@ function measureToThisMarker(e: contextMenuControls): void {
   }
 }
 
+export type MarkerColor = 'red' | 'blue' | 'yellow' | 'green' | 'length';
 export function createMarker(
   lat: number,
   lng: number,
-  color: 'red' | 'blue' | 'yellow' | 'green'
+  color: MarkerColor
 ): Marker {
   const markerOptions = {
     icon: markers[color],

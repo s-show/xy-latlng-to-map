@@ -1,4 +1,4 @@
-import L, { LatLng, latLng, layerGroup } from "leaflet";
+import L  from "leaflet";
 import { geodeticSystems } from './proj4.js';
 import type { GeodeticSystemName } from './proj4.js';
 import { sourceTable, convertedTable, clearTable, resizeTable } from './jspreadsheet.js';
@@ -336,7 +336,7 @@ if (printPreviewBtn !== null) {
 // 地図引き伸ばし
 const zoomRangeInput = document.querySelector<HTMLInputElement>('#zoomRange')
 const mapDiv = document.querySelector<HTMLDivElement>('#map')
-const zoomRangeValue = document.querySelector<HTMLOutputElement>('#zoomRange')
+const zoomRangeValue = document.querySelector<HTMLOutputElement>('#zoomRangeValue')
 if (zoomRangeInput !== null && mapDiv !== null && zoomRangeValue !== null) {
   zoomRangeInput.addEventListener('input', (e) => {
     if (e.currentTarget instanceof HTMLInputElement) {
@@ -443,8 +443,8 @@ function getEspgCodes(
 
 /**
  * 変換元テーブルに入力された値のチェック
- * @param {array} sourceData 変換元データ（緯度経度の配列）
- * @return {array} 不正なデータを削除したデータ。配列の形式は変換元と同じ。
+ * @param  sourceData 変換元データ（緯度経度の配列）
+ * @return 不正なデータを削除したデータ。配列の形式は変換元と同じ。
  */
 function dataCleansing(sourceData: CellValue[][]) {
   return sourceData.filter((data) => {
@@ -456,9 +456,9 @@ function dataCleansing(sourceData: CellValue[][]) {
 
 /**
  * 変換元テーブルのデータをパラメータに従って変換する関数
- * @param {ConvertParameter} convertParameter 変換元・変換先データの EPSG コード
- * @param {CellValue[][]} sourceData 変換元データ（緯度経度の配列）
- * @return {[number, number][]} 変換後データ。配列の各要素は[緯度, 経度]のタプル。
+ * @param  convertParameter 変換元・変換先データの EPSG コード
+ * @param  sourceData 変換元データ（緯度経度の配列）
+ * @return 変換後データ。配列の各要素は[緯度, 経度]のタプル。
  */
 function convertData(
   convertParameter: ConvertParameter,
@@ -522,7 +522,7 @@ function afterPrint() {
  * 円の追加に関連する処理
  */
 const addCircleToMap = document.querySelector<HTMLButtonElement>('#addCircleToMap')
-const inputDiameter = document.querySelector<HTMLDialogElement>('inputDiameter')
+const inputDiameter = document.querySelector<HTMLDialogElement>('#inputDiameter')
 const latitude = document.querySelector<HTMLInputElement>('#latitude')
 const longitude = document.querySelector<HTMLInputElement>('#longitude')
 const selectLineColorSelector = document.querySelector<HTMLSelectElement>('#selectLineColor')
@@ -571,8 +571,8 @@ if (
 
 /**
  * 座標タイプに応じた軸ラベルを取得
- * @param {string} type - 'XY' または 'latlng'
- * @return {Array<string>} 軸ラベルの配列
+ * @param  type - 'XY' または 'latlng'
+ * @return 軸ラベルの配列
  */
 function getAxisLabels(type: string) {
   type axisLabels = Record<string, string[]>
@@ -585,8 +585,8 @@ function getAxisLabels(type: string) {
 
 /**
  * 測地系に応じたラベルを取得
- * @param {string} geodeticSystem - 'TOKYO', 'JGD2000', または 'JGD2011'
- * @return {string} 測地系ラベル
+ * @param  geodeticSystem - 'TOKYO', 'JGD2000', または 'JGD2011'
+ * @return 測地系ラベル
  */
 function getGeodeticLabel(geodeticSystem: string) {
   type geodeticLabels = Record<string, string>;
@@ -600,8 +600,8 @@ function getGeodeticLabel(geodeticSystem: string) {
 
 /**
  * 系番号に応じたラベルを取得
- * @param {string} zoneNo - 系番号
- * @return {string} 系番号ラベル
+ * @param  zoneNo - 系番号
+ * @return 系番号ラベル
  */
 function getZoneLabel(zoneNo: string) {
   return zoneNo !== '0' ? `${zoneNo}系` : '';
@@ -678,16 +678,16 @@ function selectLineColor(shouldReturnDefaultColor = true) {
   let lineColor = ''
   switch (selectLineColor.value) {
     case 'red':
-      lineColor = '#8b4513';
+      lineColor = '#ff4500';
       break;
     case 'blue':
-      lineColor = '#4682b4';
+      lineColor = '#1e90ff';
       break;
     case 'yellow':
-      lineColor = '#ffd700';
+      lineColor = '#FFDF00';
       break;
     case 'green':
-      lineColor = '#2e8b57';
+      lineColor = '#006400';
       break;
     default:
       lineColor = shouldReturnDefaultColor ? '#8b4513' : 'no'
