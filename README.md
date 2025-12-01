@@ -19,14 +19,14 @@
   - [aratcliffe/Leaflet.contextmenu: A context menu for Leaflet.](https://github.com/aratcliffe/Leaflet.contextmenu)
   - [mad-gooze/Leaflet.Arc: Leaflet.js plugin for drawing Great Circle arcs using arc.js](https://github.com/MAD-GooZe/Leaflet.Arc)
   - [PROJ4JS | Proj4js](http://proj4js.org/)
-  - [The javascript spreadsheet](https://bossanova.uk/jspreadsheet/v4/)
+  - [Getting Started with Jspreadsheet CE v5](https://bossanova.uk/jspreadsheet/docs/getting-started)
   - [Bootstrap · The most popular HTML, CSS, and JS library in the world.](https://getbootstrap.com/)
   - [yonda-yonda/geo4326](https://github.com/yonda-yonda/geo4326)
 
 - アイコンなど
-  - [Placeholder Map Pointer Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/186038/placeholder-map-pointer)
-  - [Location Poi Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/399145/location-poi)
+  - [Map Outlined Target Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/418577/map-outlined-target)
   - [Cross Vector SVG Icon (109) - SVG Repo](https://www.svgrepo.com/svg/475147/cross)
+  - [Push Pin 4 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/479442/push-pin-4)
   - [Help 2 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/502697/help-2)
   - [Github 142 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/512317/github-142)
   - [About Vector SVG Icon (6) - SVG Repo](https://www.svgrepo.com/svg/486929/about)

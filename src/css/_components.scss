@@ -80,12 +80,12 @@
     width: 0;
     height: 0;
 
-    &:checked ~ .switch__base {
+    &:checked~.switch__base {
       background-color: $color-switch-active;
       transition: $transition-fast;
     }
 
-    &:checked ~ .switch__circle {
+    &:checked~.switch__circle {
       transform: translateX(100%);
       background-color: $color-switch-active-circle;
     }
@@ -109,7 +109,6 @@
   }
 
   &__slider {
-    // スライダーのスタイル（必要に応じて追加）
   }
 }
 
@@ -138,8 +137,8 @@
     border-top: 1px solid $color-guide-border;
 
     // hover と [open] のとき子要素のタイトルの背景色を変更
-    &:hover > .user-guide__title,
-    &[open] > .user-guide__title {
+    &:hover>.user-guide__title,
+    &[open]>.user-guide__title {
       background-color: $color-guide-hover;
     }
   }
@@ -162,7 +161,7 @@
   box-sizing: border-box;
 
   // 子要素 #userGuideTitle に関するスタイル
-  > #userGuideTitle {
+  >#userGuideTitle {
     display: revert;
 
     // hover と [open] のとき同じ背景色を適用
