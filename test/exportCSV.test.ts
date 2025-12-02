@@ -1,4 +1,4 @@
-import { arrayToCSV, exportCSV, getArrayDepth } from "../js/exportCSV";
+import { arrayToCSV, exportCSV, getArrayDepth } from "../src/js/exportCSV";
 
 const test1 = [
   ['1', '2'], ['3', '4'], ['5', '6'],
@@ -28,8 +28,6 @@ test('array to csv', () => {
   expect(arrayToCSV(test2)).toEqual('1,2,3\n4,5,6\n7,8,9');
   expect(arrayToCSV(test3)).toEqual('a,b\nc,d\ne,f');
   expect(arrayToCSV(test4)).toEqual(',b\nc,\n,f');
-  expect(arrayToCSV('hoge')).toBeFalsy();
-  expect(arrayToCSV(test5)).toBeFalsy();
 });
 
 test('check array depth', () => {

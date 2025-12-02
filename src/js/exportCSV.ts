@@ -8,7 +8,7 @@ function arrayToCSV(array: CellValue[][]) {
 }
 
 function exportCSV(tableData: CellValue[][]): false | Blob {
-  if (getArrayDepth(tableData) >= 2) {
+  if (getArrayDepth(tableData) === 2) {
     const blob = new Blob(
       [
         new Uint8Array([0xEF, 0xBB, 0xBF]), // UTF-8のBOM無しだとExcelで文字化けする

@@ -1,4 +1,4 @@
-import { isValidNumber } from "../js/isvalidNumber";
+import { isValidNumber } from "../src/js/isvalidNumber";
 
 test('validation table value', () => {
   expect(isValidNumber('1')).toBe(true);

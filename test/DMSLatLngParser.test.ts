@@ -1,4 +1,4 @@
-import { extractNumber, dms2deg } from "../js/DMSLatLngParser.js";
+import { extractNumber, dms2deg } from "../src/js/DMSLatLngParser";
 
 test('Split DMS LatLng.', () => {
   expect(extractNumber('139度46分13.6秒')).toStrictEqual([139, 46, 13.6]);

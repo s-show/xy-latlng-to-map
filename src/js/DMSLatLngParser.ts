@@ -7,14 +7,16 @@ function extractNumber(latlngStr: string) {
   // 南緯|西経に向かう緯度経度は十進法では負の値になるので'-'に置き換える
   const tempStr1 = latlngStr.replace(/北緯|東経/, '');
   const tempStr2 = tempStr1.replace(/南緯|西経/, '-');
-
   // 北緯/南緯・東経/西経以外で緯度経度に付される全角文字を削除・変換する
   const tempStr3 = zen2han(tempStr2);
+  // `29秒1572` は `29.1572` に変換し `29.1572秒` は `29.1572秒` のままにする。
+  const tempStr4 = tempStr3.replace(/秒(?=\d)/, '.')
 
   // 度分秒形式の緯度経度を数値の配列に分割する
   // 北緯35度39分29秒1572 → [35, 39, 29.1572]
   // 南緯35度40分39.2秒 → [-35, 40, 39.2]
-  const array = tempStr3.match(/[-－]?([0-9０-９]*[.．])?[0-9０-９]+/gu);
+  const array = tempStr4.match(/[-－]?([0-9０-９]*[.．])?[0-9０-９]+/gu);
+  console.info(array)
 
   if (array !== null) {
     return array.map(x => Number(x));
@@ -23,7 +25,6 @@ function extractNumber(latlngStr: string) {
   }
 }
 
-// 
 /**
  * 度分秒形式の緯度経度を十進法形式の緯度経度に変換する 
  */

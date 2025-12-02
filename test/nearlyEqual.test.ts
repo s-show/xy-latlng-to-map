@@ -1,4 +1,4 @@
-import { isNearlyEqual } from "../js/nearlyEqual";
+import { isNearlyEqual } from "../src/js/nearlyEqual";
 
 test('test nearly equal', () => {
   expect(isNearlyEqual(34.04447459433428, 34.04447459433429)).toBe(true);

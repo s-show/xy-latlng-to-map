@@ -1,4 +1,4 @@
-import { zen2han } from "../js/zen2han.js";
+import { zen2han } from "../src/js/zen2han.js";
 
 test('全角文字は半角に、半角文字はそのままに', () => {
   expect(zen2han('1')).toBe('1');
