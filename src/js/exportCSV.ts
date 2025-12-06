@@ -1,7 +1,7 @@
 import { CellValue } from "jspreadsheet-ce";
 
 function arrayToCSV(array: CellValue[][]) {
-  let csvData = array.flatMap((row) => {
+  const csvData = array.flatMap((row) => {
     return row.join(',');
   }).join('\n');
   return csvData;

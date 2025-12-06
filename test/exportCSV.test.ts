@@ -1,4 +1,4 @@
-import { arrayToCSV, exportCSV, getArrayDepth } from "../src/js/exportCSV";
+import { arrayToCSV, getArrayDepth } from "../src/js/exportCSV";
 
 const test1 = [
   ['1', '2'], ['3', '4'], ['5', '6'],

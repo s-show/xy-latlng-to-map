@@ -137,7 +137,7 @@ const zoneNoDialog = document.querySelector<HTMLDialogElement>('#zoneNoDialog')
 if (openZoneNoDialog !== null) {
   openZoneNoDialog.addEventListener('click', () => {
     const zoneNoSelectBtns = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
-    let dataType = getParams().source.type;
+    const dataType = getParams().source.type;
     if (isNodeList(zoneNoSelectBtns)) {
       zoneNoSelectBtns.forEach((btn) => {
         if (btn.parentElement !== null) {
@@ -374,7 +374,7 @@ type ConvertParameter = {
 };
 
 function getParams(): ParamsType {
-  let params: ParamsType = {
+  const params: ParamsType = {
     'source': {
       'type': null,
       'geodeticSystem': null,
@@ -465,7 +465,7 @@ function convertData(
   sourceData: CellValue[][]
 ): [number, number][] {
   return sourceData.map((data) => {
-    let temp = proj4(
+    const temp = proj4(
       convertParameter.fromProjection,
       convertParameter.toProjection,
       [
@@ -647,7 +647,7 @@ if (exportCSVBtn !== null) {
   exportCSVBtn.addEventListener('click', () => {
     const params = getParams();
     const headerText = buildHeaderText(params);
-    let sourceData = sourceTable[0].getData();
+    const sourceData = sourceTable[0].getData();
     const convertData = convertedTable[0].getData();
     sourceData.forEach((data, index) => {
       if (data[0] != '') {
@@ -673,7 +673,7 @@ if (exportCSVBtn !== null) {
 
 // 線の色を選択する処理
 function selectLineColor(shouldReturnDefaultColor = true) {
-  let selectLineColor = document.querySelector<HTMLSelectElement>('#selectLineColor');
+  const selectLineColor = document.querySelector<HTMLSelectElement>('#selectLineColor');
   if (!selectLineColor) return shouldReturnDefaultColor ? '#8b4513' : 'no';
   let lineColor = ''
   switch (selectLineColor.value) {

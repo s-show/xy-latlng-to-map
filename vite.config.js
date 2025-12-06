@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { defineConfig } from "vite";
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { ViteEjsPlugin, ejs } from "vite-plugin-ejs";
+import { ViteEjsPlugin } from "vite-plugin-ejs";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -29,13 +29,15 @@ export default defineConfig({
   },
   plugins: [
     ViteEjsPlugin(
-      async (config) => {
+      async () => {
         // 共通データを読み込んでテンプレに渡す
         let siteData = {};
         try {
           const json = await fs.readFile(path.resolve('src/data/site.json'), 'utf8');
           siteData = JSON.parse(json);
-        } catch { }
+        } catch {
+          // エラーを無視して続行
+        }
         
         return { site: siteData };
       },

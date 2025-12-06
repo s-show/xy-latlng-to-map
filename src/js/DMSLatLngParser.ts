@@ -34,9 +34,9 @@ function dms2deg(latlngStr: string) {
   const latlng = extractNumber(latlngStr);
   let result = new Big(0);
   if (latlng !== false) {
-    let deg = new Big(latlng[0]);
-    let min = new Big(latlng[1]);
-    let sec = new Big(latlng[2]);
+    const deg = new Big(latlng[0]);
+    const min = new Big(latlng[1]);
+    const sec = new Big(latlng[2]);
     if (deg.gt(0)) {
       result = deg.plus(min.div(60)).plus(sec.div(3600));
     } else {

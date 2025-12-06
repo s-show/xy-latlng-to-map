@@ -10,7 +10,7 @@ import { ContextMenuEvent } from './interface.js';
 // 初期位置は日本緯度経度原点
 // 北緯35度39分29.1572秒, 東経139度44分28.8869秒
 ---------------------------------------------------------*/
-export let map = L.map('map', {
+export const map = L.map('map', {
   preferCanvas: true,
   contextmenu: true,
   contextmenuItems: [
@@ -40,12 +40,12 @@ interface MeasurePoints {
   end: L.LatLng | null;
 }
 // アイコン同士の距離を測るための変数
-export let measureMarkers: MeasurePoints = {
+export const measureMarkers: MeasurePoints = {
   start: null,
   end: null,
 };
 // 任意の2点間の距離を測るための変数
-export let measureLocations: MeasurePoints = {
+export const measureLocations: MeasurePoints = {
   start: null,
   end: null,
 };

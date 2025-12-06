@@ -4,7 +4,7 @@ import { dms2deg } from '../js/DMSLatLngParser.js';
 import 'jsuites/dist/jsuites.js';
 import 'jsuites/dist/jsuites.css';
 import 'jspreadsheet-ce/dist/jspreadsheet.css';
-import jspreadsheet, { WorksheetInstance, ContextMenuItem, ContextMenuRole } from 'jspreadsheet-ce';
+import jspreadsheet, { WorksheetInstance } from 'jspreadsheet-ce';
 import { CellValue } from 'jspreadsheet-ce';
 
 /*
@@ -57,12 +57,12 @@ const sourceTableContextMenuItems = (
   obj: WorksheetInstance,
   x: string | number | null,
   y: string | number | null,
-  _e: PointerEvent,
-  _items: ContextMenuItem[], // 本来のコンテキストメニューのメニュー群
-  _section: ContextMenuRole // 右クリックした場所の情報
+  // _e: PointerEvent,
+  // _items: ContextMenuItem[], // 本来のコンテキストメニューのメニュー群
+  // _section: ContextMenuRole // 右クリックした場所の情報
 ) => {
   console.info(obj);
-  let newItems = [];
+  const newItems = [];
   newItems.push({
     title: '行を削除',
     onclick: () => {
@@ -94,13 +94,13 @@ const sourceTableContextMenuItems = (
  */
 const convertedTableContextMenuItems = (
   obj: WorksheetInstance,
-  _x: string | number | null,
-  _y: string | number | null,
-  _e: PointerEvent,
-  _items: ContextMenuItem[], // 本来のコンテキストメニューのメニュー群
-  _section: ContextMenuRole // 右クリックした場所の情報
+  // _x: string | number | null,
+  // _y: string | number | null,
+  // _e: PointerEvent,
+  // _items: ContextMenuItem[], // 本来のコンテキストメニューのメニュー群
+  // _section: ContextMenuRole // 右クリックした場所の情報
 ) => {
-  let newItems = [];
+  const newItems = [];
   newItems.push({
     title: 'データを全てコピー',
     shortcut: 'Ctrl + C',
