@@ -81,6 +81,7 @@ interface markers {
   yellow: L.Icon
   green: L.Icon
   length?: L.Icon
+  photo?: L.Icon
 }
 
 const markerSize = L.point(25, 25);
@@ -111,12 +112,19 @@ const lengthMarker = L.icon({
   iconAnchor: L.point(15, 30),
   className: 'lengthStartIcon',
 });
+const photoMarker = L.icon({
+  iconUrl: getImage('photo_icon', 'svg'),
+  iconSize: L.point(30, 30),
+  iconAnchor: L.point(15, 30),
+  className: 'photoIcon',
+});
 const markers: markers = {
   red: redMarker,
   blue: blueMarker,
   yellow: yellowMarker,
   green: greenMarker,
   length: lengthMarker,
+  photo: photoMarker
 };
 
 const centerMarkerSize = L.point(30, 30);

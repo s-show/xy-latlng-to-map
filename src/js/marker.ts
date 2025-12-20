@@ -80,31 +80,47 @@ function measureToThisMarker(e: ContextMenuItemClickEvent): void {
   }
 }
 
-export type MarkerColor = 'red' | 'blue' | 'yellow' | 'green' | 'length';
+export type MarkerColor = 'red' | 'blue' | 'yellow' | 'green' | 'length' | 'photo';
 export function createMarker(
   lat: number,
   lng: number,
   color: MarkerColor
 ): Marker {
-  const markerOptions = {
-    icon: markers[color],
-    attribution: 'marker',
-    contextmenu: true,
-    contextmenuInheritItems: false,
-    contextmenuItems: [
-      {
-        text: 'アイコンを削除',
-        callback: removeSelectedMarker,
-      },
-      {
-        text: 'このアイコンからの距離を計測',
-        callback: measureFromThisMarker,
-      },
-      {
-        text: 'このアイコンまでの距離を計測',
-        callback: measureToThisMarker,
-      },
-    ],
-  };
-  return L.marker([lat, lng], markerOptions)
+  if (color !== 'photo') {
+    const markerOptions = {
+      icon: markers[color],
+      attribution: 'marker',
+      contextmenu: true,
+      contextmenuInheritItems: false,
+      contextmenuItems: [
+        {
+          text: 'アイコンを削除',
+          callback: removeSelectedMarker,
+        },
+        {
+          text: 'このアイコンからの距離を計測',
+          callback: measureFromThisMarker,
+        },
+        {
+          text: 'このアイコンまでの距離を計測',
+          callback: measureToThisMarker,
+        },
+      ],
+    };
+    return L.marker([lat, lng], markerOptions)
+  } else {
+    const markerOptions = {
+      icon: markers[color],
+      attribution: 'marker',
+      contextmenu: true,
+      contextmenuInheritItems: false,
+      contextmenuItems: [
+        {
+          text: 'アイコンを削除',
+          callback: removeSelectedMarker,
+        },
+      ],
+    };
+    return L.marker([lat, lng], markerOptions)
+  }
 }

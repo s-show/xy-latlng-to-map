@@ -11,6 +11,8 @@ import 'bootstrap';
 import 'leaflet/dist/leaflet.css';
 import proj4 from 'proj4';
 import { CellValue } from "jspreadsheet-ce";
+import './importPhoto.js'
+import { addPhotoPoint } from "./importPhoto.js";
 
 // 印刷モード時に非表示にするラジオボタンのリスト
 const noPrintRadioBtn: string[] = [
@@ -346,6 +348,19 @@ if (zoomRangeInput !== null && mapDiv !== null && zoomRangeValue !== null) {
   })
 }
 
+// 写真のGPSデータを読み込んで地図に表示する処理
+if (mapDiv !== null) {
+  mapDiv.addEventListener('dragover', (event) => {
+    event.preventDefault();
+  })
+  mapDiv.addEventListener('drop', (event) => {
+    event.preventDefault();
+    if (event.dataTransfer !== null) {
+      addPhotoPoint(map, event.dataTransfer.files);
+    }
+  })
+}
+
 /**
  * データタイプの種類
  */
@@ -386,7 +401,6 @@ function getParams(): ParamsType {
       'zoneNo': null
     }
   };
-
   const sourceDataType = document.querySelectorAll<HTMLInputElement>('[name="sourceDataType"]')
   const convertDataType = document.querySelectorAll<HTMLInputElement>('[name="convertToDataType"]')
   const sourceGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="sourceGeodeticSystem"]')
@@ -635,7 +649,6 @@ function buildHeaderText(params: ParamsType): string[][] {
       [sourceZoneLabel, sourceZoneLabel, convertZoneLabel, convertZoneLabel]
     ];
   }
-
   // デフォルト値を返す
   return [['', '', '', '']];
 }

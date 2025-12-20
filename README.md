@@ -30,3 +30,4 @@
   - [Help 2 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/502697/help-2)
   - [Github 142 Vector SVG Icon - SVG Repo](https://www.svgrepo.com/svg/512317/github-142)
   - [About Vector SVG Icon (6) - SVG Repo](https://www.svgrepo.com/svg/486929/about)
+  - [Camera Vector SVG Icon (338) - SVG Repo](https://www.svgrepo.com/svg/522016/camera)
