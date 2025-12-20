@@ -79,7 +79,7 @@ function addMarker(e: ContextMenuEvent) {
     const iconColor = selectMarkerIcon.value;
     if (iconColor !== 'none' && iconColor !== null) {
       const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor as MarkerColor);
-      marker.bindTooltip('緯度経度: ' + Number(e.latlng.lat) + ', ' + e.latlng.lng, {}).openTooltip();
+      marker.bindTooltip('緯度経度: ' + Number(e.latlng.lat) + '<br />' + e.latlng.lng, {}).openTooltip();
       marker.addTo(map);
     } else {
       window.alert('アイコンの色を選択してください')
