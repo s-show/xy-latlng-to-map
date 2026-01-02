@@ -35,6 +35,14 @@ export const map = L.map('map', {
 L.control.layers(baseMaps).addTo(map);
 gsiStandard.addTo(map);
 
+// 現在アクティブなベースマップの名前を保持
+// export let activeBaseMapName: string = '地理院地図 (標準地図)';
+
+// ベースレイヤー変更時にアクティブレイヤー名を更新
+// map.on('baselayerchange', (e: L.LayersControlEvent) => {
+//   activeBaseMapName = e.name;
+// });
+
 interface MeasurePoints {
   start: L.LatLng | null;
   end: L.LatLng | null;

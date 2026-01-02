@@ -165,6 +165,7 @@ if (closeZoneNoDialogBtn !== null) {
     }
   })
 }
+
 // データテーブルの注意事項ダイアログの表示処理
 const openAcceptableDataDialogBtn = document.querySelector<HTMLButtonElement>('#openAcceptableDataDialog')
 const acceptableDataDialog = document.querySelector<HTMLDialogElement>('#acceptableDataDialog')
@@ -707,6 +708,15 @@ function selectLineColor(shouldReturnDefaultColor = true) {
   }
   return lineColor;
 };
+
+// map.on('zoomend', () => {
+//   const currentZoom = map.getZoom();
+//   if (currentZoom > 8) {
+//     console.info(`現在のベースマップ: ${activeBaseMapName}`);
+//   } else if (currentZoom >= 5 && currentZoom <= 8) {
+//     console.info(`現在のベースマップ: ${activeBaseMapName}`);
+//   }
+// })
 
 window.onerror = function myErrorHandler(errorMsg) {
   const errorMessageDiv = document.querySelector<HTMLDivElement>('#errorMessage')
