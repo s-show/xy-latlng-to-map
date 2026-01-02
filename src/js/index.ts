@@ -1,4 +1,6 @@
-import L  from "leaflet";
+import L from "leaflet";
+import proj4 from 'proj4';
+import { CellValue } from "jspreadsheet-ce";
 import { geodeticSystems } from './proj4.js';
 import type { GeodeticSystemName } from './proj4.js';
 import { sourceTable, convertedTable, clearTable, resizeTable } from './jspreadsheet.js';
@@ -7,12 +9,9 @@ import { exportCSV } from "./exportCSV.js";
 import { createMarker } from './marker.js';
 import { map } from "./map.js";
 import { addCircle } from "./circle.js";
+import { addPhotoPoint } from "./importPhoto.js";
 import 'bootstrap';
 import 'leaflet/dist/leaflet.css';
-import proj4 from 'proj4';
-import { CellValue } from "jspreadsheet-ce";
-import './importPhoto.js'
-import { addPhotoPoint } from "./importPhoto.js";
 
 // 印刷モード時に非表示にするラジオボタンのリスト
 const noPrintRadioBtn: string[] = [
@@ -134,7 +133,7 @@ if (closeGeodeticSystemDialogBtn !== null) {
   })
 }
 // 系番号の説明ダイアログ表示処理
-const openZoneNoDialog = document.querySelector<HTMLButtonElement>('#openZonNoDialog')
+const openZoneNoDialog = document.querySelector<HTMLButtonElement>('#openZoneNoDialog')
 const zoneNoDialog = document.querySelector<HTMLDialogElement>('#zoneNoDialog')
 if (openZoneNoDialog !== null) {
   openZoneNoDialog.addEventListener('click', () => {
