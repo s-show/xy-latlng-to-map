@@ -22,26 +22,26 @@ const getImage = (fileName: string, fileType = 'png') => {
 // });
 // 地理院地図の標準地図タイル
 const gsiStandard = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
-  minZoom: 5,
+  minZoom: 2,
   maxZoom: 18,
   attribution:
-    "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>",
+    "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
 });
 // 地理院地図の淡色地図タイル
 const gsiPale = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
-  minZoom: 5,
+  minZoom: 2,
   maxZoom: 18,
   attribution:
-    "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>",
+    "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
 });
 // 地理院地図の写真タイル
 const gsiSatellite = L.tileLayer(
   'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
   {
-    minZoom: 14,
+    minZoom: 2,
     maxZoom: 18,
     attribution:
-      "<a href='http://portal.cyberjapan.jp/help/termsofuse.html' target='_blank'>地理院タイル</a>",
+    "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
   }
 );
 // 地理院地図の年代別（1974年～1978年）写真タイル
@@ -51,7 +51,7 @@ const gsiSatellite1974_1978 = L.tileLayer(
     minZoom: 10,
     maxZoom: 18,
     attribution:
-      "<a href='http://portal.cyberjapan.jp/help/termsofuse.html' target='_blank'>地理院タイル</a>",
+    "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
   }
 );
 // 地理院地図の年代別（1961年～1969年）写真タイル
@@ -61,7 +61,7 @@ const gsiSatellite1961_1969 = L.tileLayer(
     minZoom: 10,
     maxZoom: 18,
     attribution:
-      "<a href='http://portal.cyberjapan.jp/help/termsofuse.html' target='_blank'>地理院タイル</a>",
+    "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
   }
 );
 

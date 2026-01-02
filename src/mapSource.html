@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="jp" data-bs-theme="light">
+
+<head>
+  <%- include("./partials/head.ejs", { subtitle: '地図の出典について' }) %>
+</head>
+
+<body>
+  <%- include("./partials/header.ejs", { page: 'about' }) %>
+    <div class="container-fluid content-wrapper-about">
+      <div class="row justify-content-center">
+        <div class="col-6 mt-3">
+          <h2>地図の出典について</h2>
+          <p class="mb-1">地図の出典は以下のとおりです。</p>
+          <hr>
+          <h3>地理院地図（標準地図）</h3>
+          <ul>
+            <li class="mb-3">ズームレベル9〜18:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+              </ul>
+              
+            </li>
+            <li class="mb-3">ズームレベル5〜8:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+                <li><p class="mb-1">「The bathymetric contours are derived from those contained within the GEBCO Digital Atlas, published by
+                the BODC on behalf of IOC and IHO (2003) (https://www.gebco.net)
+                海上保安庁許可第292502号（水路業務法第25条に基づく類似刊行物）」</p></li>
+                <li><p class="mb-1">
+                Shoreline data is derived from: United States. National Imagery and Mapping Agency. "Vector Map Level 0
+                (VMAP0)." Bethesda, MD: Denver, CO: The Agency; USGS Information Services, 1997.</p></li>
+              </ul>
+            </li>
+            <li class="mb-3">ズームレベル2〜7:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+              </ul>
+              
+            </li>
+          </ul>
+          <hr>
+          <h3>地理院地図（淡色地図）</h3>
+          <ul>
+            <li class="mb-3">ズームレベル9〜18:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+              </ul>
+              
+            </li>
+            <li class="mb-3">ズームレベル5〜8:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+                <li><p class="mb-1">Shoreline data is derived from: United States. National Imagery and Mapping Agency. "Vector Map Level 0
+                (VMAP0)." Bethesda, MD: Denver, CO: The Agency; USGS Information Services, 1997.</p></li>
+              </ul>
+            </li>
+            <li class="mb-3">ズームレベル2〜7:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+                <li><p class="mb-1">Shoreline data is derived from: United States. National Imagery and Mapping Agency. "Vector Map Level 0
+                (VMAP0)." Bethesda, MD: Denver, CO: The Agency; USGS Information Services, 1997.</p></li>
+              </ul>
+            </li>
+          </ul>
+          <hr>
+          <h3>地理院地図（航空写真）</h3>
+          <ul>
+            <li class="mb-3">ズームレベル14〜18:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+                <li><p class="mb-1">北緯20度24分28秒～北緯20度27分21、 東経136度3分58秒～東経136度8分25秒の範囲のみGRUS画像（© Axelspace）</p></li>
+              </ul>
+            </li>
+            <li class="mb-3">ズームレベル9〜13:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+                <li><p class="mb-1">「データソース：Landsat8画像（GSI,TSIC,GEO Grid/AIST）, Landsat8画像（courtesy of the U.S. Geological Survey）,
+                海底地形（GEBCO）」</p></li>
+              </ul>
+            </li>
+            <li class="mb-3">ズームレベル2〜8:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+                <li><p class="mb-1">Images on 世界衛星モザイク画像 obtained from site https://lpdaac.usgs.gov/data_access maintained by the NASA Land
+                Processes Distributed Active Archive Center (LP DAAC), USGS/Earth Resources Observation and Science
+                (EROS)
+                Center, Sioux Falls, South Dakota, (Year). Source of image data product.</p></li>
+              </ul>
+              
+            </li>
+          </ul>
+          <hr>
+          <h3>地理院地図（航空写真・1974年～1978年）</h3>
+          <ul>
+            <li class="mb-3">ズームレベル10〜17:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+              </ul>
+            </li>
+          </ul>
+          <hr>
+          <h3>地理院地図（航空写真・1961年～1969年）</h3>
+          <ul>
+            <li class="mb-3">ズームレベル10〜17:
+              <ul>
+                <li><a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院 地理院地図</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <%- include("./partials/footer.ejs", { page: 'about' }) %>
+      <script type="module" src="./js/about.ts"></script>
+</body>
+
+</html>
