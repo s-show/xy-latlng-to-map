@@ -49,6 +49,9 @@ importers:
       leaflet-geometryutil:
         specifier: ^0.10.3
         version: 0.10.3
+      leaflet.gridlayer.googlemutant:
+        specifier: ^0.16.0
+        version: 0.16.0
       proj4:
         specifier: ^2.19.10
         version: 2.19.10
@@ -74,6 +77,9 @@ importers:
       '@types/leaflet-contextmenu':
         specifier: ^1.4.4
         version: 1.4.4
+      '@types/leaflet.gridlayer.googlemutant':
+        specifier: ^0.4.11
+        version: 0.4.11
       eslint:
         specifier: ^9.39.1
         version: 9.39.1
@@ -863,6 +869,9 @@ packages:
 
   '@types/leaflet-contextmenu@1.4.4':
     resolution: {integrity: sha512-3BcUZceTEHDOu2kD6Is5cQB5z/DIVMPZoN/o5yXGrH0Y4CfWuSpP1Sm6ZHdBMQ+nVtEQXZnIV/GOE4ZEGX39HQ==}
+
+  '@types/leaflet.gridlayer.googlemutant@0.4.11':
+    resolution: {integrity: sha512-ODwQEOFqp6GW2UsTbjUSfXwp49ksSeT0XYpI83rsMElcvq20S283Oy/lRFbyJv6CAOW0LUA2R3RoroqlGF8Jcg==}
 
   '@types/leaflet@1.9.20':
     resolution: {integrity: sha512-rooalPMlk61LCaLOvBF2VIf9M47HgMQqi5xQ9QRi7c8PkdIe0WrIi5IxXUXQjAdL0c+vcQ01mYWbthzmp9GHWw==}
@@ -1723,6 +1732,9 @@ packages:
 
   leaflet-geometryutil@0.10.3:
     resolution: {integrity: sha512-Qeas+KsnenE0Km/ydt8km3AqFe7kJhVwuLdbCYM2xe2epsxv5UFEaVJiagvP9fnxS8QvBNbm7DJlDA0tkKo9VA==}
+
+  leaflet.gridlayer.googlemutant@0.16.0:
+    resolution: {integrity: sha512-wN8DxR5zplhZA6a5998AOluCL97H5lkr1yCLOT7siaQyc+hT6E8kcGqjAuSsEUSoaf/U3H25x8Avkp9OpgJpng==}
 
   leaflet@1.9.4:
     resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
@@ -3013,6 +3025,10 @@ snapshots:
     dependencies:
       '@types/leaflet': 1.9.20
 
+  '@types/leaflet.gridlayer.googlemutant@0.4.11':
+    dependencies:
+      '@types/leaflet': 1.9.20
+
   '@types/leaflet@1.9.20':
     dependencies:
       '@types/geojson': 7946.0.16
@@ -4064,6 +4080,8 @@ snapshots:
   leaflet-geometryutil@0.10.3:
     dependencies:
       leaflet: 1.9.4
+
+  leaflet.gridlayer.googlemutant@0.16.0: {}
 
   leaflet@1.9.4: {}
 

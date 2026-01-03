@@ -1,4 +1,5 @@
 import L from "leaflet";
+import GoogleMutant from "leaflet.gridlayer.googlemutant";
 
 const getImage = (fileName: string, fileType = 'png') => {
   if (fileType == 'jpg') {
@@ -12,14 +13,30 @@ const getImage = (fileName: string, fileType = 'png') => {
   }
 };
 
-// Google map の航空写真
-// const googlemapHybrid = L.gridLayer.googleMutant({
-// 	type: "hybrid", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-// });
-// // Google map の通常地図
-// const googlemapRoadmap = L.gridLayer.googleMutant({
-// 	type: "roadmap", // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-// });
+// Google Map の道路地図
+const googleMapRoadmap = new GoogleMutant({
+  type: "roadmap",
+  attribution: '&copy; <a href="https://www.google.com/maps" target="_blank translate="no"><span>Google Maps</span></a>',
+});
+
+// Google Map の航空写真（ラベルなし）
+const googleMapSatellite = new GoogleMutant({
+  type: "satellite",
+  attribution: '&copy; <a href="https://www.google.com/maps" target="_blank translate="no">Google Maps</a>',
+});
+
+// Google Map の航空写真（ラベル付き）
+const googleMapHybrid = new GoogleMutant({
+  type: "hybrid",
+  attribution: '&copy; <a href="https://www.google.com/maps" target="_blank translate="no">Google Maps</a>',
+});
+
+// Google Map の地形図
+const googleMapTerrain = new GoogleMutant({
+  type: "terrain",
+  attribution: '&copy; <a href="https://www.google.com/maps" target="_blank translate="no">Google Maps</a>',
+});
+
 // 地理院地図の標準地図タイル
 const gsiStandard = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
   minZoom: 2,
@@ -66,8 +83,10 @@ const gsiSatellite1961_1969 = L.tileLayer(
 );
 
 const baseMaps = {
-  // "Google Map (航空写真)": googlemapHybrid,
-  // "Google Map (地図)": googlemapRoadmap,
+  'Google Map (道路地図)': googleMapRoadmap,
+  'Google Map (航空写真)': googleMapSatellite,
+  'Google Map (航空写真・ラベル付き)': googleMapHybrid,
+  'Google Map (地形図)': googleMapTerrain,
   '地理院地図 (標準地図)': gsiStandard,
   '地理院地図 (淡色地図)': gsiPale,
   '地理院地図 (航空写真)': gsiSatellite,
