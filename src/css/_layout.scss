@@ -80,7 +80,7 @@ body {
 @include mobile-down {
 
   // Bootstrap lg breakpoint
-  .content-wrapper {
+  .content-wrapper-toppage {
     height: auto;
     overflow: visible;
 
@@ -92,7 +92,6 @@ body {
 
   #menu_column {
     height: auto;
-    max-height: $map-min-height;
     overflow-y: auto;
   }
 

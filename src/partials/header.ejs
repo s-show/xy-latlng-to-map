@@ -2,16 +2,16 @@
   <div class="container-fluid">
     <a href="./index.html" class="navbar-brand h1">座標の地図表示と座標・緯度経度の変換</a>
     <% if (page == 'toppage') { %>
-    <div class="d-flex align-items-stretch">
+    <div class="d-md-flex align-items-md-stretch">
       <div id="openHelp" class="me-2">
-        <div class="border border-white rounded d-print-none">
+        <div class="d-print-none">
           <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"
             class="button button--dialog-open">
             <img src="./assets/help.svg" height="24">使い方を表示</button>
         </div>
       </div>
-      <div id="togglePreview" class="">
-        <div class="border border-white rounded p-2">
+      <div id="togglePreview">
+        <div class="p-2">
           <label class="switch__label d-flex align-items-center mb-0" for="printPreviewBtn">
             <div class="form-check form-switch ms-1">
               <input id="printPreviewBtn" class="form-check-input" type="checkbox" role="switch">
