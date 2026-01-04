@@ -149,4 +149,8 @@ dist
 
 # AI
 CLAUDE.md
+GEMINI.md
 .serena/*
+
+# Memo
+GOOGLE_MAPS_SETUP.md
