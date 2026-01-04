@@ -83,15 +83,15 @@ const gsiSatellite1961_1969 = L.tileLayer(
 );
 
 const baseMaps = {
-  'Google Map (道路地図)': googleMapRoadmap,
-  'Google Map (航空写真)': googleMapSatellite,
-  'Google Map (航空写真・ラベル付き)': googleMapHybrid,
-  'Google Map (地形図)': googleMapTerrain,
   '地理院地図 (標準地図)': gsiStandard,
   '地理院地図 (淡色地図)': gsiPale,
   '地理院地図 (航空写真)': gsiSatellite,
   '地理院地図 (航空写真・1974-78年)': gsiSatellite1974_1978,
   '地理院地図 (航空写真・1961-69年)': gsiSatellite1961_1969,
+  'Google Map (道路地図)': googleMapRoadmap,
+  'Google Map (航空写真)': googleMapSatellite,
+  'Google Map (航空写真・ラベル付き)': googleMapHybrid,
+  'Google Map (地形図)': googleMapTerrain,
 };
 
 interface markers {
