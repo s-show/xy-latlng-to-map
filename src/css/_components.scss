@@ -178,3 +178,25 @@
 .offcanvas.offcanvas-end.show {
   @include box-shadow(rgba(0, 0, 0, 0.5), -3px, 3px, 3px, 1px);
 }
+
+// Leaflet Control Layers
+// --------------------------------------------------------------------------
+.leaflet-control-layers-toggle {
+  position: relative;
+
+  &::after {
+    content: '地図';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 66.66%; // 下3分の1
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    font-size: 11px;
+    color: $color-white;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+    pointer-events: none; // クリックイベントを親要素に透過
+  }
+}
