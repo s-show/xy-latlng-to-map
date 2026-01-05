@@ -34,7 +34,7 @@ body {
   @include content-wrapper(hidden)
 }
 .content-wrapper-about {
-  @include content-wrapper(scroll)
+  @include content-wrapper(visible)
 }
 
 // Menu Column
