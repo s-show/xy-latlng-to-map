@@ -41,6 +41,7 @@ const googleMapTerrain = new GoogleMutant({
 const gsiStandard = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
   minZoom: 2,
   maxZoom: 18,
+  errorTileUrl: getImage('error_tile', 'png'),
   attribution:
     "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
 });
@@ -48,6 +49,7 @@ const gsiStandard = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x
 const gsiPale = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
   minZoom: 2,
   maxZoom: 18,
+  errorTileUrl: getImage('error_tile', 'png'),
   attribution:
     "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
 });
@@ -57,6 +59,7 @@ const gsiSatellite = L.tileLayer(
   {
     minZoom: 2,
     maxZoom: 18,
+    errorTileUrl: getImage('error_tile', 'png'),
     attribution:
     "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
   }
@@ -67,6 +70,7 @@ const gsiSatellite1974_1978 = L.tileLayer(
   {
     minZoom: 10,
     maxZoom: 18,
+    errorTileUrl: getImage('error_tile', 'png'),
     attribution:
     "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
   }
@@ -77,6 +81,7 @@ const gsiSatellite1961_1969 = L.tileLayer(
   {
     minZoom: 10,
     maxZoom: 18,
+    errorTileUrl: getImage('error_tile', 'png'),
     attribution:
     "<a target='_blank' href='mapSource.html'>地図の出典情報</a>",
   }
