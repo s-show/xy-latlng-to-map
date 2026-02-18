@@ -16,6 +16,9 @@
           packages = with pkgs; [
             nodejs_24
             nodePackages.pnpm
+            emmet-ls
+            typescript-language-server
+            eslint_d
           ];
           shellHook = ''
             echo "Entering custom Nix shell..."
