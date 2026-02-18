@@ -1,4 +1,4 @@
-import { gsiStandard, baseMaps } from './leaflet.js';
+import { gsiStandard, baseMapsWithoutGoogle, getBaseMaps } from './leaflet.js';
 import { createMarker, MarkerColor } from './marker.js';
 import { measureLength } from './measurement.js';
 import 'leaflet-contextmenu';
@@ -32,8 +32,21 @@ export const map = L.map('map', {
     },
   ],
 }).setView([35.6580992222, 139.7413574722], 15);
-L.control.layers(baseMaps).addTo(map);
+// 初期状態では地理院地図のみでレイヤーコントロールを作成
+let layersControl = L.control.layers(baseMapsWithoutGoogle).addTo(map);
 gsiStandard.addTo(map);
+
+// Google Maps API 読み込み完了後に Google Maps レイヤーを追加
+(async () => {
+  try {
+    const fullBaseMaps = await getBaseMaps();
+    // 既存のコントロールを削除して再作成
+    layersControl.remove();
+    layersControl = L.control.layers(fullBaseMaps).addTo(map);
+  } catch (error) {
+    console.warn('Google Maps レイヤーの初期化に失敗しました:', error);
+  }
+})();
 
 // 現在アクティブなベースマップの名前を保持
 // export let activeBaseMapName: string = '地理院地図 (標準地図)';

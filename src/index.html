@@ -4,7 +4,7 @@
 <head>
   <%- include("./partials/head.ejs", { subtitle: 'メインページ' }) %>
   <!-- 環境変数をどうやっても渡せなかったためハードコーディングしている -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=%VITE_GOOGLE_MAPS_API_KEY%"></script>
+  <script async src="https://maps.googleapis.com/maps/api/js?key=%VITE_GOOGLE_MAPS_API_KEY%&loading=async"></script>
 </head>
 
 <body>
