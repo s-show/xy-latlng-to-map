@@ -655,7 +655,7 @@ function buildHeaderText(params: ParamsType): string[][] {
 
 // 変換前後のデータをCSVでexportする
 const exportCSVBtn = document.querySelector<HTMLButtonElement>('#exportCSVBtn');
-const dataConvert = document.querySelector<HTMLDivElement>('#dataConvert')
+const dataConvertDiv = document.querySelector<HTMLDivElement>('#data-convert-pane')
 if (exportCSVBtn !== null) {
   exportCSVBtn.addEventListener('click', () => {
     const params = getParams();
@@ -669,16 +669,16 @@ if (exportCSVBtn !== null) {
     })
     sourceData.unshift(...headerText)
     const csvData = exportCSV(sourceData);
-    if (csvData instanceof Blob && dataConvert !== null) {
+    if (csvData instanceof Blob && dataConvertDiv !== null) {
       const objUrl = URL.createObjectURL(csvData);
       const link = document.createElement('a');
       link.setAttribute('href', objUrl);
       link.setAttribute('download', 'data.csv');
       link.textContent = 'Click to Download';
 
-      dataConvert.appendChild(link);
+      dataConvertDiv.appendChild(link);
       link.click();
-      dataConvert.removeChild(link);
+      dataConvertDiv.removeChild(link);
       URL.revokeObjectURL(objUrl);
     }
   })
@@ -708,15 +708,6 @@ function selectLineColor(shouldReturnDefaultColor = true) {
   }
   return lineColor;
 };
-
-// map.on('zoomend', () => {
-//   const currentZoom = map.getZoom();
-//   if (currentZoom > 8) {
-//     console.info(`現在のベースマップ: ${activeBaseMapName}`);
-//   } else if (currentZoom >= 5 && currentZoom <= 8) {
-//     console.info(`現在のベースマップ: ${activeBaseMapName}`);
-//   }
-// })
 
 window.onerror = function myErrorHandler(errorMsg) {
   const errorMessageDiv = document.querySelector<HTMLDivElement>('#errorMessage')
