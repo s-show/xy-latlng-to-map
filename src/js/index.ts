@@ -43,10 +43,19 @@ function isNodeList<T extends Element>(nodeList: NodeListOf<T> | null | undefine
 // アプリ実装開始
 ---------------------------------------------------------*/
 // ウィンドウサイズに応じてデータテーブルの大きさを変える
+// Offcanvas 化により表はオーバーレイメニュー内にあるため、
+// ウィンドウ幅ではなくメニューカラムの実際の表示幅を基準にする。
+function getMenuColumnWidth(): number {
+  const menuColumn = document.querySelector('#menu_column');
+  if (menuColumn instanceof HTMLElement) {
+    // offcanvas が非表示でも CSS の幅変数を基準にした値を得る
+    return Math.max(menuColumn.offsetWidth, window.innerWidth || 0);
+  }
+  return window.innerWidth || 0;
+}
+
 window.addEventListener('resize', () => {
-  resizeTable(
-    Math.max(document.querySelector('.container-fluid')!.clientWidth, window.innerWidth || 0)
-  );
+  resizeTable(getMenuColumnWidth());
 })
 
 // 測地系と系番号の説明画面から該当する項目を選択できるようにする処理 
@@ -321,6 +330,22 @@ window.addEventListener("beforeprint", () => {
 window.addEventListener("afterprint", () => {
   afterPrint();
 });
+// 印刷プレビューのリフロー（用紙向き・余白・倍率の変更）に追従するため、
+// matchMedia('print') で印刷状態の変化を監視して invalidateSize を呼ぶ (Issue #11 修正)。
+// beforeprint は1回しか発火せず、プレビュー内の設定変更によるリフローに追従できない。
+if (window.matchMedia) {
+  const printMQ = window.matchMedia('print');
+  const onPrintChange = (e: MediaQueryListEvent | MediaQueryList) => {
+    // 印刷状態になった瞬間と解除された瞬間で地図サイズを再計算
+    setTimeout(() => map.invalidateSize(), e.matches ? 0 : 100);
+  };
+  // ブラウザ互換: addEventListener と addListener の両方を試す
+  if (typeof printMQ.addEventListener === 'function') {
+    printMQ.addEventListener('change', onPrintChange as EventListener);
+  } else if (typeof (printMQ as MediaQueryList).addListener === 'function') {
+    (printMQ as MediaQueryList).addListener(onPrintChange as (mql: MediaQueryList) => void);
+  }
+}
 // 印刷プレビュー画面の作成
 const printPreviewBtn = document.querySelector<HTMLButtonElement>('#printPreviewBtn')
 if (printPreviewBtn !== null) {
@@ -346,6 +371,21 @@ if (zoomRangeInput !== null && mapDiv !== null && zoomRangeValue !== null) {
       zoomRangeValue.value = e.currentTarget.value + 'x';
     }
   })
+}
+
+// オーバーレイメニュー(Offcanvas)の開閉に合わせて地図サイズを再計算する (Issue #11)
+// Offcanvas は地図の表示サイズを変えないが、開閉後に念のため invalidateSize で
+// Leaflet の内部サイズを更新し、表の幅もメニュー幅基準で再調整する。
+const menuColumn = document.querySelector('#menu_column');
+if (menuColumn !== null) {
+  menuColumn.addEventListener('shown.bs.offcanvas', () => {
+    map.invalidateSize();
+    resizeTable(getMenuColumnWidth());
+  });
+  menuColumn.addEventListener('hidden.bs.offcanvas', () => {
+    map.invalidateSize();
+    resizeTable(getMenuColumnWidth());
+  });
 }
 
 // 写真のGPSデータを読み込んで地図に表示する処理
@@ -510,6 +550,10 @@ function preparePrint() {
       }
     })
   })
+  // 印刷時に CSS で地図サイズが変化するため、Leaflet にサイズ再計算させる。
+  // これを呼ばないと用紙向き（横印刷）で地図が空白になる (Issue #11 修正)。
+  // 同期呼び出しでは印刷レンダリングに間に合わないため setTimeout で遅延させる。
+  setTimeout(() => map.invalidateSize(), 100);
 }
 
 /**
@@ -530,6 +574,8 @@ function afterPrint() {
       }
     })
   })
+  // 印刷後に地図サイズを元に戻すため再計算 (Issue #11 修正)
+  setTimeout(() => map.invalidateSize(), 100);
 }
 
 /*

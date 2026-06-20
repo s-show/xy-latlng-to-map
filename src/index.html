@@ -10,9 +10,13 @@
 <body>
   <%- include("./partials/header.ejs", { page: 'toppage' }) %>
     <div class="container-fluid content-wrapper-toppage">
-      <div class="row flex-nowrap">
-        <div id="menu_column" class="col-lg-3">
-          <div id="dataInformation" class="p-2">
+      <div id="menu_column" class="offcanvas offcanvas-start" tabindex="-1" aria-labelledby="menuColumnLabel">
+        <div class="offcanvas-header">
+          <h3 id="menuColumnLabel" class="offcanvas-title">メニュー</h3>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="閉じる"></button>
+        </div>
+        <div class="offcanvas-body">
+        <div id="dataInformation" class="p-2">
             <h3>データ詳細情報</h3>
             <%- include("./partials/dataTypeSelect.ejs", { dataType: 'source' }) %>
               <hr class="border-2">
@@ -23,7 +27,7 @@
                     <%- include("./partials/zoneNoDialog.ejs") -%>
                       <hr class="border-2">
                       <h3 id="headerDataTable" class="p-0">データテーブル</h3>
-                      <div id="sourceDataTable"></div>
+                      <div id="sourceDataTable" class="d-print-none"></div>
                       <p class="d-print-none">使用するデータを入力または貼り付けしてください。空白セルがある行は無視して処理します。右クリックからの貼り付けが成功しない場合、"ctrl-v"
                         で貼り付けしてください。</p>
                       <button id="clearSourceTableBtn" type="button"
@@ -118,7 +122,7 @@
                     <%- include("./partials/zoneNoSelect.ejs", { select_id: "convertZoneNo" }) %>
                       <hr class="border-2">
                       <button id="data-convertBtn" type="button" class="btn btn-primary mb-3 d-print-none">変換</button>
-                      <div id="convertedDataTable"></div>
+                      <div id="convertedDataTable" class="d-print-none"></div>
                       <p class="mb-3">表を右クリックして表示されるメニューからデータをコピーできます</p>
                       <button id="clearConvertedTableBtn" type="button"
                         class="btn button--danger mb-3 d-print-none">データを削除</button>
@@ -128,7 +132,8 @@
             </div>
           </div>
         </div>
-        <div id="main_content" class="col-lg-9">
+      </div>
+      <div id="main_content">
           <div class="mapContainer">
             <div id="map" class="mb-2 map"></div>
           </div>
@@ -136,7 +141,6 @@
             <h4 class="alert-heading">エラーメッセージ</h4>
             <p id="errorMessage"></p>
           </div>
-        </div>
       </div>
       <%- include("./partials/help.ejs") %>
     </div>

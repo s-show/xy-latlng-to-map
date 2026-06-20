@@ -13,6 +13,16 @@ export default defineConfig(() => {
     server: {
       hmr: true,
     },
+    resolve: {
+      alias: {
+        // Vite8 は、パッケージの package.json に "module" と "browser" が定義されていると、`resolve.mainFields` の
+        // デフォルト値に基づいて、"browser" フィールドの "dist/Leaflet.GoogleMutant.js" をインポートする。
+        // しかし、"Leaflet.GoogleMutant.js" には `export default` がないので `export default class GoogleMutant extends GridLayer` エラーになる。
+        // そのため、`resolve.alias` オプションを使って "module" フィールドの "src/Leaflet.GoogleMutant.mjs" を
+        // 読み込むようにしている。
+        'leaflet.gridlayer.googlemutant': 'leaflet.gridlayer.googlemutant/src/Leaflet.GoogleMutant.mjs',
+      },
+    },
     build: {
       outDir: '../dist',
       rollupOptions: {
