@@ -12,6 +12,11 @@ body {
   background-color: $color-header;
 }
 
+// About ページではヘッダーのタイトルを中央寄せにする
+.about-page #header .container-fluid {
+  justify-content: center;
+}
+
 #footer {
   background-color: $color-footer;
 }
@@ -23,14 +28,19 @@ body {
   --header-height: #{$header-height}; // Approximate height with padding + safety margin
   --footer-height: #{$footer-height}; // Approximate height with padding + safety margin
   height: calc(100vh - var(--header-height) - var(--footer-height));
+  width: calc(50vw);
   overflow: $overflow;
 }
 
 .content-wrapper-toppage {
-  @include content-wrapper(visible)
+  @include content-wrapper(visible);
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
 }
 .content-wrapper-about {
-  @include content-wrapper(visible)
+  @include content-wrapper(visible);
+  margin-inline: auto;
 }
 
 // Menu Column (Offcanvas オーバーレイ)
@@ -67,7 +77,7 @@ body {
       /* height: 98% !important; // Override the calc height */
       --header-height: #{$header-height}; // Approximate height with padding + safety margin
       --footer-height: #{$footer-height}; // Approximate height with padding + safety margin
-      height: calc(100vh - var(--header-height) - var(--footer-height) - 10px);
+      /* height: calc(100vh - var(--header-height) - var(--footer-height) - 10px); */
       margin-bottom: 0;
     }
   }

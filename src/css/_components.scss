@@ -258,3 +258,18 @@
     pointer-events: none; // クリックイベントを親要素に透過
   }
 }
+
+// Heading
+// --------------------------------------------------------------------------
+.heading2 {
+  padding: 0.5em;
+  color: black;
+  background: $color-heading2-bg;
+  border-left: solid 10px $color-heading2-border;
+}
+.heading3 {
+  padding: 0.5em;
+  color: black;
+  background: $color-heading3-bg;
+  border-left: solid 5px $color-heading3-border;
+}
