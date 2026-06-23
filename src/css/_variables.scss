@@ -50,6 +50,12 @@ $footer-height: 60px;
 $map-min-height: 600px;
 $scrollbar-width: 8px;
 
+// Overlay Menu (Offcanvas) — col-lg-3 相当の 25% を基準に最小/最大を設ける
+// --------------------------------------------------------------------------
+$menu-overlay-width: 25vw;
+$menu-overlay-min-width: 280px;
+$menu-overlay-max-width: 480px;
+
 // Border Radius
 // --------------------------------------------------------------------------
 $border-radius-sm: 4px;

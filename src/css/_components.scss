@@ -179,6 +179,64 @@
   @include box-shadow(rgba(0, 0, 0, 0.5), -3px, 3px, 3px, 1px);
 }
 
+.offcanvas.offcanvas-start.show {
+  @include box-shadow(rgba(0, 0, 0, 0.5), 3px, 3px, 3px, 1px);
+}
+
+// Hamburger Toggle Button（ハンバーガーメニューアイコン）
+// --------------------------------------------------------------------------
+#menuToggleBtn {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin-right: 0.5em;
+
+  .menu-toggle-btn__bars,
+  .menu-toggle-btn__bars::before,
+  .menu-toggle-btn__bars::after {
+    content: '';
+    display: block;
+    width: 22px;
+    height: 2px;
+    background-color: $color-black;
+    border-radius: 1px;
+    transition: transform $transition-fast, opacity $transition-fast;
+  }
+
+  .menu-toggle-btn__bars {
+    position: relative;
+
+    &::before {
+      position: absolute;
+      top: -7px;
+    }
+
+    &::after {
+      position: absolute;
+      top: 7px;
+    }
+  }
+
+  // Offcanvas 表示中はアイコンを「×」に変形
+  &[aria-expanded="true"] .menu-toggle-btn__bars {
+    background-color: transparent;
+
+    &::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    &::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
+  }
+}
+
 // Leaflet Control Layers
 // --------------------------------------------------------------------------
 .leaflet-control-layers-toggle {
