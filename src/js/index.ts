@@ -10,6 +10,7 @@ import { createMarker } from './marker.js';
 import { map } from "./map.js";
 import { addCircle } from "./circle.js";
 import { addPhotoPoint } from "./importPhoto.js";
+import { splitDataByBlankRows } from "./splitTableData.js";
 import 'bootstrap';
 import 'leaflet/dist/leaflet.css';
 
@@ -252,15 +253,18 @@ if (clearConvertedTableBtn !== null) {
 const addMarkerBtn = document.querySelector<HTMLButtonElement>('#addMarkerBtn')
 if (addMarkerBtn !== null) {
   addMarkerBtn.addEventListener('click', (e) => {
-    const sourceData = dataCleansing(sourceTable[0].getData(
+    // 空白行を区切りとしてテーブルをグループに分割し、グループごとに
+    // 不正データを除去する。線（ポリライン）はグループ内の点だけを結ぶ。
+    const dataGroups = splitDataByBlankRows(sourceTable[0].getData(
       undefined,
       undefined,
       undefined,
       true
-    ));
+    )).map((group) => dataCleansing(group))
+      .filter((group) => group.length > 0);
     const params = getParams();
-    // 緯度経度テーブルに有効なデータが無い場合 sourceData.length は 0 になる
-    if (sourceData.length > 0) {
+    // 緯度経度テーブルに有効なデータが無い場合 dataGroups.length は 0 になる
+    if (dataGroups.length > 0) {
       // アイコン追加には緯度経度が必要なため、変換先パラメータは緯度経度に固定している
       if (
         params.source.geodeticSystem !== null &&
@@ -274,30 +278,35 @@ if (addMarkerBtn !== null) {
           params.source.zoneNo,
           '0'
         );
-        const convertedData = convertData(convertParameter, sourceData);
         const iconColor = document.querySelector<HTMLSelectElement>('#selectMarkerIcon')!.value
         const lineColor = selectLineColor(false);
+        // fitBounds 用に全グループの変換後データをまとめて保持する
+        const allConvertedData: [number, number][] = [];
 
-        convertedData.forEach((data, index) => {
-          if (iconColor != 'none') {
-            createMarker(data[0], data[1], iconColor as 'red' | 'blue' | 'yellow' | 'green').addTo(map);
-          }
-          if (lineColor != 'no' && convertedData[index + 1] != undefined) {
-            L.polyline([convertedData[index], convertedData[index + 1]],
-              {
-                attribution: 'markerPolyline',
-                color: lineColor
-              }
-            ).addTo(map);
-          }
+        dataGroups.forEach((group) => {
+          const convertedData = convertData(convertParameter, group);
+          allConvertedData.push(...convertedData);
+          convertedData.forEach((data, index) => {
+            if (iconColor != 'none') {
+              createMarker(data[0], data[1], iconColor as 'red' | 'blue' | 'yellow' | 'green').addTo(map);
+            }
+            if (lineColor != 'no' && convertedData[index + 1] != undefined) {
+              L.polyline([convertedData[index], convertedData[index + 1]],
+                {
+                  attribution: 'markerPolyline',
+                  color: lineColor
+                }
+              ).addTo(map);
+            }
+          })
         })
         const southWestPoint = L.latLng([
-          convertedData.reduce((x, y) => (x[0] < y[0]) ? x : y)[0],
-          convertedData.reduce((x, y) => (x[1] < y[1]) ? x : y)[1],
+          allConvertedData.reduce((x, y) => (x[0] < y[0]) ? x : y)[0],
+          allConvertedData.reduce((x, y) => (x[1] < y[1]) ? x : y)[1],
         ]);
         const northEastPoint = L.latLng([
-          convertedData.reduce((x, y) => (x[0] > y[0]) ? x : y)[0],
-          convertedData.reduce((x, y) => (x[1] > y[1]) ? x : y)[1],
+          allConvertedData.reduce((x, y) => (x[0] > y[0]) ? x : y)[0],
+          allConvertedData.reduce((x, y) => (x[1] > y[1]) ? x : y)[1],
         ]);
         map.fitBounds(L.latLngBounds(southWestPoint, northEastPoint));
       }
