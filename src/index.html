@@ -3,8 +3,10 @@
 
 <head>
   <%- include("./partials/head.ejs", { subtitle: 'メインページ' }) %>
-  <!-- 環境変数をどうやっても渡せなかったためハードコーディングしている -->
-  <script async src="https://maps.googleapis.com/maps/api/js?key=%VITE_GOOGLE_MAPS_API_KEY%&loading=async"></script>
+  <!-- APIキー未設定時は Google Maps を読み込まない（地理院地図のみで動作する） -->
+  <% if (googleMapsApiKey) { %>
+  <script async src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsApiKey %>&loading=async"></script>
+  <% } %>
 </head>
 
 <body>

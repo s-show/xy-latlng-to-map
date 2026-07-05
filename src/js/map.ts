@@ -38,6 +38,12 @@ gsiStandard.addTo(map);
 
 // Google Maps API 読み込み完了後に Google Maps レイヤーを追加
 (async () => {
+  // APIキー未設定時は index.html で Google Maps の script タグ自体を出力しないため、
+  // レイヤーコントロールも地理院地図のみのままにする
+  if (!import.meta.env?.VITE_GOOGLE_MAPS_API_KEY) {
+    console.info('VITE_GOOGLE_MAPS_API_KEY が未設定のため Google Maps レイヤーは追加しません（地理院地図のみ利用できます）');
+    return;
+  }
   try {
     const fullBaseMaps = await getBaseMaps();
     // 既存のコントロールを削除して再作成
