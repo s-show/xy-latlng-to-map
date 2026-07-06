@@ -1,14 +1,18 @@
 import { resolve } from 'path'
-import { defineConfig } from "vite";
-import fs from 'node:fs/promises';
+import { defineConfig, loadEnv } from "vite";
+import fs from 'node:fs';
 import path from 'node:path';
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 
 // https://vitejs.dev/config/
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
   // 環境変数を読み込む
+  // envDir を指定しない場合 root ('src/') が基準になるため、
+  // リポジトリ直下の .env を読むよう明示している
+  const env = loadEnv(mode, __dirname);
   return {
     root: 'src/',
+    envDir: __dirname,
     // base: './',
     server: {
       hmr: true,
@@ -42,11 +46,14 @@ export default defineConfig(() => {
     },
     plugins: [
       ViteEjsPlugin(
-        async () => {
+        // vite-plugin-ejs はデータ関数の戻り値を await しないため、
+        // async にすると Promise がそのまま EJS に渡って全データが undefined になる。
+        // 必ず同期関数にすること。
+        () => {
           // 共通データを読み込んでテンプレに渡す
           let siteData = {};
           try {
-            const json = await fs.readFile(path.resolve('src/data/site.json'), 'utf8');
+            const json = fs.readFileSync(path.resolve('src/data/site.json'), 'utf8');
             siteData = JSON.parse(json);
           } catch {
             // エラーを無視して続行
@@ -54,6 +61,8 @@ export default defineConfig(() => {
 
           return {
             site: siteData,
+            // キー未設定時に index.html で Google Maps の script タグを出力しないための値
+            googleMapsApiKey: env.VITE_GOOGLE_MAPS_API_KEY ?? '',
           };
         },
         {
