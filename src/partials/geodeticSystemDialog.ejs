@@ -1,5 +1,5 @@
 <!-- 測地系の部分 -->
-<button type="button" id="openGeodeticSystemDialog" class="button button--dialog-open d-print-none">測地系の解説</button>
+<button commandFor="geodeticSystemDialog" command="show-modal" type="button" id="openGeodeticSystemDialog" class="button button--dialog-open d-print-none">測地系の解説</button>
 <dialog id="geodeticSystemDialog" class="dialog">
   <div class="dialog__inner">
     <h1 class="fs-5" id="geodeticSystemLabel">測地系の解説</h1>
@@ -41,6 +41,6 @@
         </tr>
       </tbody>
     </table>
-    <button type="button" id="closeGeodeticSystemDialog" class="btn btn-secondary">閉じる</button>
+    <button commandFor="geodeticSystemDialog" command="close" type="button" id="closeGeodeticSystemDialog" class="btn btn-secondary">閉じる</button>
   </div>
 </dialog>

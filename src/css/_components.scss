@@ -175,11 +175,13 @@
 
 // Offcanvas
 // --------------------------------------------------------------------------
-.offcanvas.offcanvas-end.show {
+/* .offcanvas.offcanvas-end.show { */
+.offcanvas {
   @include box-shadow(rgba(0, 0, 0, 0.5), -3px, 3px, 3px, 1px);
 }
 
-.offcanvas.offcanvas-start.show {
+/* .offcanvas.offcanvas-start.show { */
+.offcanvas {
   @include box-shadow(rgba(0, 0, 0, 0.5), 3px, 3px, 3px, 1px);
 }
 

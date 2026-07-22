@@ -1,10 +1,9 @@
 <nav id="header" class="navbar sticky-top p-3">
   <div class="container-fluid">
     <% if (page == 'toppage') { %>
-    <button id="menuToggleBtn" type="button" aria-label="メニューを開く"
-      class="button button--dialog-open d-print-none" data-bs-toggle="offcanvas" data-bs-target="#menu_column"
-      aria-controls="menu_column">
-      <span class="menu-toggle-btn__bars" aria-hidden="true"></span>
+    <button commandFor="menu_column" command="show-popover" id="menuToggleBtn" type="button" aria-label="メニューを開く"
+      class="button d-print-none">
+      <span class="">≡</span>
       <span class="visually-hidden">メニュー</span>
     </button>
     <% } %>

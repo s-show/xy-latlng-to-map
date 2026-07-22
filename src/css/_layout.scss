@@ -43,21 +43,63 @@ body {
   margin-inline: auto;
 }
 
-// Menu Column (Offcanvas オーバーレイ)
+// Menu Column (Manual Popover オーバーレイ)
 // --------------------------------------------------------------------------
+// popover="" (manual popover) で CSS による配置を制御する。
+// 非表示時は幅 0 で折りたたみ、表示時は :popover-open でサイドバーとして展開。
+// メニューはページ全体の上にオーバーレイ表示され、ヘッダー/フッターが隠れても問題ない。
+//
+// manual popover はブラウザのデフォルトスタイル（position: fixed, inset: 0,
+// max-height: 80vh, border-radius, padding, margin: auto, box-shadow）を
+// 持つため、全てリセットしてオーバーレイとして再定義する。
+
 #menu_column {
   // col-lg-3 相当の幅を基準に、最小/最大で制約を設ける
   --bs-offcanvas-width: #{$menu-overlay-width};
+
+  // ブラウザの manual popover デフォルトスタイルをリセット
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  max-height: none;
+  box-shadow: none;
+  z-index: 1000; // ヘッダー/フッターの上に重ねる
+
+  // 非表示時は画面外に、表示時は left: 0 でスライドイン
+  // popover 要素は非表示時レンダリング木から切り離されるため transform が使えない
   width: $menu-overlay-width;
   min-width: $menu-overlay-min-width;
   max-width: $menu-overlay-max-width;
+  left: calc(-1 * $menu-overlay-width);
+  overflow: hidden;
+  transition: left 1.5s ease;
 
-  .offcanvas-body {
-    // メニュー内はスクロール可能
+  // 表示時
+  &:popover-open {
+    left: 0;
     overflow-y: auto;
     overflow-x: hidden;
     @include custom-scrollbar;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
   }
+}
+
+// メニューが開いているとき、メインコンテンツに暗いオーバーレイを表示
+.content-wrapper-toppage:has(#menu_column:popover-open)::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999; // メニュー (1000) の手前
+  pointer-events: none;
 }
 
 // Main Content Area（全画面化）
@@ -125,6 +167,9 @@ body {
   // オーバーレイメニューは印刷しない
   #menu_column {
     display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
   }
 
   // Leaflet のタイル画像やコントロールが「背景」として印刷除外されるのを防ぐ。

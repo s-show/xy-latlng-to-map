@@ -123,82 +123,27 @@ function changeZoneNo(selectedBtn: HTMLInputElement, selectMenu: HTMLSelectEleme
   })
 }
 
-// 測地系の説明ダイアログ表示処理
-const openGeodeticSystemDialogBtn = document.querySelector<HTMLButtonElement>('#openGeodeticSystemDialog')
-const geodeticSystemDialog = document.querySelector<HTMLDialogElement>('#geodeticSystemDialog')
-if (openGeodeticSystemDialogBtn !== null) {
-  openGeodeticSystemDialogBtn.addEventListener('click', () => {
-    if (geodeticSystemDialog !== null) {
-      showDialog(geodeticSystemDialog, 'geodeticSystemDialog');
-    }
-  })
-}
-// 測地系の説明ダイアログを閉じる処理
-const closeGeodeticSystemDialogBtn = document.querySelector<HTMLButtonElement>('#closeGeodeticSystemDialog')
-if (closeGeodeticSystemDialogBtn !== null) {
-  closeGeodeticSystemDialogBtn.addEventListener('click', () => {
-    if (geodeticSystemDialog !== null) {
-      geodeticSystemDialog.close();
-    }
-  })
-}
 // 系番号の説明ダイアログ表示処理
-const openZoneNoDialog = document.querySelector<HTMLButtonElement>('#openZoneNoDialog')
 const zoneNoDialog = document.querySelector<HTMLDialogElement>('#zoneNoDialog')
-if (openZoneNoDialog !== null) {
-  openZoneNoDialog.addEventListener('click', () => {
-    const zoneNoSelectBtns = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
-    const dataType = getParams().source.type;
-    if (isNodeList(zoneNoSelectBtns)) {
-      zoneNoSelectBtns.forEach((btn) => {
-        if (btn.parentElement !== null) {
-          if (dataType == 'XY') {
-            btn.parentElement.classList.remove('d-none');
-            btn.classList.remove('d-none');
-          } else {
-            btn.parentElement.classList.add('d-none');
-            btn.classList.add('d-none');
+if (zoneNoDialog !== null) {
+  zoneNoDialog.addEventListener('command', (event) => {
+    if (event.command === 'show-modal') {
+      console.table(event);
+      const zoneNoSelectBtns = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
+      const dataType = getParams().source.type;
+      if (isNodeList(zoneNoSelectBtns)) {
+        zoneNoSelectBtns.forEach((btn) => {
+          if (btn.parentElement !== null) {
+            if (dataType == 'XY') {
+              btn.parentElement.classList.remove('d-none');
+              btn.classList.remove('d-none');
+            } else {
+              btn.parentElement.classList.add('d-none');
+              btn.classList.add('d-none');
+            }
           }
-        }
-      })
-      if (zoneNoDialog !== null) {
-        showDialog(zoneNoDialog, 'zoneNoDialog');
+        })
       }
-    }
-  })
-}
-const closeZoneNoDialogBtn = document.querySelector<HTMLButtonElement>('#closeZoneNoDialog')
-if (closeZoneNoDialogBtn !== null) {
-  closeZoneNoDialogBtn.addEventListener('click', () => {
-    if (zoneNoDialog !== null) {
-      zoneNoDialog.close();
-    }
-  })
-}
-
-// データテーブルの注意事項ダイアログの表示処理
-const openAcceptableDataDialogBtn = document.querySelector<HTMLButtonElement>('#openAcceptableDataDialog')
-const acceptableDataDialog = document.querySelector<HTMLDialogElement>('#acceptableDataDialog')
-if (openAcceptableDataDialogBtn !== null) {
-  openAcceptableDataDialogBtn.addEventListener('click', () => {
-    if (acceptableDataDialog !== null) {
-      showDialog(acceptableDataDialog, 'acceptableDataDialog');
-    }
-  })
-}
-const closeAcceptableDataDialogBtn = document.querySelector<HTMLButtonElement>('#closeAcceptableDataDialog')
-if (closeAcceptableDataDialogBtn !== null) {
-  closeAcceptableDataDialogBtn.addEventListener('click', () => {
-    if (acceptableDataDialog !== null) {
-      acceptableDataDialog.close();
-    }
-  })
-}
-function showDialog(dialog: HTMLDialogElement, dialogId: string) {
-  dialog.showModal();
-  dialog.addEventListener('click', () => {
-    if (dialog.id === dialogId) {
-      dialog.close();
     }
   })
 }
@@ -387,14 +332,20 @@ if (zoomRangeInput !== null && mapDiv !== null && zoomRangeValue !== null) {
 // Leaflet の内部サイズを更新し、表の幅もメニュー幅基準で再調整する。
 const menuColumn = document.querySelector('#menu_column');
 if (menuColumn !== null) {
-  menuColumn.addEventListener('shown.bs.offcanvas', () => {
-    map.invalidateSize();
-    resizeTable(getMenuColumnWidth());
+  // menuColumn.addEventListener('shown.bs.offcanvas', () => {
+  menuColumn.addEventListener('command', (event) => {
+    if (event.command === 'show-popover') {
+      map.invalidateSize();
+      resizeTable(getMenuColumnWidth());
+    } else if (event.command === 'hide-popover') {
+      map.invalidateSize();
+      resizeTable(getMenuColumnWidth());
+    }
   });
-  menuColumn.addEventListener('hidden.bs.offcanvas', () => {
-    map.invalidateSize();
-    resizeTable(getMenuColumnWidth());
-  });
+  // menuColumn.addEventListener('hidden.bs.offcanvas', () => {
+  //   map.invalidateSize();
+  //   resizeTable(getMenuColumnWidth());
+  // });
 }
 
 // 写真のGPSデータを読み込んで地図に表示する処理
