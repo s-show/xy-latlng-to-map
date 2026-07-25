@@ -316,6 +316,18 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+
+  // Google Maps 帰属表示の印刷崩れ対策。
+  // GoogleMutant は Google の帰属コンテナを Leaflet コーナーに移動しており、
+  // Google 自身の印刷用 CSS (@media print で .gmnoprint を非表示・.gmnoscreen を表示)
+  // により印刷時は印刷用 DOM に切り替わる。このコンテナは float の shrink-to-fit で
+  // 幅が約10pxに潰れているため、印刷用テキスト (Map data ©YYYY Google) が1語ずつ
+  // 折り返され、GoogleMutant が付ける固定高さ height:14px から溢れて Leaflet 帰属と
+  // 重なって崩れる。white-space: nowrap で折り返しを抑止し1行表示に戻す。
+  // （Terms が印刷で非表示になるのは Google 自身の印刷設計どおり）
+  .leaflet-bottom.leaflet-right .leaflet-control-attribution {
+    white-space: nowrap;
+  }
 }
 
 // Map Container
