@@ -152,7 +152,7 @@ const columnsConfig = [
 // convertedTable用に readonly を追加
 const readonlyColumnsConfig = columnsConfig.map(col => ({ ...col, readOnly: true }));
 
-export const sourceTable = jspreadsheet(document.getElementById('sourceDataTable') as HTMLDivElement, {
+export const sourceTable = jspreadsheet(document.getElementById('source-data-table') as HTMLDivElement, {
   worksheets: [{
     ...worksheetConfig,
     data: initTableData,
@@ -165,7 +165,7 @@ export const sourceTable = jspreadsheet(document.getElementById('sourceDataTable
   onpaste: afterPaste,
 });
 
-export const convertedTable = jspreadsheet(document.getElementById('convertedDataTable') as HTMLDivElement, {
+export const convertedTable = jspreadsheet(document.getElementById('converted-data-table') as HTMLDivElement, {
   worksheets: [{
     ...worksheetConfig,
     data: initTableData,

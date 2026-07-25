@@ -47,7 +47,7 @@ function isNodeList<T extends Element>(nodeList: NodeListOf<T> | null | undefine
 // Offcanvas 化により表はオーバーレイメニュー内にあるため、
 // ウィンドウ幅ではなくメニューカラムの実際の表示幅を基準にする。
 function getMenuColumnWidth(): number {
-  const menuColumn = document.querySelector('#menu_column');
+  const menuColumn = document.querySelector('#menu-column');
   if (menuColumn instanceof HTMLElement) {
     // offcanvas が非表示でも CSS の幅変数を基準にした値を得る
     return Math.max(menuColumn.offsetWidth, window.innerWidth || 0);
@@ -76,20 +76,20 @@ function setupDialog() {
             radioBtn.checked = true;
           }
         })
-        document.querySelector<HTMLDialogElement>('#geodeticSystemDialog')!.close();
+        document.querySelector<HTMLDialogElement>('#geodetic-system-dialog')!.close();
       })
     })
   }
   // 系番号の説明画面の処理
   const zoneNoSelectBtn = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
-  const sourceZoneNo = document.querySelector<HTMLSelectElement>('#sourceZoneNo');
+  const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no');
   if (isNodeList(zoneNoSelectBtn) && isElement(sourceZoneNo)) {
     zoneNoSelectBtn.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         if (e.currentTarget instanceof HTMLButtonElement) {
           sourceZoneNo.value = String(e.currentTarget.getAttribute('data-zone-no-btn'));
           sourceZoneNo.options[0].disabled = true;
-          document.querySelector<HTMLDialogElement>('#zoneNoDialog')!.close();
+          document.querySelector<HTMLDialogElement>('#zone-no-dialog')!.close();
         }
       })
     })
@@ -98,13 +98,13 @@ function setupDialog() {
 
 // 変換元・変換先データのXY座標・緯度経度の選択に応じて系番号を変更する
 document.querySelectorAll<HTMLInputElement>('[name="sourceDataType"]').forEach((selectedBtn) => {
-  const sourceZoneNo = document.querySelector<HTMLSelectElement>('#sourceZoneNo')
+  const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no')
   if (isElement(sourceZoneNo)) {
     changeZoneNo(selectedBtn, sourceZoneNo);
   }
 })
 document.querySelectorAll<HTMLInputElement>('[name="convertToDataType"]').forEach((selectedBtn) => {
-  const convertZoneNo = document.querySelector<HTMLSelectElement>('#convertZoneNo')
+  const convertZoneNo = document.querySelector<HTMLSelectElement>('#convert-zone-no')
   if (isElement(convertZoneNo)) {
     changeZoneNo(selectedBtn, convertZoneNo);
   }
@@ -124,7 +124,7 @@ function changeZoneNo(selectedBtn: HTMLInputElement, selectMenu: HTMLSelectEleme
 }
 
 // 系番号の説明ダイアログ表示処理
-const zoneNoDialog = document.querySelector<HTMLDialogElement>('#zoneNoDialog')
+const zoneNoDialog = document.querySelector<HTMLDialogElement>('#zone-no-dialog')
 if (zoneNoDialog !== null) {
   zoneNoDialog.addEventListener('command', (event) => {
     if (event.command === 'show-modal') {
@@ -149,7 +149,7 @@ if (zoneNoDialog !== null) {
 }
 
 // データ変換
-const dataConvertBtn = document.querySelector<HTMLButtonElement>('#data-convertBtn')
+const dataConvertBtn = document.querySelector<HTMLButtonElement>('#data-convert-btn')
 if (dataConvertBtn !== null) {
   dataConvertBtn.addEventListener('click', (e) => {
     const params = getParams()
@@ -180,14 +180,14 @@ if (dataConvertBtn !== null) {
 }
 
 // 変換元データの表のデータクリア
-const clearSourceTableBtn = document.querySelector<HTMLButtonElement>('#clearSourceTableBtn')
+const clearSourceTableBtn = document.querySelector<HTMLButtonElement>('#clear-source-table-btn')
 if (clearSourceTableBtn !== null) {
   clearSourceTableBtn.addEventListener('click', (e) => {
     clearTable(e, 'source');
   })
 }
 // 変換後データの表のデータクリア
-const clearConvertedTableBtn = document.querySelector<HTMLButtonElement>('#clearConvertedTableBtn')
+const clearConvertedTableBtn = document.querySelector<HTMLButtonElement>('#clear-converted-table-btn')
 if (clearConvertedTableBtn !== null) {
   clearConvertedTableBtn.addEventListener('click', (e) => {
     clearTable(e, 'converted');
@@ -195,7 +195,7 @@ if (clearConvertedTableBtn !== null) {
 }
 
 // アイコン一括追加ボタンクリック時の動作
-const addMarkerBtn = document.querySelector<HTMLButtonElement>('#addMarkerBtn')
+const addMarkerBtn = document.querySelector<HTMLButtonElement>('#add-marker-btn')
 if (addMarkerBtn !== null) {
   addMarkerBtn.addEventListener('click', (e) => {
     // 空白行を区切りとしてテーブルをグループに分割し、グループごとに
@@ -223,7 +223,7 @@ if (addMarkerBtn !== null) {
           params.source.zoneNo,
           '0'
         );
-        const iconColor = document.querySelector<HTMLSelectElement>('#selectMarkerIcon')!.value
+        const iconColor = document.querySelector<HTMLSelectElement>('#select-marker-icon')!.value
         const lineColor = selectLineColor(false);
         // fitBounds 用に全グループの変換後データをまとめて保持する
         const allConvertedData: [number, number][] = [];
@@ -261,7 +261,7 @@ if (addMarkerBtn !== null) {
 
 }
 // アイコン全削除
-const removeMarkerBtn = document.querySelector<HTMLButtonElement>('#removeMarkerBtn')
+const removeMarkerBtn = document.querySelector<HTMLButtonElement>('#remove-marker-btn')
 if (removeMarkerBtn !== null) {
   removeMarkerBtn.addEventListener('click', (e) => {
     map.eachLayer((layer) => {
@@ -301,7 +301,7 @@ if (window.matchMedia) {
   }
 }
 // 印刷プレビュー画面の作成
-const printPreviewBtn = document.querySelector<HTMLButtonElement>('#printPreviewBtn')
+const printPreviewBtn = document.querySelector<HTMLButtonElement>('#print-preview-btn')
 if (printPreviewBtn !== null) {
   printPreviewBtn.addEventListener('input', (e) => {
     if (e.currentTarget instanceof HTMLInputElement) {
@@ -315,9 +315,9 @@ if (printPreviewBtn !== null) {
 }
 
 // 地図引き伸ばし
-const zoomRangeInput = document.querySelector<HTMLInputElement>('#zoomRange')
+const zoomRangeInput = document.querySelector<HTMLInputElement>('#zoom-range')
 const mapDiv = document.querySelector<HTMLDivElement>('#map')
-const zoomRangeValue = document.querySelector<HTMLOutputElement>('#zoomRangeValue')
+const zoomRangeValue = document.querySelector<HTMLOutputElement>('#zoom-range-value')
 if (zoomRangeInput !== null && mapDiv !== null && zoomRangeValue !== null) {
   zoomRangeInput.addEventListener('input', (e) => {
     if (e.currentTarget instanceof HTMLInputElement) {
@@ -330,7 +330,7 @@ if (zoomRangeInput !== null && mapDiv !== null && zoomRangeValue !== null) {
 // オーバーレイメニュー(Offcanvas)の開閉に合わせて地図サイズを再計算する (Issue #11)
 // Offcanvas は地図の表示サイズを変えないが、開閉後に念のため invalidateSize で
 // Leaflet の内部サイズを更新し、表の幅もメニュー幅基準で再調整する。
-const menuColumn = document.querySelector('#menu_column');
+const menuColumn = document.querySelector('#menu-column');
 if (menuColumn !== null) {
   // menuColumn.addEventListener('shown.bs.offcanvas', () => {
   menuColumn.addEventListener('command', (event) => {
@@ -405,8 +405,8 @@ function getParams(): ParamsType {
   const convertDataType = document.querySelectorAll<HTMLInputElement>('[name="convertToDataType"]')
   const sourceGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="sourceGeodeticSystem"]')
   const convertToGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="convertToGeodeticSystem"]')
-  const sourceZoneNo = document.querySelector<HTMLSelectElement>('#sourceZoneNo')
-  const convertZoneNo = document.querySelector<HTMLSelectElement>('#convertZoneNo')
+  const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no')
+  const convertZoneNo = document.querySelector<HTMLSelectElement>('#convert-zone-no')
   sourceDataType.forEach((currentNode) => {
     if (currentNode.checked) {
       params['source']['type'] = currentNode.value as DataType;
@@ -541,13 +541,13 @@ function afterPrint() {
 /*
  * 円の追加に関連する処理
  */
-const addCircleToMap = document.querySelector<HTMLButtonElement>('#addCircleToMap')
-const inputDiameter = document.querySelector<HTMLDialogElement>('#inputDiameter')
+const addCircleToMap = document.querySelector<HTMLButtonElement>('#add-circle-to-map')
+const inputDiameter = document.querySelector<HTMLDialogElement>('#input-diameter')
 const latitude = document.querySelector<HTMLInputElement>('#latitude')
 const longitude = document.querySelector<HTMLInputElement>('#longitude')
-const selectLineColorSelector = document.querySelector<HTMLSelectElement>('#selectLineColor')
+const selectLineColorSelector = document.querySelector<HTMLSelectElement>('#select-line-color')
 const circleRadius = document.querySelector<HTMLInputElement>('#radius')
-const cancelAddCircle = document.querySelector<HTMLButtonElement>('#cancelAddCircle')
+const cancelAddCircle = document.querySelector<HTMLButtonElement>('#cancel-add-circle')
 if (
   addCircleToMap !== null &&
   inputDiameter !== null &&
@@ -660,7 +660,7 @@ function buildHeaderText(params: ParamsType): string[][] {
 }
 
 // 変換前後のデータをCSVでexportする
-const exportCSVBtn = document.querySelector<HTMLButtonElement>('#exportCSVBtn');
+const exportCSVBtn = document.querySelector<HTMLButtonElement>('#export-csv-btn');
 const dataConvertDiv = document.querySelector<HTMLDivElement>('#data-convert-pane')
 if (exportCSVBtn !== null) {
   exportCSVBtn.addEventListener('click', () => {
@@ -692,7 +692,7 @@ if (exportCSVBtn !== null) {
 
 // 線の色を選択する処理
 function selectLineColor(shouldReturnDefaultColor = true) {
-  const selectLineColor = document.querySelector<HTMLSelectElement>('#selectLineColor');
+  const selectLineColor = document.querySelector<HTMLSelectElement>('#select-line-color');
   if (!selectLineColor) return shouldReturnDefaultColor ? '#8b4513' : 'no';
   let lineColor = ''
   switch (selectLineColor.value) {
@@ -716,7 +716,7 @@ function selectLineColor(shouldReturnDefaultColor = true) {
 };
 
 window.onerror = function myErrorHandler(errorMsg) {
-  const errorMessageDiv = document.querySelector<HTMLDivElement>('#errorMessage')
+  const errorMessageDiv = document.querySelector<HTMLDivElement>('#error-message')
   if (errorMessageDiv !== null) {
     errorMessageDiv.innerText = String(errorMsg);
   }

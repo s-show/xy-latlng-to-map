@@ -98,7 +98,7 @@ body {
 }
 
 // メニューが開いているとき、メインコンテンツに暗いオーバーレイを表示
-.content-wrapper-toppage:has(#menu_column:popover-open)::before {
+.content-wrapper-toppage:has(#menu-column:popover-open)::before {
   content: '';
   position: fixed;
   top: 0;
@@ -189,13 +189,13 @@ body {
 
 // Main Content Area（全画面化）
 // --------------------------------------------------------------------------
-#main_content {
+#main-content {
   height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 
-  .mapContainer {
+  .map-container {
     flex: 1;
     position: relative;
 
@@ -209,7 +209,7 @@ body {
     }
   }
 
-  #errorMessageWrap {
+  #error-message-wrap {
     flex-shrink: 0;
   }
 }
@@ -225,11 +225,11 @@ body {
     overflow: visible;
   }
 
-  #main_content {
+  #main-content {
     height: auto;
     min-height: $map-min-height; // 最小高さを追加
 
-    .mapContainer {
+    .map-container {
       min-height: $map-min-height; // コンテナの最小高さ
       position: relative;
 
@@ -250,7 +250,7 @@ body {
   }
 
   // オーバーレイメニュー・ヘルプは印刷しない
-  #menu_column,
+  #menu-column,
   #offcanvasScrolling {
     display: none !important;
     width: 0 !important;
@@ -266,19 +266,19 @@ body {
   .leaflet-control,
   .leaflet-container img,
   #map,
-  .mapContainer {
+  .map-container {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  #main_content {
+  #main-content {
     height: auto;
     overflow: visible;
     // 印刷時は flex レイアウトを解除してブロックレイアウトに戻す。
-    // flex コンテナ内だと .mapContainer の height が意図通り反映されない (Issue #11 修正)。
+    // flex コンテナ内だと .map-container の height が意図通り反映されない (Issue #11 修正)。
     display: block !important;
 
-    .mapContainer {
+    .map-container {
       // 印刷時は明示的な高さを与えて Leaflet が確実に描画できるようにする。
       // 用紙の向き（縦/横）に依存しない安全な高さとする (Issue #11 修正)。
       height: 90vh;
@@ -292,20 +292,20 @@ body {
     #map {
       position: relative !important; // absolute から relative に変更して印刷に確実に描画
       width: 100% !important;
-      height: 100% !important; // .mapContainer の高さに追従
+      height: 100% !important; // .map-container の高さに追従
     }
   }
 
   // jspreadsheet の座標入力表を印刷対象から除外（Issue #11）
-  #sourceDataTable,
-  #convertedDataTable {
+  #source-data-table,
+  #converted-data-table {
     display: none !important;
   }
 }
 
 // Map Container
 // --------------------------------------------------------------------------
-.mapContainer {
+.map-container {
   overflow: hidden;
 }
 

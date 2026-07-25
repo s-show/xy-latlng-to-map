@@ -173,13 +173,13 @@ const lengthMarker = L.icon({
   iconUrl: getImage('length_pin_icon', 'svg'),
   iconSize: L.point(30, 30),
   iconAnchor: L.point(15, 30),
-  className: 'lengthStartIcon',
+  className: 'length-start-icon',
 });
 const photoMarker = L.icon({
   iconUrl: getImage('photo_icon', 'svg'),
   iconSize: L.point(30, 30),
   iconAnchor: L.point(15, 30),
-  className: 'photoIcon',
+  className: 'photo-icon',
 });
 const markers: markers = {
   red: redMarker,

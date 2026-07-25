@@ -1,7 +1,7 @@
 <nav id="header" class="navbar sticky-top p-3">
   <div class="container-fluid">
     <% if (page == 'toppage') { %>
-    <button commandFor="menu-column" command="show-popover" id="menuToggleBtn" type="button" aria-label="メニューを開く"
+    <button commandFor="menu-column" command="show-popover" id="menu-toggle-btn" type="button" aria-label="メニューを開く"
       class="button d-print-none">
       <span class="">≡</span>
       <span class="visually-hidden">メニュー</span>
@@ -10,7 +10,7 @@
     <a href="./index.html" class="navbar-brand h1">座標の地図表示と座標・緯度経度の変換</a>
     <% if (page == 'toppage') { %>
     <div class="d-md-flex align-items-md-stretch">
-      <div id="openHelp" class="me-2">
+      <div id="open-help" class="me-2">
         <div class="d-print-none">
           <button commandFor="help-column" command="show-popover" class="button button--dialog-open">
             <img src="./assets/help.svg" height="24">使い方を表示</button>

@@ -46,7 +46,7 @@
     overflow-y: scroll;
     padding-top: 0px;
 
-    #zoneNoTable th {
+    #zone-no-table th {
       position: sticky;
       top: 0;
       z-index: $z-index-sticky;
@@ -153,16 +153,16 @@
   }
 }
 
-// 旧#userGuideのスタイル（後方互換性のため保持）
-#userGuide {
+// 旧#user-guideのスタイル（後方互換性のため保持）
+#user-guide {
   border: 1px solid $color-guide-border;
   border-radius: $border-radius-sm;
   margin-bottom: 8px;
   width: 100%;
   box-sizing: border-box;
 
-  // 子要素 #userGuideTitle に関するスタイル
-  >#userGuideTitle {
+  // 子要素 #user-guide-title に関するスタイル
+  >#user-guide-title {
     display: revert;
 
     // hover と [open] のとき同じ背景色を適用
@@ -187,7 +187,7 @@
 
 // Hamburger Toggle Button（ハンバーガーメニューアイコン）
 // --------------------------------------------------------------------------
-#menuToggleBtn {
+#menu-toggle-btn {
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
@@ -263,13 +263,13 @@
 
 // Heading
 // --------------------------------------------------------------------------
-.heading2 {
+.heading-2 {
   padding: 0.5em;
   color: black;
   background: $color-heading2-bg;
   border-left: solid 10px $color-heading2-border;
 }
-.heading3 {
+.heading-3 {
   padding: 0.5em;
   color: black;
   background: $color-heading3-bg;

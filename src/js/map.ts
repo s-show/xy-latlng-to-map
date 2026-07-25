@@ -79,7 +79,7 @@ export const measureLocations: MeasurePoints = {
 
 // 半径を入力するダイアログを表示する処理
 function openRadiusInputDialog(e: ContextMenuEvent) {
-  const dialog = document.querySelector<HTMLDialogElement>('#inputDiameter');
+  const dialog = document.querySelector<HTMLDialogElement>('#input-diameter');
   dialog?.showModal();
   const inputRadius = document.querySelector<HTMLInputElement>('#radius')
   inputRadius?.select();
@@ -90,7 +90,7 @@ function openRadiusInputDialog(e: ContextMenuEvent) {
     inputLongitude.value = String(e.latlng.lng);
   }
   dialog?.addEventListener('click', (e: PointerEvent) => {
-    if (e.target instanceof HTMLElement && e.target.id === 'inputDiameter') {
+    if (e.target instanceof HTMLElement && e.target.id === 'input-diameter') {
       dialog.close();
     }
   });
@@ -101,7 +101,7 @@ function openRadiusInputDialog(e: ContextMenuEvent) {
  * @param {object} e クリックした場所の緯度経度、ピクセル形式の場所情報、親要素のピクセル形式の場所情報
  */
 function addMarker(e: ContextMenuEvent) {
-  const selectMarkerIcon = document.querySelector<HTMLSelectElement>('#selectMarkerIcon');
+  const selectMarkerIcon = document.querySelector<HTMLSelectElement>('#select-marker-icon');
   if (selectMarkerIcon !== null) {
     const iconColor = selectMarkerIcon.value;
     if (iconColor !== 'none' && iconColor !== null) {

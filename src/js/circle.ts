@@ -71,7 +71,7 @@ export function addCircle(
     direction: 'bottom',
     permanent: true,
     content: '半径: ' + radius + 'm',
-    className: 'tooltipVisual',
+    className: 'tooltip-visual',
     attribution: 'circleTooltip',
     opacity: 1.0,
   };
