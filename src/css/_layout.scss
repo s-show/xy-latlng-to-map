@@ -175,7 +175,7 @@ body {
 }
 
 // ヘルプが開いているとき、メインコンテンツに暗いオーバーレイを表示
-.content-wrapper-toppage:has(#offcanvasScrolling:popover-open)::before {
+.content-wrapper-toppage:has(#help-column:popover-open)::before {
   content: '';
   position: fixed;
   top: 0;
@@ -251,7 +251,7 @@ body {
 
   // オーバーレイメニュー・ヘルプは印刷しない
   #menu-column,
-  #offcanvasScrolling {
+  #help-column {
     display: none !important;
     width: 0 !important;
     min-width: 0 !important;
