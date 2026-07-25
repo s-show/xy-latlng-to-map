@@ -1,8 +1,7 @@
-<div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1"
-  id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasScrollingLabel">目的別操作ガイド</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<div id="help-column" tabindex="-1" popover>
+  <div class="d-flex align-items-center justify-content-between">
+    <h5 class="m-1">目的別操作ガイド</h5>
+    <button commandFor="help-column" command="hide-popover" type="button" id="close-help-btn" aria-label="閉じる">×</button>
   </div>
   <div class="offcanvas-body">
     <details class="user-guide__details" name="userGuideDetails">

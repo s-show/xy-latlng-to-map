@@ -1,7 +1,7 @@
 <nav id="header" class="navbar sticky-top p-3">
   <div class="container-fluid">
     <% if (page == 'toppage') { %>
-    <button commandFor="menu_column" command="show-popover" id="menuToggleBtn" type="button" aria-label="メニューを開く"
+    <button commandFor="menu-column" command="show-popover" id="menuToggleBtn" type="button" aria-label="メニューを開く"
       class="button d-print-none">
       <span class="">≡</span>
       <span class="visually-hidden">メニュー</span>
@@ -12,8 +12,7 @@
     <div class="d-md-flex align-items-md-stretch">
       <div id="openHelp" class="me-2">
         <div class="d-print-none">
-          <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"
-            class="button button--dialog-open">
+          <button commandFor="help-column" command="show-popover" class="button button--dialog-open">
             <img src="./assets/help.svg" height="24">使い方を表示</button>
         </div>
       </div>
