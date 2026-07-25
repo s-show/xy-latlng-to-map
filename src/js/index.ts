@@ -16,10 +16,10 @@ import 'leaflet/dist/leaflet.css';
 
 // 印刷モード時に非表示にするラジオボタンのリスト
 const noPrintRadioBtn: string[] = [
-  'sourceDataType',
-  'sourceGeodeticSystem',
-  'convertToDataType',
-  'convertToGeodeticSystem'
+  'source-data-type',
+  'source-geodetic-system',
+  'convert-to-data-type',
+  'convert-to-geodetic-system'
 ];
 
 /**
@@ -66,13 +66,13 @@ window.addEventListener('load', () => {
 
 function setupDialog() {
   // 測地系の説明画面の処理
-  const geodeticSystemSelectBtn = document.querySelectorAll<HTMLButtonElement>('[data-geodeticSystem]')
-  const geodeticSystemRadioBtn = document.querySelectorAll<HTMLInputElement>('input[name="sourceGeodeticSystem"]');
+  const geodeticSystemSelectBtn = document.querySelectorAll<HTMLButtonElement>('[data-geodetic-system]')
+  const geodeticSystemRadioBtn = document.querySelectorAll<HTMLInputElement>('input[name="source-geodetic-system"]');
   if (isNodeList(geodeticSystemSelectBtn) && isNodeList(geodeticSystemRadioBtn)) {
     geodeticSystemSelectBtn.forEach((btn) => {
       btn.addEventListener('click', () => {
         geodeticSystemRadioBtn.forEach((radioBtn) => {
-          if (btn.getAttribute('data-geodeticSystem') == radioBtn.value) {
+          if (btn.getAttribute('data-geodetic-system') == radioBtn.value) {
             radioBtn.checked = true;
           }
         })
@@ -97,13 +97,13 @@ function setupDialog() {
 }
 
 // 変換元・変換先データのXY座標・緯度経度の選択に応じて系番号を変更する
-document.querySelectorAll<HTMLInputElement>('[name="sourceDataType"]').forEach((selectedBtn) => {
+document.querySelectorAll<HTMLInputElement>('[name="source-data-type"]').forEach((selectedBtn) => {
   const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no')
   if (isElement(sourceZoneNo)) {
     changeZoneNo(selectedBtn, sourceZoneNo);
   }
 })
-document.querySelectorAll<HTMLInputElement>('[name="convertToDataType"]').forEach((selectedBtn) => {
+document.querySelectorAll<HTMLInputElement>('[name="convert-to-data-type"]').forEach((selectedBtn) => {
   const convertZoneNo = document.querySelector<HTMLSelectElement>('#convert-zone-no')
   if (isElement(convertZoneNo)) {
     changeZoneNo(selectedBtn, convertZoneNo);
@@ -401,10 +401,10 @@ function getParams(): ParamsType {
       'zoneNo': null
     }
   };
-  const sourceDataType = document.querySelectorAll<HTMLInputElement>('[name="sourceDataType"]')
-  const convertDataType = document.querySelectorAll<HTMLInputElement>('[name="convertToDataType"]')
-  const sourceGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="sourceGeodeticSystem"]')
-  const convertToGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="convertToGeodeticSystem"]')
+  const sourceDataType = document.querySelectorAll<HTMLInputElement>('[name="source-data-type"]')
+  const convertDataType = document.querySelectorAll<HTMLInputElement>('[name="convert-to-data-type"]')
+  const sourceGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="source-geodetic-system"]')
+  const convertToGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="convert-to-geodetic-system"]')
   const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no')
   const convertZoneNo = document.querySelector<HTMLSelectElement>('#convert-zone-no')
   sourceDataType.forEach((currentNode) => {
