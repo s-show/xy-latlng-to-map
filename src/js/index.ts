@@ -10,6 +10,7 @@ import { createMarker } from './marker.js';
 import { map } from "./map.js";
 import { addCircle } from "./circle.js";
 import { addPhotoPoint } from "./importPhoto.js";
+import { isImageFile } from "./isImageFile.js";
 import { splitDataByBlankRows } from "./splitTableData.js";
 import 'bootstrap';
 import 'leaflet/dist/leaflet.css';
@@ -397,7 +398,15 @@ if (mapDiv !== null) {
   mapDiv.addEventListener('drop', (event) => {
     event.preventDefault();
     if (event.dataTransfer !== null) {
-      addPhotoPoint(map, event.dataTransfer.files);
+      const files = Array.from(event.dataTransfer.files);
+      const imageFiles = files.filter(isImageFile);
+      const rejectedCount = files.length - imageFiles.length;
+      if (rejectedCount > 0) {
+        alert(`画像ファイル以外は読み込めません。${rejectedCount}件のファイルを除外しました。`);
+      }
+      if (imageFiles.length > 0) {
+        addPhotoPoint(map, imageFiles);
+      }
     }
   })
 }
