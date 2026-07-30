@@ -12,6 +12,9 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname);
   return {
     root: 'src/',
+    // HTML操作マニュアルとスクリーンショットを開発サーバー・ビルド成果物の
+    // ルートへそのまま公開する。
+    publicDir: '../docs',
     envDir: __dirname,
     // base: './',
     server: {

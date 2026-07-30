@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="座標の地図表示と座標・緯度経度の変換 操作マニュアル">
+  <title>操作マニュアル | 座標の地図表示と座標・緯度経度の変換</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #526078;
+      --line: #d7deea;
+      --panel: #f5f8fc;
+      --brand: #245f9e;
+      --brand-dark: #17436f;
+      --accent: #e7f1fc;
+      --warning: #fff6dc;
+      --danger: #a52828;
+      --page: #ffffff;
+      --shadow: 0 12px 34px rgba(27, 45, 76, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      color: var(--ink);
+      background: #eef2f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+      line-height: 1.75;
+      scroll-behavior: smooth;
+    }
+
+    body { margin: 0; }
+
+    a { color: var(--brand); }
+    a:hover { color: var(--brand-dark); }
+
+    .cover {
+      color: #fff;
+      background: linear-gradient(135deg, #173a63 0%, #2f6faa 58%, #6e9cc8 100%);
+      padding: 64px max(24px, calc((100vw - 1160px) / 2));
+    }
+
+    .cover__eyebrow {
+      margin: 0 0 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.82;
+    }
+
+    .cover h1 {
+      max-width: 850px;
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.25;
+    }
+
+    .cover__lead {
+      max-width: 720px;
+      margin: 22px 0 0;
+      font-size: 1.08rem;
+      opacity: 0.93;
+    }
+
+    .cover__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .cover__meta span {
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 0.88rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 34px;
+      width: min(1160px, calc(100% - 40px));
+      margin: 34px auto 70px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--page);
+      box-shadow: var(--shadow);
+    }
+
+    .toc h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding-left: 1.3rem;
+    }
+
+    .toc li { margin: 7px 0; }
+    .toc a { color: var(--ink); text-decoration: none; }
+    .toc a:hover { color: var(--brand); text-decoration: underline; }
+
+    main {
+      min-width: 0;
+      padding: 10px 42px 52px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--page);
+      box-shadow: var(--shadow);
+    }
+
+    section {
+      padding-top: 42px;
+      scroll-margin-top: 20px;
+    }
+
+    section + section {
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      color: var(--brand-dark);
+      font-size: clamp(1.45rem, 3vw, 2rem);
+      line-height: 1.4;
+    }
+
+    h3 {
+      margin: 30px 0 12px;
+      font-size: 1.2rem;
+      line-height: 1.5;
+    }
+
+    p { margin: 12px 0; }
+    ol, ul { padding-left: 1.5rem; }
+    li + li { margin-top: 7px; }
+
+    .lead {
+      color: var(--muted);
+      font-size: 1.06rem;
+    }
+
+    .quick-start {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 22px 0;
+      padding: 0;
+      counter-reset: quick;
+      list-style: none;
+    }
+
+    .quick-start li {
+      position: relative;
+      min-height: 104px;
+      margin: 0;
+      padding: 18px 16px 16px 52px;
+      border-radius: 12px;
+      background: var(--panel);
+    }
+
+    .quick-start li::before {
+      content: counter(quick);
+      position: absolute;
+      top: 18px;
+      left: 16px;
+      display: grid;
+      width: 26px;
+      height: 26px;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--brand);
+      counter-increment: quick;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    figure {
+      margin: 24px 0 30px;
+      break-inside: avoid;
+    }
+
+    figure a {
+      display: block;
+      overflow: hidden;
+      border: 1px solid #bfc9d8;
+      border-radius: 12px;
+      background: #dfe7f2;
+      box-shadow: 0 7px 22px rgba(20, 42, 74, 0.12);
+    }
+
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    figcaption {
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .control-detail {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+
+    .control-detail a {
+      width: 96px;
+      border-radius: 8px;
+      box-shadow: none;
+    }
+
+    .control-detail figcaption { margin: 0; }
+    .control-detail strong { color: var(--ink); }
+
+    .note, .warning {
+      margin: 20px 0;
+      padding: 15px 18px;
+      border-left: 5px solid var(--brand);
+      border-radius: 4px 10px 10px 4px;
+      background: var(--accent);
+    }
+
+    .warning {
+      border-left-color: #c98b14;
+      background: var(--warning);
+    }
+
+    .note strong, .warning strong { display: block; margin-bottom: 3px; }
+
+    table {
+      width: 100%;
+      margin: 20px 0;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--panel); }
+
+    kbd {
+      display: inline-block;
+      min-width: 1.8em;
+      padding: 1px 7px;
+      border: 1px solid #aeb7c5;
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      background: #fff;
+      font: inherit;
+      font-size: 0.88em;
+      text-align: center;
+    }
+
+    .checklist {
+      padding: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      position: relative;
+      padding-left: 1.7rem;
+    }
+
+    .checklist li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #157347;
+      font-weight: 800;
+    }
+
+    .document-footer {
+      margin-top: 44px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; width: min(100% - 24px, 760px); }
+      .toc { position: static; }
+      main { padding: 6px 22px 38px; }
+      .quick-start { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      @page { size: A4 portrait; margin: 14mm; }
+      html, body { background: #fff; font-size: 10pt; }
+      .cover { padding: 20mm 0 12mm; color: #111; background: none; }
+      .cover__meta span { border-color: #888; background: none; }
+      .layout { display: block; width: auto; margin: 0; }
+      .toc { position: static; margin-bottom: 10mm; box-shadow: none; }
+      main { padding: 0; border: 0; box-shadow: none; }
+      section { padding-top: 8mm; }
+      h2, h3 { break-after: avoid; }
+      figure a { border-radius: 0; box-shadow: none; }
+      a { color: inherit; text-decoration: none; }
+      .quick-start { grid-template-columns: 1fr 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="cover">
+    <p class="cover__eyebrow">User manual</p>
+    <h1>座標の地図表示と<br>座標・緯度経度の変換</h1>
+    <p class="cover__lead">座標の入力、地図への図形追加、距離計測、座標変換、CSV出力、写真位置表示の操作マニュアルです。</p>
+    <div class="cover__meta">
+      <span>デスクトップ版</span>
+      <span>HTMLマニュアル</span>
+      <span>画面更新: 2026年7月30日</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="目次">
+      <h2>目次</h2>
+      <ol>
+        <li><a href="#start">はじめに</a></li>
+        <li><a href="#screen">画面の見方</a></li>
+        <li><a href="#input">座標を入力する</a></li>
+        <li><a href="#markers">アイコンを一括追加する</a></li>
+        <li><a href="#map-tools">地図を右クリックして加工する</a></li>
+        <li><a href="#measure">距離を計測する</a></li>
+        <li><a href="#convert">座標を変換・出力する</a></li>
+        <li><a href="#photo">写真の撮影場所を表示する</a></li>
+        <li><a href="#print">地図表示・削除・印刷</a></li>
+        <li><a href="#trouble">困ったときは</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <section id="start">
+        <h2>1. はじめに</h2>
+        <p class="lead">このアプリでは、XY座標と緯度経度の相互変換、複数地点の地図表示、円の作成、地点間の距離計測ができます。</p>
+        <ol class="quick-start">
+          <li>左上の <strong>≡</strong> からメニューを開きます。</li>
+          <li>座標の種類、測地系、系番号を選び、表に値を入力します。</li>
+          <li>「地図加工」または「データ変換」から目的の操作を実行します。</li>
+        </ol>
+        <figure>
+          <a href="assets/screenshots/01-overview.png" target="_blank">
+            <img src="assets/screenshots/01-overview.png" alt="アプリの初期画面。上部にメニューボタンと使い方ボタン、中央に地図が表示されている" width="1440" height="1000">
+          </a>
+          <figcaption>初期画面。画像をクリックすると原寸で開きます。</figcaption>
+        </figure>
+        <div class="note">
+          <strong>最初に確認すること</strong>
+          XY座標を使う場合は、座標に対応する測地系と1～19系の系番号を確認してください。誤った組み合わせを選ぶと、違う場所に表示・変換されます。
+        </div>
+      </section>
+
+      <section id="screen">
+        <h2>2. 画面の見方</h2>
+        <table>
+          <thead>
+            <tr><th>場所</th><th>できること</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>左上の「≡」</td><td>座標条件、データテーブル、地図加工、データ変換を表示します。</td></tr>
+            <tr><td>中央の地図</td><td>移動、拡大・縮小、右クリック操作、写真のドロップを行います。</td></tr>
+            <tr><td>地図右上のレイヤーボタン</td><td>標準地図、淡色地図、航空写真などを切り替えます。</td></tr>
+            <tr><td>右上の「使い方を表示」</td><td>目的別の簡易操作ガイドを表示します。</td></tr>
+          </tbody>
+        </table>
+        <figure class="control-detail">
+          <a href="assets/screenshots/01-layer-button.png" target="_blank">
+            <img src="assets/screenshots/01-layer-button.png" alt="地図右上に表示される、四角形が重なった絵柄のレイヤーボタン" width="73" height="76" loading="lazy">
+          </a>
+          <figcaption><strong>レイヤーボタン</strong><br>地図右上にある、四角形が重なった絵柄のボタンです。ポインターを合わせると、背景地図の選択肢が開きます。</figcaption>
+        </figure>
+        <figure>
+          <a href="assets/screenshots/10-help-panel.png" target="_blank">
+            <img src="assets/screenshots/10-help-panel.png" alt="画面右側に目的別操作ガイドを開いた状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>右側の操作ガイドでは、目的ごとに手順を開いて確認できます。</figcaption>
+        </figure>
+      </section>
+
+      <section id="input">
+        <h2>3. 座標を入力する</h2>
+        <ol>
+          <li>左上の「≡」を押してメニューを開きます。</li>
+          <li>「データの種類」で「XY座標」または「緯度経度」を選びます。</li>
+          <li>座標に対応する測地系を選びます。</li>
+          <li>XY座標の場合は「XY座標の系番号」を選びます。緯度経度の場合、系番号は選択不要です。</li>
+          <li>データテーブルの左列にXまたは緯度、右列にYまたは経度を入力します。</li>
+        </ol>
+        <figure>
+          <a href="assets/screenshots/02-data-input.png" target="_blank">
+            <img src="assets/screenshots/02-data-input.png" alt="メニューで緯度経度と世界測地系JGD2011を選び、3地点を入力した状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>緯度経度を十進数形式で3行入力した例。</figcaption>
+        </figure>
+
+        <h3>入力できる形式</h3>
+        <ul>
+          <li>XY座標</li>
+          <li>十進数形式の緯度経度（例: <code>35.658099</code>）</li>
+          <li>度分秒形式の緯度経度（例: <code>35度39分29.1572秒</code>）</li>
+          <li>Excelのセル、またはタブ区切りテキストからの貼り付け</li>
+        </ul>
+        <p>度分秒形式は、貼り付け時に十進数形式へ自動変換されます。右クリックの「貼り付け」が利用できない場合は、セルを選択して <kbd>Ctrl</kbd> + <kbd>V</kbd> を押してください。</p>
+        <figure>
+          <a href="assets/screenshots/09-input-formats.png" target="_blank">
+            <img src="assets/screenshots/09-input-formats.png" alt="入力可能なデータ形式を説明するダイアログ" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>「入力可能なデータ」ボタンで、対応形式を画面内でも確認できます。</figcaption>
+        </figure>
+        <div class="warning">
+          <strong>空白行の扱い</strong>
+          片方でもセルが空の行は処理対象外です。アイコンを線で結ぶ場合は、空白行を区切りとして別々の線になります。
+        </div>
+      </section>
+
+      <section id="markers">
+        <h2>4. アイコンを一括追加する</h2>
+        <ol>
+          <li>データテーブルに座標を入力します。</li>
+          <li>「地図加工」タブを開きます。</li>
+          <li>「地図に追加するアイコンの色」を選びます。アイコンが不要なら「なし」を選びます。</li>
+          <li>地点を順番に結ぶ場合は「地図に追加する線の有無と色」で色を選びます。線が不要なら「線無し」を選びます。</li>
+          <li>「アイコンの一括追加」を押します。</li>
+        </ol>
+        <p>追加したすべての地点が収まるように、地図の表示範囲が自動調整されます。</p>
+        <figure>
+          <a href="assets/screenshots/03-marker-line-settings.png" target="_blank">
+            <img src="assets/screenshots/03-marker-line-settings.png" alt="航空写真を背景に、地図加工で赤いアイコンと黄色い線を選択した状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>航空写真を背景に、アイコンを赤、地点を結ぶ線を黄色に設定した例。</figcaption>
+        </figure>
+        <figure>
+          <a href="assets/screenshots/03-markers-and-lines.png" target="_blank">
+            <img src="assets/screenshots/03-markers-and-lines.png" alt="航空写真上の3地点に赤いアイコンを追加し、黄色い線で結んだ地図" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>航空写真上に赤いアイコンを一括追加し、入力順に黄色い線で結んだ例。</figcaption>
+        </figure>
+
+        <h3>線を使わずアイコンだけ追加する</h3>
+        <ol>
+          <li>「地図に追加するアイコンの色」で使用する色を選びます。</li>
+          <li>「地図に追加する線の有無と色」で「線無し」を選びます。</li>
+          <li>「アイコンの一括追加」を押します。</li>
+        </ol>
+        <figure>
+          <a href="assets/screenshots/03-icon-only-settings.png" target="_blank">
+            <img src="assets/screenshots/03-icon-only-settings.png" alt="航空写真を背景に、地図加工で黄色いアイコンと線無しを選択した状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>航空写真を背景に、アイコンを黄色、線を「線無し」に設定した例。</figcaption>
+        </figure>
+        <figure>
+          <a href="assets/screenshots/03-icons-only.png" target="_blank">
+            <img src="assets/screenshots/03-icons-only.png" alt="航空写真上の3地点に黄色いアイコンだけを追加した地図" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>航空写真上に、線を使わず3地点の黄色いアイコンだけを追加した例。</figcaption>
+        </figure>
+      </section>
+
+      <section id="map-tools">
+        <h2>5. 地図を右クリックして加工する</h2>
+        <p>地図上の任意の場所を右クリックすると、次のメニューが開きます。</p>
+        <ul>
+          <li>円を追加</li>
+          <li>アイコンを追加</li>
+          <li>この地点からの距離を計測</li>
+          <li>この地点までの距離を計測</li>
+        </ul>
+        <figure>
+          <a href="assets/screenshots/04-map-context-menu.png" target="_blank">
+            <img src="assets/screenshots/04-map-context-menu.png" alt="地図を右クリックして操作メニューを表示した状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>地図の右クリックメニュー。</figcaption>
+        </figure>
+
+        <h3>円を追加する</h3>
+        <ol>
+          <li>「地図加工」で線の色を選びます。</li>
+          <li>円の中心にしたい地点を右クリックし、「円を追加」を選びます。</li>
+          <li>半径をメートル単位で入力し、「追加」を押します。</li>
+        </ol>
+        <figure>
+          <a href="assets/screenshots/05-circle-radius-dialog.png" target="_blank">
+            <img src="assets/screenshots/05-circle-radius-dialog.png" alt="円の半径をメートル単位で入力するダイアログ" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>半径500mを入力した例。</figcaption>
+        </figure>
+        <figure>
+          <a href="assets/screenshots/06-circle.png" target="_blank">
+            <img src="assets/screenshots/06-circle.png" alt="地図に半径500メートルの円を追加した状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>円には中心アイコンと半径ラベルが表示されます。</figcaption>
+        </figure>
+
+        <h3>任意の場所にアイコンを追加する</h3>
+        <ol>
+          <li>「地図加工」でアイコンの色を選びます。</li>
+          <li>追加地点を右クリックし、「アイコンを追加」を選びます。</li>
+        </ol>
+      </section>
+
+      <section id="measure">
+        <h2>6. 距離を計測する</h2>
+        <h3>地図上の任意の2点を計測する</h3>
+        <ol>
+          <li>始点を右クリックし、「この地点からの距離を計測」を選びます。</li>
+          <li>終点を右クリックし、「この地点までの距離を計測」を選びます。</li>
+          <li>2点が線で結ばれ、距離がメートル単位で表示されます。</li>
+        </ol>
+        <figure>
+          <a href="assets/screenshots/07-distance-measurement.png" target="_blank">
+            <img src="assets/screenshots/07-distance-measurement.png" alt="地図上の2点を黒い線で結び、距離を表示した状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>任意の2点間を計測した例。</figcaption>
+        </figure>
+
+        <h3>アイコンや円の中心から計測する</h3>
+        <p>アイコンまたは円を右クリックし、「～からの距離を計測」を始点で、「～までの距離を計測」を終点で選びます。アイコン同士、円同士、アイコンと円の組み合わせで計測できます。</p>
+      </section>
+
+      <section id="convert">
+        <h2>7. 座標を変換・出力する</h2>
+        <ol>
+          <li>変換元の種類、測地系、系番号を選び、データテーブルに値を入力します。</li>
+          <li>「データ変換」タブを開きます。</li>
+          <li>変換先のデータ形式、測地系、系番号を選びます。</li>
+          <li>「変換」を押します。</li>
+          <li>結果をコピーする場合は結果表を右クリックし、「データを全てコピー」を選びます。</li>
+          <li>変換元と変換後をファイルに保存する場合は、「CSV形式でダウンロード」を押します。</li>
+        </ol>
+        <figure>
+          <a href="assets/screenshots/08-coordinate-conversion.png" target="_blank">
+            <img src="assets/screenshots/08-coordinate-conversion.png" alt="JGD2011の緯度経度を9系のXY座標へ変換した結果" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>JGD2011の緯度経度を、JGD2011・9系のXY座標へ変換した例。</figcaption>
+        </figure>
+        <div class="note">
+          <strong>CSVの内容</strong>
+          CSVには変換元と変換後の値に加え、軸名、測地系、系番号の見出しが出力されます。
+        </div>
+        <figure>
+          <a href="assets/screenshots/12-csv-in-excel.png" target="_blank">
+            <img src="assets/screenshots/12-csv-in-excel.png" alt="座標変換後にダウンロードしたCSVファイルをExcelで開いた画面" width="1920" height="1044" loading="lazy">
+          </a>
+          <figcaption>ダウンロードしたCSVファイルをExcelで開いた例。変換元と変換後の値、測地系、系番号を確認できます。</figcaption>
+        </figure>
+      </section>
+
+      <section id="photo">
+        <h2>8. 写真の撮影場所を表示する</h2>
+        <ol>
+          <li>GPS位置情報が記録された画像ファイルを用意します。</li>
+          <li>画像ファイルを地図上へドラッグ＆ドロップします。複数ファイルもまとめて指定できます。</li>
+          <li>GPS位置情報を読み取れた写真は、撮影地点にカメラアイコンで表示されます。</li>
+        </ol>
+        <figure>
+          <a href="assets/screenshots/11-photo-locations.png" target="_blank">
+            <img src="assets/screenshots/11-photo-locations.png" alt="GPS位置情報を持つ3枚の写真を追加し、撮影地点にカメラアイコンを表示した淡色地図" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>GPS位置情報を持つ写真3枚を追加した例。撮影地点がカメラアイコンで表示されます。</figcaption>
+        </figure>
+        <div class="warning">
+          <strong>写真が表示されない場合</strong>
+          写真にGPS位置情報が含まれているか確認してください。画像以外のファイルは読み込まれません。
+        </div>
+      </section>
+
+      <section id="print">
+        <h2>9. 地図表示・削除・印刷</h2>
+        <h3>地図の種類を変える</h3>
+        <p>地図右上のレイヤーボタンにポインターを合わせ、標準地図、淡色地図、航空写真などから選択します。</p>
+
+        <h3>追加した図形を削除する</h3>
+        <ul>
+          <li>個別に削除する: 対象のアイコンまたは円を右クリックし、削除メニューを選びます。</li>
+          <li>まとめて削除する: 「地図加工」の「全図形を削除」を押します。</li>
+        </ul>
+
+        <h3>地図を印刷する</h3>
+        <ol>
+          <li>印刷したい範囲が画面に収まるよう、地図を移動・拡大縮小します。</li>
+          <li>必要に応じて「地図加工」の「地図を引き伸ばす」を調整します。</li>
+          <li>ブラウザの印刷機能を開きます。Windows/Linuxは <kbd>Ctrl</kbd> + <kbd>P</kbd>、macOSは <kbd>⌘</kbd> + <kbd>P</kbd> です。</li>
+          <li>プレビューで範囲と地図の出典表示を確認して印刷します。</li>
+        </ol>
+      </section>
+
+      <section id="trouble">
+        <h2>10. 困ったときは</h2>
+        <table>
+          <thead>
+            <tr><th>症状</th><th>確認すること</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>意図しない場所に表示される</td><td>XY座標／緯度経度、測地系、XY座標の系番号が元データと一致しているか確認します。</td></tr>
+            <tr><td>入力行が処理されない</td><td>同じ行の2セルが両方入力されているか、数値として認識できる形式か確認します。</td></tr>
+            <tr><td>表へ貼り付けられない</td><td>対象セルを選択し、<kbd>Ctrl</kbd> + <kbd>V</kbd> を使用します。</td></tr>
+            <tr><td>地図が表示されない</td><td>ネットワーク接続を確認します。地図タイルは外部サービスから読み込まれます。</td></tr>
+            <tr><td>写真の位置が表示されない</td><td>画像にGPS位置情報が記録されているか確認します。</td></tr>
+            <tr><td>画面上の図形を消したい</td><td>「地図加工」の「全図形を削除」を使用します。</td></tr>
+          </tbody>
+        </table>
+        <ul class="checklist">
+          <li>右上の「使い方を表示」から、目的別の短い手順をいつでも確認できます。</li>
+          <li>入力条件の「測地系の解説」「地域別の系番号」も参照してください。</li>
+        </ul>
+      </section>
+
+      <footer class="document-footer">
+        <p>本書のアプリ画面は、リポジトリの最新ビルドをChromium上で操作し、Playwrightで撮影しています。地図画像には国土地理院の淡色地図・航空写真タイルを使用しています。</p>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
