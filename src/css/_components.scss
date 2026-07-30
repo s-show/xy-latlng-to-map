@@ -32,6 +32,40 @@
   }
 }
 
+// Overlay Menu Close Button
+// --------------------------------------------------------------------------
+.overlay-menu__close {
+  display: inline-grid;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  margin: $spacer * 0.25;
+  padding: 0;
+  place-items: center;
+  border: 1px solid $color-guide-border;
+  border-radius: 50%;
+  color: rgba($color-black, 0.75);
+  background-color: $color-white;
+  box-shadow: 0 1px 2px rgba($color-black, 0.12);
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 1.6rem;
+  font-weight: normal;
+  line-height: 1;
+  transition: background-color $transition-fast, border-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    color: $color-black;
+    background-color: rgba($color-black, 0.06);
+    border-color: rgba($color-black, 0.55);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
+
 // Dialog Component
 // --------------------------------------------------------------------------
 .dialog {
@@ -133,6 +167,21 @@
 // --------------------------------------------------------------------------
 .user-guide {
   // メインのユーザーガイドコンテナスタイル（必要に応じて追加）
+
+  &__manual {
+    padding: $spacer * 0.75;
+    border-top: 1px solid $color-guide-border;
+    background-color: rgba($color-dialog-open, 0.2);
+
+    p {
+      margin: 0 0 $spacer * 0.5;
+    }
+  }
+
+  &__manual-link {
+    display: inline-block;
+    text-decoration: none;
+  }
 
   &__details {
     border-top: 1px solid $color-guide-border;

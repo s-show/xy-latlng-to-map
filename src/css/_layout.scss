@@ -167,11 +167,6 @@ body {
     @include custom-scrollbar;
   }
 
-  #close-help-btn {
-    background-color: transparent;
-    border: none;
-    margin: $spacer * 0.25;
-  }
 }
 
 // ヘルプが開いているとき、メインコンテンツに暗いオーバーレイを表示

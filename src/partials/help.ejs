@@ -1,7 +1,11 @@
-<div id="help-column" tabindex="-1" popover>
+<aside id="help-column" tabindex="-1" popover="manual" aria-labelledby="help-column-label">
   <div class="d-flex align-items-center justify-content-between">
-    <h5 class="m-1">目的別操作ガイド</h5>
-    <button commandFor="help-column" command="hide-popover" type="button" id="close-help-btn" aria-label="閉じる">×</button>
+    <h5 id="help-column-label" class="m-1">目的別操作ガイド</h5>
+    <button commandFor="help-column" command="hide-popover" type="button" id="close-help-btn" class="overlay-menu__close" aria-label="閉じる">×</button>
+  </div>
+  <div class="user-guide__manual">
+    <p>画像付きの詳しい手順や注意事項は、操作マニュアルで確認できます。</p>
+    <a href="./manual.html" target="_blank" rel="noopener" class="button button--dialog-open user-guide__manual-link">詳しい操作マニュアルを開く</a>
   </div>
   <div class="offcanvas-body">
     <details class="user-guide__details" name="user-guide-details">
@@ -72,4 +76,4 @@
       </ol>
     </details>
   </div>
-</div>
+</aside>
