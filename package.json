@@ -3,7 +3,13 @@
   "version": "2.0.0",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@10.17.0",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": "10.17.0"
+  },
   "scripts": {
+    "check": "./scripts/check.sh",
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
