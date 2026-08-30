@@ -18,7 +18,7 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.62.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
