@@ -22,7 +22,7 @@
     "@playwright/test": "^1.62.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^7.0.1",
-    "@types/big.js": "^6.2.2",
+    "@types/big.js": "^7.0.0",
     "@types/bootstrap": "^5.2.11",
     "@types/google.maps": "^3.66.0",
     "@types/jest": "^30.0.0",
