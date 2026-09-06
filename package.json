@@ -24,20 +24,20 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@types/big.js": "^7.0.0",
     "@types/bootstrap": "^5.2.11",
-    "@types/google.maps": "^3.66.0",
+    "@types/google.maps": "^3.66.2",
     "@types/jest": "^30.0.0",
     "@types/jspreadsheet-ce": "^4.7.9",
     "@types/leaflet": "^1.9.22",
     "@types/leaflet-contextmenu": "^1.4.4",
     "@types/leaflet.gridlayer.googlemutant": "^0.4.11",
     "eslint": "^9.39.1",
-    "globals": "^17.11.0",
-    "jest": "^30.4.2",
-    "jest-environment-jsdom": "^30.0.0",
+    "globals": "^17.12.0",
+    "jest": "^30.5.1",
+    "jest-environment-jsdom": "^30.5.1",
     "sass": "^1.103.1",
     "ts-jest": "^29.4.12",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.68.0",
+    "typescript-eslint": "^8.69.0",
     "vite": "^8.2.2",
     "vite-plugin-ejs": "^2.0.0"
   },
@@ -55,7 +55,7 @@
     "leaflet-contextmenu": "^1.4.0",
     "leaflet-geometryutil": "^0.10.3",
     "leaflet.gridlayer.googlemutant": "^0.16.0",
-    "proj4": "^2.21.0"
+    "proj4": "^2.22.0"
   },
   "pnpm": {
     "overrides": {
