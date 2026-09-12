@@ -1,6 +1,7 @@
 import { gsiStandard, baseMapsWithoutGoogle, getBaseMaps } from './leaflet.js';
 import { createMarker, MarkerColor } from './marker.js';
 import { measureLength } from './measurement.js';
+import { getReinfolibOverlays } from './reinfolibLayer.js';
 import 'leaflet-contextmenu';
 import L from 'leaflet';
 import { ContextMenuEvent } from './interface.js';
@@ -32,8 +33,11 @@ export const map = L.map('map', {
     },
   ],
 }).setView([35.6580992222, 139.7413574722], 15);
+// 不動産情報ライブラリのレイヤー（プロキシURL未設定時は空になる）
+const reinfolibOverlays = getReinfolibOverlays();
+
 // 初期状態では地理院地図のみでレイヤーコントロールを作成
-let layersControl = L.control.layers(baseMapsWithoutGoogle).addTo(map);
+let layersControl = L.control.layers(baseMapsWithoutGoogle, reinfolibOverlays).addTo(map);
 gsiStandard.addTo(map);
 
 // Google Maps API 読み込み完了後に Google Maps レイヤーを追加
@@ -48,7 +52,7 @@ gsiStandard.addTo(map);
     const fullBaseMaps = await getBaseMaps();
     // 既存のコントロールを削除して再作成
     layersControl.remove();
-    layersControl = L.control.layers(fullBaseMaps).addTo(map);
+    layersControl = L.control.layers(fullBaseMaps, reinfolibOverlays).addTo(map);
   } catch (error) {
     console.warn('Google Maps レイヤーの初期化に失敗しました:', error);
   }
