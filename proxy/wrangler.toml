@@ -3,13 +3,15 @@ main = "src/index.ts"
 compatibility_date = "2024-09-23"
 
 # 不動産情報ライブラリAPIキー（REINFOLIB_API_KEY）は絶対にここへ書かない。
-# 本番: `wrangler secret put REINFOLIB_API_KEY`
-# ローカル開発: `proxy/.dev.vars` に `REINFOLIB_API_KEY=...` を記載（.gitignore 済み）
+# 本番: `wrangler secret put REINFOLIB_API_KEY`（環境を指定せず、トップレベル環境に設定すること。
+#       Cloudflare Workers Builds のデプロイコマンドは `npx wrangler deploy` で環境を指定しないため）
+# ローカル開発: `proxy/.dev.vars` に `REINFOLIB_API_KEY=...` と
+#       `ALLOWED_ORIGINS=http://localhost:5173,https://xy-latlng-to-map.com` を記載（.gitignore 済み）
+#
+# 環境（[env.xxx]）は意図的に1つに統一している。複数環境を定義すると
+# `wrangler secret put` 実行時に環境の指定漏れでシークレットが
+# 本番と異なる環境に登録されてしまう事故につながるため。
 
 [vars]
 # カンマ区切りで、このプロキシへのアクセスを許可するオリジンを列挙する
 ALLOWED_ORIGINS = "https://xy-latlng-to-map.com"
-
-[env.development]
-[env.development.vars]
-ALLOWED_ORIGINS = "http://localhost:5173,https://xy-latlng-to-map.com"
