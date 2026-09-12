@@ -40,13 +40,24 @@ interface GeoJsonFeatureLike {
   properties?: Record<string, unknown> | null;
 }
 
-function buildPopupHtml(properties: Record<string, unknown> | null | undefined): string {
+// APIレスポンスの属性値は外部（MLIT）由来であり信頼できないため、
+// ポップアップHTMLへ埋め込む前に必ずエスケープする。
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function buildPopupHtml(properties: Record<string, unknown> | null | undefined): string {
   const entries = Object.entries(properties ?? {});
   if (entries.length === 0) {
     return '属性情報はありません';
   }
   const rows = entries
-    .map(([key, value]) => `<tr><th style="text-align:left;padding-right:0.5em;">${key}</th><td>${String(value)}</td></tr>`)
+    .map(([key, value]) => `<tr><th style="text-align:left;padding-right:0.5em;">${escapeHtml(key)}</th><td>${escapeHtml(String(value))}</td></tr>`)
     .join('');
   return `<table>${rows}</table>`;
 }

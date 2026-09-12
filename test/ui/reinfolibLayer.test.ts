@@ -12,7 +12,7 @@
  * このテストはネットワークアクセスを一切行わない（レイヤーの construct のみ検証する）。
  */
 import L from 'leaflet';
-import { getReinfolibOverlays, REINFOLIB_LAYER_DEFINITIONS } from '../../src/js/reinfolibLayer.js';
+import { getReinfolibOverlays, REINFOLIB_LAYER_DEFINITIONS, buildPopupHtml } from '../../src/js/reinfolibLayer.js';
 
 describe('getReinfolibOverlays', () => {
   it('プロキシURLが未設定の場合は空のオブジェクトを返す', () => {
@@ -38,5 +38,30 @@ describe('getReinfolibOverlays', () => {
   it('末尾スラッシュ付きのプロキシURLでもレイヤーを生成できる', () => {
     const overlays = getReinfolibOverlays('https://example.com/proxy/');
     expect(Object.keys(overlays)).toHaveLength(REINFOLIB_LAYER_DEFINITIONS.length);
+  });
+});
+
+describe('buildPopupHtml', () => {
+  it('属性情報が無い場合はメッセージを返す', () => {
+    expect(buildPopupHtml(null)).toBe('属性情報はありません');
+    expect(buildPopupHtml(undefined)).toBe('属性情報はありません');
+    expect(buildPopupHtml({})).toBe('属性情報はありません');
+  });
+
+  it('属性のキー・値をHTMLエスケープする（XSS対策）', () => {
+    const html = buildPopupHtml({
+      '<script>alert(1)</script>': '"><img src=x onerror=alert(2)>',
+    });
+    expect(html).not.toContain('<script>');
+    expect(html).not.toContain('<img');
+    expect(html).toContain('&lt;script&gt;');
+    expect(html).toContain('&lt;img src=x onerror=alert(2)&gt;');
+  });
+
+  it('通常の属性値はテーブル形式で表示する', () => {
+    const html = buildPopupHtml({ use_area_ja: '準工業地域' });
+    expect(html).toContain('use_area_ja');
+    expect(html).toContain('準工業地域');
+    expect(html).toMatch(/^<table>.*<\/table>$/);
   });
 });
