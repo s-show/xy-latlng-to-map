@@ -343,14 +343,25 @@ export function buildCombinedPopupHtml(results: LayerPointInfo[]): string {
   return `<div class="reinfolib-popup">${sections.join('')}</div>`;
 }
 
-// 印刷2ページ目用: 6レイヤー分の情報を3列×2行のグリッドで並べる
-// （REINFOLIB_LAYER_DEFINITIONS の並び順どおりに3列で自動的に折り返される）。
+// 印刷2ページ目のグリッドの列数。
+const PRINT_GRID_COLUMNS = 3;
+
+// 印刷2ページ目用: 6レイヤー分の情報を3列×2行で並べる。
+// CSS Grid/Flexboxはブラウザの印刷ページ分割との相性が悪く、内容が消えてしまう
+// ことがあるため、印刷での実績が長い <table> による行・列構成を用いる。
 export function buildPrintGridHtml(results: LayerPointInfo[]): string {
-  const cells = results.map(
-    ({ definition, properties, asOf }) =>
-      `<div class="reinfolib-print-grid__cell">${buildLayerInfoInnerHtml(definition, properties, asOf)}</div>`,
-  );
-  return `<div class="reinfolib-print-grid">${cells.join('')}</div>`;
+  const rows: string[] = [];
+  for (let i = 0; i < results.length; i += PRINT_GRID_COLUMNS) {
+    const cells = results
+      .slice(i, i + PRINT_GRID_COLUMNS)
+      .map(
+        ({ definition, properties, asOf }) =>
+          `<td class="reinfolib-print-grid__cell">${buildLayerInfoInnerHtml(definition, properties, asOf)}</td>`,
+      )
+      .join('');
+    rows.push(`<tr>${cells}</tr>`);
+  }
+  return `<table class="reinfolib-print-grid">${rows.join('')}</table>`;
 }
 
 // 印刷時、1ページ目に地図、2ページ目に直近クリックした地点の情報を
