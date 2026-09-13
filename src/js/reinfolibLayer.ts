@@ -312,30 +312,60 @@ async function fetchLayerPointInfo(
   }
 }
 
+// ポップアップ・印刷用グリッドの両方で共通して使う、1レイヤー分の中身（見出し・
+// データ基準時点・属性テーブル、または「指定無し」）を組み立てる。
+function buildLayerInfoInnerHtml(
+  definition: ReinfolibLayerDefinition,
+  properties: Record<string, unknown> | null,
+  asOf: string | null,
+): string {
+  const heading = `<h4 class="reinfolib-info__heading">${escapeHtml(definition.name)}</h4>`;
+  const asOfHtml = asOf ? `<p class="reinfolib-info__as-of">${escapeHtml(asOf)}時点のデータ</p>` : '';
+  if (!properties) {
+    return `${heading}<p class="reinfolib-info__empty">指定無し</p>`;
+  }
+  const rows = Object.entries(properties)
+    .filter(([key, value]) => !EXCLUDED_KEYS.has(key) && value !== '' && value !== null && value !== undefined)
+    .map(([key, value]) => {
+      const label = labelForKey(definition.apiId, key, definition.name);
+      const displayValue = displayValueForKey(definition.apiId, key, value);
+      return `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(displayValue)}</td></tr>`;
+    })
+    .join('');
+  return `${heading}${asOfHtml}<table class="reinfolib-info__table">${rows}</table>`;
+}
+
 export function buildCombinedPopupHtml(results: LayerPointInfo[]): string {
-  const sections = results.map(({ definition, properties, asOf }) => {
-    const heading = `<h4>${escapeHtml(definition.name)}</h4>`;
-    const asOfHtml = asOf ? `<p class="reinfolib-popup__as-of">${escapeHtml(asOf)}時点のデータ</p>` : '';
-    if (!properties) {
-      return `<section class="reinfolib-popup__section">${heading}<p class="reinfolib-popup__empty">指定無し</p></section>`;
-    }
-    const rows = Object.entries(properties)
-      .filter(([key, value]) => !EXCLUDED_KEYS.has(key) && value !== '' && value !== null && value !== undefined)
-      .map(([key, value]) => {
-        const label = labelForKey(definition.apiId, key, definition.name);
-        const displayValue = displayValueForKey(definition.apiId, key, value);
-        return `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(displayValue)}</td></tr>`;
-      })
-      .join('');
-    return `<section class="reinfolib-popup__section">${heading}${asOfHtml}<table class="reinfolib-popup__table">${rows}</table></section>`;
-  });
+  const sections = results.map(
+    ({ definition, properties, asOf }) =>
+      `<section class="reinfolib-popup__section">${buildLayerInfoInnerHtml(definition, properties, asOf)}</section>`,
+  );
   return `<div class="reinfolib-popup">${sections.join('')}</div>`;
 }
+
+// 印刷2ページ目用: 6レイヤー分の情報を3列×2行のグリッドで並べる
+// （REINFOLIB_LAYER_DEFINITIONS の並び順どおりに3列で自動的に折り返される）。
+export function buildPrintGridHtml(results: LayerPointInfo[]): string {
+  const cells = results.map(
+    ({ definition, properties, asOf }) =>
+      `<div class="reinfolib-print-grid__cell">${buildLayerInfoInnerHtml(definition, properties, asOf)}</div>`,
+  );
+  return `<div class="reinfolib-print-grid">${cells.join('')}</div>`;
+}
+
+// 印刷時、1ページ目に地図、2ページ目に直近クリックした地点の情報を
+// 3列グリッドで表示するための、画面上は非表示の印刷専用コンテナのID。
+export const PRINT_INFO_CONTAINER_ID = 'reinfolib-print-info';
+// 印刷専用コンテナに内容が入ったことを示すクラス（このクラスが無い間は
+// 印刷しても2ページ目を追加しない）。
+const PRINT_INFO_READY_CLASS = 'reinfolib-print-grid--has-content';
 
 /**
  * 地図クリック時に、その地点における不動産情報ライブラリ6レイヤー分の情報を
  * まとめてポップアップ表示する。表示中（チェックボックスON）かどうかに関わらず、
  * 常に全レイヤーの情報を取得する。
+ * あわせて、印刷用コンテナ（`#reinfolib-print-info`）にも同じ情報を
+ * 3列グリッドで書き込み、印刷時に2ページ目として出力できるようにする。
  * `VITE_REINFOLIB_PROXY_URL` が未設定の場合は何もしない。
  */
 export function attachReinfolibInfoPopup(
@@ -367,6 +397,12 @@ export function attachReinfolibInfoPopup(
       // 移動している場合は反映しない。
       if (map.hasLayer(popup) && currentLatLng && currentLatLng.equals(e.latlng)) {
         popup.setContent(buildCombinedPopupHtml(results));
+      }
+
+      const printContainer = document.getElementById(PRINT_INFO_CONTAINER_ID);
+      if (printContainer) {
+        printContainer.innerHTML = buildPrintGridHtml(results);
+        printContainer.classList.add(PRINT_INFO_READY_CLASS);
       }
     });
   });
