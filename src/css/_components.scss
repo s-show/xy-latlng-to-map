@@ -408,8 +408,13 @@
   // 実際に内容が入る <table> 側には --has-content が付かず表示されない
   // （ラッパーだけが display:table になり高さ0で消える）ため、
   // ラッパー用と <table> 用でクラス名を分けている。
+  // break-before は、実際にページを送りたい要素（#main-content と兄弟関係にある
+  // このラッパー要素自体）に指定する。内側の <table> に指定すると、
+  // Firefoxで「ラッパーの残り分」と「tableの分」の2回改ページが起き、
+  // 間に白紙ページが挟まることがあるため。
   .reinfolib-print-grid.reinfolib-print-grid--has-content {
     display: block;
+    break-before: page;
   }
 
   // CSS Grid/Flexboxはブラウザの印刷ページ分割との相性が悪く内容が消えることが
@@ -419,7 +424,6 @@
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
-    break-before: page;
   }
 
   .reinfolib-print-grid__cell {
