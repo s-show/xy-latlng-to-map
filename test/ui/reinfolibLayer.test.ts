@@ -287,7 +287,13 @@ describe('buildPrintGridHtml', () => {
       asOf: null,
     }));
     const html = buildPrintGridHtml(results);
-    expect(html).toContain('class="reinfolib-print-grid"');
+    // ラッパー要素（#reinfolib-print-info）と同じクラス名を使うと、印刷用CSSの
+    // 「内容が入った時だけ表示する」判定が壊れるため、テーブル自体は
+    // reinfolib-print-grid__table という別名にしている。
+    expect(html).toContain('class="reinfolib-print-grid__table"');
+    // 回帰防止: #reinfolib-print-info（ラッパー要素）と同じクラス名を
+    // そのまま使ってしまうと、印刷用CSSの表示切り替えが効かなくなる。
+    expect(html).not.toContain('class="reinfolib-print-grid"');
     const cellCount = html.split('reinfolib-print-grid__cell').length - 1;
     expect(cellCount).toBe(REINFOLIB_LAYER_DEFINITIONS.length);
   });
@@ -299,7 +305,7 @@ describe('buildPrintGridHtml', () => {
       asOf: null,
     }));
     const html = buildPrintGridHtml(results);
-    expect(html).toMatch(/^<table class="reinfolib-print-grid">.*<\/table>$/);
+    expect(html).toMatch(/^<table class="reinfolib-print-grid__table">.*<\/table>$/);
     const rowCount = html.split('<tr>').length - 1;
     expect(rowCount).toBe(2);
     const firstRow = html.match(/<tr>(.*?)<\/tr>/)?.[1] ?? '';

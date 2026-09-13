@@ -361,7 +361,7 @@ export function buildPrintGridHtml(results: LayerPointInfo[]): string {
       .join('');
     rows.push(`<tr>${cells}</tr>`);
   }
-  return `<table class="reinfolib-print-grid">${rows.join('')}</table>`;
+  return `<table class="reinfolib-print-grid__table">${rows.join('')}</table>`;
 }
 
 // 印刷時、1ページ目に地図、2ページ目に直近クリックした地点の情報を
