@@ -325,27 +325,14 @@
   border-left: solid 5px $color-heading3-border;
 }
 
-// 不動産情報ライブラリ ポップアップ
+// 不動産情報ライブラリ 共通パーツ（ポップアップ・印刷グリッドの両方で使う）
 // --------------------------------------------------------------------------
-.reinfolib-popup {
-  max-height: 320px;
-  max-width: 100%;
-  overflow-y: auto;
-  font-size: 0.85rem;
-
-  h4 {
+.reinfolib-info {
+  &__heading {
     margin: 0.6em 0 0.25em;
     padding-bottom: 0.15em;
     font-size: 0.95rem;
     border-bottom: 1px solid #ccc;
-  }
-
-  &__section {
-    margin-bottom: 0.5em;
-
-    &:first-of-type h4 {
-      margin-top: 0;
-    }
   }
 
   &__as-of {
@@ -379,5 +366,53 @@
       font-weight: 600;
       text-align: left;
     }
+  }
+}
+
+// 不動産情報ライブラリ ポップアップ（地図クリック時、画面に表示するもの）
+// --------------------------------------------------------------------------
+.reinfolib-popup {
+  max-height: 320px;
+  max-width: 100%;
+  overflow-y: auto;
+  font-size: 0.85rem;
+
+  &__section {
+    margin-bottom: 0.5em;
+
+    &:first-of-type .reinfolib-info__heading {
+      margin-top: 0;
+    }
+  }
+}
+
+// 不動産情報ライブラリ 印刷用グリッド（印刷2ページ目、画面には常に非表示）
+// --------------------------------------------------------------------------
+.reinfolib-print-grid {
+  display: none;
+
+  &__cell {
+    padding: 0.4em;
+
+    .reinfolib-info__heading {
+      margin-top: 0;
+    }
+  }
+}
+
+@media print {
+  // JS が内容を書き込むまでは（クリックが一度も行われていない場合）
+  // 2ページ目を追加しない。
+  .reinfolib-print-grid.reinfolib-print-grid--has-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    break-before: page;
+  }
+
+  .reinfolib-print-grid__cell {
+    border: 1px solid #999;
+    overflow: hidden;
+    break-inside: avoid;
   }
 }

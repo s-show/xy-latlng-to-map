@@ -7,9 +7,11 @@
  * - 点と多角形（穴・MultiPolygon含む）の包含判定
  * - `_index` からのデータ基準時点の抽出
  * - クリック地点情報からのポップアップHTML組み立て（日本語ラベル・指定無し・XSS対策）
+ * - 印刷用グリッドHTML組み立て（3列グリッド用のセル構造）
  *
  * 検証限界（手動確認対象）:
  * - 実際の地図クリックからポップアップ表示までの一連の動作
+ * - 実際の印刷プレビューでの2ページ目のレイアウト・ページ区切り
  * - プロキシ（Cloudflare Workers）との実通信
  * このテストはネットワークアクセスを一切行わない。
  */
@@ -21,6 +23,7 @@ import {
   isPointInGeometry,
   extractAsOfFromIndex,
   buildCombinedPopupHtml,
+  buildPrintGridHtml,
   LayerPointInfo,
 } from '../../src/js/reinfolibLayer.js';
 
@@ -271,5 +274,39 @@ describe('buildCombinedPopupHtml', () => {
     expect(html).not.toContain('<img');
     expect(html).toContain('&lt;script&gt;');
     expect(html).toContain('&lt;img src=x onerror=alert(2)&gt;');
+  });
+});
+
+describe('buildPrintGridHtml', () => {
+  const [xkt001, xkt002] = REINFOLIB_LAYER_DEFINITIONS;
+
+  it('レイヤーごとに reinfolib-print-grid__cell で囲んだセルを生成する', () => {
+    const results: LayerPointInfo[] = REINFOLIB_LAYER_DEFINITIONS.map((definition) => ({
+      definition,
+      properties: null,
+      asOf: null,
+    }));
+    const html = buildPrintGridHtml(results);
+    expect(html).toContain('class="reinfolib-print-grid"');
+    const cellCount = html.split('reinfolib-print-grid__cell').length - 1;
+    expect(cellCount).toBe(REINFOLIB_LAYER_DEFINITIONS.length);
+  });
+
+  it('ポップアップと同じく日本語ラベル・指定無し・XSS対策が適用される', () => {
+    const results: LayerPointInfo[] = [
+      { definition: xkt001, properties: null, asOf: null },
+      {
+        definition: xkt002,
+        properties: { use_area_ja: '工業地域', '<script>alert(1)</script>': 'x' },
+        asOf: '2026年7月23日 11:42',
+      },
+    ];
+    const html = buildPrintGridHtml(results);
+    expect(html).toContain('指定無し');
+    expect(html).toContain('用途地域');
+    expect(html).toContain('工業地域');
+    expect(html).toContain('2026年7月23日 11:42');
+    expect(html).not.toContain('<script>');
+    expect(html).toContain('&lt;script&gt;');
   });
 });

@@ -144,6 +144,9 @@
             <p id="error-message"></p>
           </div>
       </div>
+      <!-- 印刷時、直近クリックした地点の不動産情報ライブラリ情報を2ページ目として出力する。
+           画面には常に表示しない（JSが内容を書き込むまで印刷でも非表示のまま）。 -->
+      <div id="reinfolib-print-info" class="reinfolib-print-grid"></div>
       <%- include("./partials/help.ejs") %>
     </div>
     <%- include("./partials/footer.ejs", { page: 'toppage' }) %>
