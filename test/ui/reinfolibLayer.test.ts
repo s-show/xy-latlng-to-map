@@ -292,6 +292,21 @@ describe('buildPrintGridHtml', () => {
     expect(cellCount).toBe(REINFOLIB_LAYER_DEFINITIONS.length);
   });
 
+  it('table/tr/td による3列×2行の構成になっている（CSS Grid等は印刷での分割に弱いため使わない）', () => {
+    const results: LayerPointInfo[] = REINFOLIB_LAYER_DEFINITIONS.map((definition) => ({
+      definition,
+      properties: null,
+      asOf: null,
+    }));
+    const html = buildPrintGridHtml(results);
+    expect(html).toMatch(/^<table class="reinfolib-print-grid">.*<\/table>$/);
+    const rowCount = html.split('<tr>').length - 1;
+    expect(rowCount).toBe(2);
+    const firstRow = html.match(/<tr>(.*?)<\/tr>/)?.[1] ?? '';
+    const firstRowCellCount = firstRow.split('reinfolib-print-grid__cell').length - 1;
+    expect(firstRowCellCount).toBe(3);
+  });
+
   it('ポップアップと同じく日本語ラベル・指定無し・XSS対策が適用される', () => {
     const results: LayerPointInfo[] = [
       { definition: xkt001, properties: null, asOf: null },

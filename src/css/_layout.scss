@@ -268,6 +268,12 @@ body {
     display: none !important;
   }
 
+  // 不動産情報ライブラリのポップアップは地図の上に重なって印刷されてしまうため、
+  // 1ページ目（地図）には表示しない（内容は2ページ目に別途出力する）。
+  .leaflet-popup-pane {
+    display: none !important;
+  }
+
   // 地図を用紙（印刷可能領域）の中央に配置
   #main-content {
     height: 100%;

@@ -393,6 +393,7 @@
 
   &__cell {
     padding: 0.4em;
+    vertical-align: top;
 
     .reinfolib-info__heading {
       margin-top: 0;
@@ -403,10 +404,13 @@
 @media print {
   // JS が内容を書き込むまでは（クリックが一度も行われていない場合）
   // 2ページ目を追加しない。
+  // CSS Grid/Flexboxはブラウザの印刷ページ分割との相性が悪く内容が消えることが
+  // あるため、印刷での実績が長い <table> による行・列構成を用いる。
   .reinfolib-print-grid.reinfolib-print-grid--has-content {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: table;
     width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
     break-before: page;
   }
 
