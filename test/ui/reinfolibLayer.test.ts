@@ -183,6 +183,56 @@ describe('buildCombinedPopupHtml', () => {
     expect(html).toContain('都市計画区域');
   });
 
+  it('行政区域を表す共通項目（都道府県・市区町村・各種コード）は表示しない', () => {
+    const results: LayerPointInfo[] = [
+      {
+        definition: xkt001,
+        properties: {
+          prefecture: '東京都',
+          city_name: '江東区',
+          city_code: '13108',
+          group_code: '13108',
+          kubun_id: 21,
+          area_classification_ja: '都市計画区域',
+        },
+        asOf: null,
+      },
+      {
+        definition: xkt002,
+        properties: { youto_id: 12, use_area_ja: '工業地域' },
+        asOf: null,
+      },
+    ];
+    const html = buildCombinedPopupHtml(results);
+    expect(html).not.toContain('東京都');
+    expect(html).not.toContain('江東区');
+    expect(html).not.toContain('13108');
+    expect(html).not.toContain('>21<');
+    expect(html).not.toContain('>12<');
+    expect(html).toContain('都市計画区域');
+    expect(html).toContain('工業地域');
+  });
+
+  it('土砂災害警戒区域のコード値は指定されたコード表に基づき日本語表記に変換する', () => {
+    const xkt029 = REINFOLIB_LAYER_DEFINITIONS.find((d) => d.apiId === 'XKT029')!;
+    const results: LayerPointInfo[] = [
+      {
+        definition: xkt029,
+        properties: { A33_001: 2, A33_002: 1, A33_008: 0, A33_006: '熱海市梅園町' },
+        asOf: null,
+      },
+    ];
+    const html = buildCombinedPopupHtml(results);
+    expect(html).toContain('土石流'); // A33_001 = 2
+    expect(html).toContain('土砂災害警戒区域(指定済)'); // A33_002 = 1
+    expect(html).toContain('特別警戒区域指定済み'); // A33_008 = 0
+    expect(html).toContain('熱海市梅園町');
+    // 生のコード値がそのまま出ていないこと
+    expect(html).not.toContain('>2<');
+    expect(html).not.toContain('>1<');
+    expect(html).not.toContain('>0<');
+  });
+
   it('属性のキー・値をHTMLエスケープする（XSS対策）', () => {
     const results: LayerPointInfo[] = [
       {

@@ -127,10 +127,6 @@ export function isPointInGeometry(point: Position, geometry: GeoJsonGeometryLike
 // 不動産情報ライブラリの都市計画決定GISデータ系（XKT001/002/014/023/024）で
 // 共通して現れる属性項目。
 const COMMON_FIELD_LABELS: Record<string, string> = {
-  prefecture: '都道府県',
-  city_name: '市区町村',
-  city_code: '市区町村コード',
-  group_code: '行政コード',
   notice_number: '告示番号',
   notice_number_s: '告示番号（枝番）',
   decision_date: '決定日',
@@ -147,35 +143,62 @@ const COMMON_FIELD_LABELS: Record<string, string> = {
 const LAYER_FIELD_LABELS: Partial<Record<ReinfolibApiId, Record<string, string>>> = {
   XKT001: {
     area_classification_ja: '区域区分',
-    kubun_id: '区域区分コード',
   },
   XKT002: {
     use_area_ja: '用途地域',
-    youto_id: '用途地域コード',
     u_floor_area_ratio_ja: '容積率',
     u_building_coverage_ratio_ja: '建蔽率',
   },
   XKT014: {
     fire_prevention_ja: '防火指定',
-    kubun_id: '区分コード',
-  },
-  XKT023: {
-    kubun_id: '区分コード',
   },
   XKT029: {
-    A33_001: '現象の種類コード',
-    A33_002: '区域区分コード',
+    A33_001: '現象の種類',
+    A33_002: '区域区分',
     A33_003: '都道府県コード',
     A33_004: '区域番号',
     A33_005: '区域名',
     A33_006: '所在地',
     A33_007: '公示日',
-    A33_008: '特別警戒未指定フラグ',
+    A33_008: '特別警戒区域の指定状況',
   },
 };
 
-// APIの内部管理用項目。ポップアップには表示しない。
-const EXCLUDED_KEYS = new Set(['_id', '_index']);
+// 出典・所在地の重複表示を避けるため非表示にする項目（地図上の位置で自明なため）と、
+// APIの内部管理用項目。
+const EXCLUDED_KEYS = new Set([
+  '_id',
+  '_index',
+  'prefecture',
+  'city_name',
+  'city_code',
+  'group_code',
+  'kubun_id',
+  'youto_id',
+]);
+
+// XKT029（土砂災害警戒区域）のコード値は、国土数値情報のコード表に基づき
+// 人間が読める文言に変換する（MLITのAPIマニュアル自体にはコードの意味の
+// 詳細が記載されていないため、利用者から提供されたコード表を用いる）。
+const LAYER_VALUE_LABELS: Partial<Record<ReinfolibApiId, Record<string, Record<string, string>>>> = {
+  XKT029: {
+    A33_001: {
+      '1': '急傾斜地の崩壊',
+      '2': '土石流',
+      '3': '地滑り',
+    },
+    A33_002: {
+      '1': '土砂災害警戒区域(指定済)',
+      '2': '土砂災害特別警戒区域(指定済)',
+      '3': '土砂災害警戒区域(指定前)',
+      '4': '土砂災害特別警戒区域(指定前)',
+    },
+    A33_008: {
+      '0': '特別警戒区域指定済み',
+      '1': '特別警戒区域未指定',
+    },
+  },
+};
 
 function labelForKey(apiId: ReinfolibApiId, key: string, layerName: string): string {
   const layerLabel = LAYER_FIELD_LABELS[apiId]?.[key];
@@ -192,6 +215,11 @@ function labelForKey(apiId: ReinfolibApiId, key: string, layerName: string): str
     return layerName;
   }
   return key;
+}
+
+function displayValueForKey(apiId: ReinfolibApiId, key: string, value: unknown): string {
+  const decoded = LAYER_VALUE_LABELS[apiId]?.[key]?.[String(value)];
+  return decoded ?? String(value);
 }
 
 // `_index` は "bs001_use_area_202607231142" のような形式で、末尾12桁が
@@ -271,7 +299,8 @@ export function buildCombinedPopupHtml(results: LayerPointInfo[]): string {
       .filter(([key, value]) => !EXCLUDED_KEYS.has(key) && value !== '' && value !== null && value !== undefined)
       .map(([key, value]) => {
         const label = labelForKey(definition.apiId, key, definition.name);
-        return `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(String(value))}</td></tr>`;
+        const displayValue = displayValueForKey(definition.apiId, key, value);
+        return `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(displayValue)}</td></tr>`;
       })
       .join('');
     return `<section class="reinfolib-popup__section">${heading}${asOfHtml}<table class="reinfolib-popup__table">${rows}</table></section>`;
