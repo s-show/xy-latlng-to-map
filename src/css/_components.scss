@@ -403,10 +403,18 @@
 
 @media print {
   // JS が内容を書き込むまでは（クリックが一度も行われていない場合）
-  // 2ページ目を追加しない。
+  // 2ページ目を追加しない（中身の <table> 自体が存在しないため）。
+  // 外側のラッパー要素とここで生成する <table> に同じクラス名を使うと、
+  // 実際に内容が入る <table> 側には --has-content が付かず表示されない
+  // （ラッパーだけが display:table になり高さ0で消える）ため、
+  // ラッパー用と <table> 用でクラス名を分けている。
+  .reinfolib-print-grid.reinfolib-print-grid--has-content {
+    display: block;
+  }
+
   // CSS Grid/Flexboxはブラウザの印刷ページ分割との相性が悪く内容が消えることが
   // あるため、印刷での実績が長い <table> による行・列構成を用いる。
-  .reinfolib-print-grid.reinfolib-print-grid--has-content {
+  .reinfolib-print-grid__table {
     display: table;
     width: 100%;
     table-layout: fixed;
