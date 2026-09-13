@@ -405,17 +405,28 @@ export function attachReinfolibInfoPopup(
     ).then((results) => {
       const currentLatLng = popup.getLatLng();
       // 取得中に別の場所がクリックされ、このポップアップが既に閉じられている/
-      // 移動している場合は反映しない。
+      // 移動している場合は反映しない（印刷用コンテナも同様に反映しない）。
       if (map.hasLayer(popup) && currentLatLng && currentLatLng.equals(e.latlng)) {
         popup.setContent(buildCombinedPopupHtml(results));
-      }
 
-      const printContainer = document.getElementById(PRINT_INFO_CONTAINER_ID);
-      if (printContainer) {
-        printContainer.innerHTML = buildPrintGridHtml(results);
-        printContainer.classList.add(PRINT_INFO_READY_CLASS);
+        const printContainer = document.getElementById(PRINT_INFO_CONTAINER_ID);
+        if (printContainer) {
+          printContainer.innerHTML = buildPrintGridHtml(results);
+          printContainer.classList.add(PRINT_INFO_READY_CLASS);
+        }
       }
     });
+  });
+
+  // ポップアップが閉じられたら（×ボタン・地図クリック等）印刷用コンテナも
+  // クリアする。ポップアップを表示していない状態で印刷した場合に、
+  // 直前に見ていた地点の情報が印刷されてしまわないようにするため。
+  map.on('popupclose', () => {
+    const printContainer = document.getElementById(PRINT_INFO_CONTAINER_ID);
+    if (printContainer) {
+      printContainer.innerHTML = '';
+      printContainer.classList.remove(PRINT_INFO_READY_CLASS);
+    }
   });
 }
 
