@@ -233,6 +233,31 @@ describe('buildCombinedPopupHtml', () => {
     expect(html).not.toContain('>0<');
   });
 
+  it('A33_003（都道府県コード）は表示しない', () => {
+    const xkt029 = REINFOLIB_LAYER_DEFINITIONS.find((d) => d.apiId === 'XKT029')!;
+    const results: LayerPointInfo[] = [
+      { definition: xkt029, properties: { A33_003: '22', A33_006: '熱海市梅園町' }, asOf: null },
+    ];
+    const html = buildCombinedPopupHtml(results);
+    expect(html).not.toContain('>22<');
+    expect(html).toContain('熱海市梅園町');
+  });
+
+  it('容積率・建蔽率は整数値のみ表示する', () => {
+    const results: LayerPointInfo[] = [
+      {
+        definition: xkt002,
+        properties: { u_floor_area_ratio_ja: '300.0%', u_building_coverage_ratio_ja: '60.0%' },
+        asOf: null,
+      },
+    ];
+    const html = buildCombinedPopupHtml(results);
+    expect(html).toContain('300%');
+    expect(html).toContain('60%');
+    expect(html).not.toContain('300.0%');
+    expect(html).not.toContain('60.0%');
+  });
+
   it('属性のキー・値をHTMLエスケープする（XSS対策）', () => {
     const results: LayerPointInfo[] = [
       {

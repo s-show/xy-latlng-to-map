@@ -155,7 +155,6 @@ const LAYER_FIELD_LABELS: Partial<Record<ReinfolibApiId, Record<string, string>>
   XKT029: {
     A33_001: '現象の種類',
     A33_002: '区域区分',
-    A33_003: '都道府県コード',
     A33_004: '区域番号',
     A33_005: '区域名',
     A33_006: '所在地',
@@ -175,6 +174,7 @@ const EXCLUDED_KEYS = new Set([
   'group_code',
   'kubun_id',
   'youto_id',
+  'A33_003',
 ]);
 
 // XKT029（土砂災害警戒区域）のコード値は、国土数値情報のコード表に基づき
@@ -217,9 +217,33 @@ function labelForKey(apiId: ReinfolibApiId, key: string, layerName: string): str
   return key;
 }
 
+// APIの容積率・建蔽率は "300.0%" のように小数点付きで返ってくることがあるため、
+// 整数値のみを表示する。
+function formatIntegerPercent(value: unknown): string {
+  const match = String(value).match(/^(-?\d+(?:\.\d+)?)\s*%$/);
+  if (!match) {
+    return String(value);
+  }
+  return `${Math.round(Number(match[1]))}%`;
+}
+
+const LAYER_VALUE_FORMATTERS: Partial<Record<ReinfolibApiId, Record<string, (value: unknown) => string>>> = {
+  XKT002: {
+    u_floor_area_ratio_ja: formatIntegerPercent,
+    u_building_coverage_ratio_ja: formatIntegerPercent,
+  },
+};
+
 function displayValueForKey(apiId: ReinfolibApiId, key: string, value: unknown): string {
   const decoded = LAYER_VALUE_LABELS[apiId]?.[key]?.[String(value)];
-  return decoded ?? String(value);
+  if (decoded) {
+    return decoded;
+  }
+  const formatter = LAYER_VALUE_FORMATTERS[apiId]?.[key];
+  if (formatter) {
+    return formatter(value);
+  }
+  return String(value);
 }
 
 // `_index` は "bs001_use_area_202607231142" のような形式で、末尾12桁が
