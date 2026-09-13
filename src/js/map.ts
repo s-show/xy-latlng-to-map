@@ -1,7 +1,7 @@
 import { gsiStandard, baseMapsWithoutGoogle, getBaseMaps } from './leaflet.js';
 import { createMarker, MarkerColor } from './marker.js';
 import { measureLength } from './measurement.js';
-import { getReinfolibOverlays } from './reinfolibLayer.js';
+import { getReinfolibOverlays, attachReinfolibInfoPopup } from './reinfolibLayer.js';
 import 'leaflet-contextmenu';
 import L from 'leaflet';
 import { ContextMenuEvent } from './interface.js';
@@ -35,6 +35,9 @@ export const map = L.map('map', {
 }).setView([35.6580992222, 139.7413574722], 15);
 // 不動産情報ライブラリのレイヤー（プロキシURL未設定時は空になる）
 const reinfolibOverlays = getReinfolibOverlays();
+// 地図をクリックした地点の不動産情報ライブラリ情報をポップアップ表示する
+// （レイヤーの表示/非表示に関わらず、常に全レイヤー分の情報を取得する）
+attachReinfolibInfoPopup(map);
 
 // 初期状態では地理院地図のみでレイヤーコントロールを作成
 let layersControl = L.control.layers(baseMapsWithoutGoogle, reinfolibOverlays).addTo(map);

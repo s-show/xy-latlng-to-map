@@ -324,3 +324,60 @@
   background: $color-heading3-bg;
   border-left: solid 5px $color-heading3-border;
 }
+
+// 不動産情報ライブラリ ポップアップ
+// --------------------------------------------------------------------------
+.reinfolib-popup {
+  max-height: 320px;
+  max-width: 100%;
+  overflow-y: auto;
+  font-size: 0.85rem;
+
+  h4 {
+    margin: 0.6em 0 0.25em;
+    padding-bottom: 0.15em;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #ccc;
+  }
+
+  &__section {
+    margin-bottom: 0.5em;
+
+    &:first-of-type h4 {
+      margin-top: 0;
+    }
+  }
+
+  &__as-of {
+    margin: 0 0 0.25em;
+    color: #666;
+    font-size: 0.75rem;
+  }
+
+  &__empty {
+    margin: 0;
+    color: #888;
+  }
+
+  &__table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 0.15em 0.3em;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      vertical-align: top;
+      font-size: 0.8rem;
+    }
+
+    th {
+      width: 40%;
+      color: #444;
+      font-weight: 600;
+      text-align: left;
+    }
+  }
+}
