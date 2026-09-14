@@ -129,21 +129,23 @@ function addMarker(e: ContextMenuEvent) {
  * 右クリックした地点にアイコンを追加したうえで、不動産情報ライブラリの
  * 情報をポップアップ表示する処理。アイコンの色は #select-marker-icon の
  * 選択値を使う（アイコンの一括追加等と同じ挙動）。
+ * このアイコンはポップアップが閉じられると一緒に削除される
+ * （ポップアップを開いたまま印刷する分には残る）。
  * @param {object} e クリックした場所の緯度経度、ピクセル形式の場所情報、親要素のピクセル形式の場所情報
  */
 function showReinfolibInfoAtPoint(e: ContextMenuEvent) {
   const selectMarkerIcon = document.querySelector<HTMLSelectElement>('#select-marker-icon');
-  if (selectMarkerIcon !== null) {
-    const iconColor = selectMarkerIcon.value;
-    if (iconColor !== 'none' && iconColor !== null) {
-      const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor as MarkerColor);
-      marker.addTo(map);
-    } else {
-      window.alert('アイコンの色を選択してください');
-      return;
-    }
+  if (selectMarkerIcon === null) {
+    return;
   }
-  showReinfolibInfo(e.latlng);
+  const iconColor = selectMarkerIcon.value;
+  if (iconColor === 'none' || iconColor === null) {
+    window.alert('アイコンの色を選択してください');
+    return;
+  }
+  const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor as MarkerColor);
+  marker.addTo(map);
+  showReinfolibInfo(e.latlng, marker);
 }
 
 /**
