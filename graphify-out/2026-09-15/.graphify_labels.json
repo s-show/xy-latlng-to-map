@@ -1,7 +1,7 @@
 {
   "0": "devDependencies",
   "1": "map.ts",
-  "2": "js/index.ts",
+  "2": "index.ts",
   "3": "dependencies",
   "4": "compilerOptions",
   "5": "leaflet.ts",
@@ -11,7 +11,6 @@
   "9": "index.html（メインページ）",
   "10": "capture-manual-screenshots.mjs",
   "11": "help-menu.test.ts",
-  "12": "reinfolibLayer.ts",
   "13": "Serena（MCPツール群）",
   "14": "exportCSV.test.ts",
   "15": "proj4.ts",
@@ -47,15 +46,5 @@
   "45": "Yellow Center Marker Icon",
   "46": "about.ts",
   "47": "setup.ts",
-  "48": "vite.config.js",
-  "49": "Pithagoras によるリポジトリレビューの準備ガイド",
-  "50": "proxy/package.json",
-  "51": "compilerOptions",
-  "52": "Dependabot トリアージレポート（第2回更新）",
-  "53": "Project Context: xy-latlng-to-map",
-  "54": "HTML Manual Maintainer",
-  "55": "src/index.ts",
-  "56": "Repository instructions",
-  "57": "check.sh",
-  "58": "dependabot-review.md"
+  "48": "vite.config.js"
 }

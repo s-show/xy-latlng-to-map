@@ -1,23 +1,23 @@
-# Graph Report - xy-latlng-to-map  (2026-09-15)
+# Graph Report - xy-latlng-to-map  (2026-07-31)
 
 ## Corpus Check
-- 73 files · ~923,706 words
+- 61 files · ~917,019 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 575 nodes · 721 edges · 59 communities (36 shown, 23 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 42 edges (avg confidence: 0.84)
+- 426 nodes · 554 edges · 48 communities (26 shown, 22 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 40 edges (avg confidence: 0.72)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e29b60d3`
+- Built from commit: `5a315d45`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - devDependencies
 - map.ts
-- js/index.ts
+- index.ts
 - dependencies
 - compilerOptions
 - leaflet.ts
@@ -27,7 +27,6 @@
 - index.html（メインページ）
 - capture-manual-screenshots.mjs
 - help-menu.test.ts
-- reinfolibLayer.ts
 - Serena（MCPツール群）
 - exportCSV.test.ts
 - proj4.ts
@@ -56,27 +55,18 @@
 - Red Center Marker Icon
 - Photo On Map Screenshot
 - Yellow Center Marker Icon
-- Pithagoras によるリポジトリレビューの準備ガイド
-- proxy/package.json
-- compilerOptions
-- Dependabot トリアージレポート（第2回更新）
-- Project Context: xy-latlng-to-map
-- HTML Manual Maintainer
-- src/index.ts
-- Repository instructions
-- check.sh
 
 ## God Nodes (most connected - your core abstractions)
 1. `index.html（メインページ）` - 22 edges
-2. `Pithagoras によるリポジトリレビューの準備ガイド` - 17 edges
-3. `xy-latlng-to-map（プロジェクト）` - 17 edges
-4. `compilerOptions` - 16 edges
-5. `about.html（このサイトについてページ）` - 13 edges
-6. `createMarker()` - 12 edges
-7. `compilerOptions` - 11 edges
-8. `captureScreenshots()` - 10 edges
-9. `measureLength()` - 10 edges
-10. `mapSource.html（地図の出典についてページ）` - 10 edges
+2. `xy-latlng-to-map（プロジェクト）` - 17 edges
+3. `compilerOptions` - 16 edges
+4. `about.html（このサイトについてページ）` - 13 edges
+5. `createMarker()` - 11 edges
+6. `captureScreenshots()` - 10 edges
+7. `measureLength()` - 10 edges
+8. `mapSource.html（地図の出典についてページ）` - 10 edges
+9. `hasLatLng()` - 9 edges
+10. `scripts` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Google Maps帰属表示の印刷崩れ問題` --semantically_similar_to--> `印刷時の地図左上切り出し問題`  [INFERRED] [semantically similar]
@@ -98,19 +88,19 @@
 - **Google Maps帰属表示 印刷崩れ修正フロー** — temp_google_maps_print_attribution_bug, temp_googlemutant_setupattribution, temp_fix_a2_nowrap, temp_commit_875c9b3, src_css__layout [EXTRACTED 0.90]
 - **印刷時の地図中央配置修正フロー** — temp2_applyprintsize_function, temp2_removeprintsize_function, temp2_prepareprint_function, temp2_afterprint_function, temp2_onprintchange_listener, temp2_layout_scss_page_rule [EXTRACTED 0.90]
 
-## Communities (59 total, 23 thin omitted)
+## Communities (48 total, 22 thin omitted)
 
 ### Community 0 - "devDependencies"
 Cohesion: 0.04
 Nodes (45): eslint, @eslint/js, globals, jest, jest-environment-jsdom, devDependencies, eslint, @eslint/js (+37 more)
 
 ### Community 1 - "map.ts"
-Cohesion: 0.11
-Nodes (31): addCircle(), circleMenuItems, isInnerCircle(), measureFromThisCircle(), measureToThisCircle(), removeCircle(), formatNoGpsMessage(), addPhotoPoint() (+23 more)
+Cohesion: 0.14
+Nodes (25): circleMenuItems, isInnerCircle(), measureFromThisCircle(), measureToThisCircle(), removeCircle(), formatNoGpsMessage(), addPhotoPoint(), ContextMenuEvent (+17 more)
 
-### Community 2 - "js/index.ts"
+### Community 2 - "index.ts"
 Cohesion: 0.06
-Nodes (27): addCircleToMap, addMarkerBtn, cancelAddCircle, circleRadius, clearConvertedTableBtn, clearSourceTableBtn, ConvertParameter, dataConvertBtn (+19 more)
+Nodes (28): addCircle(), addCircleToMap, addMarkerBtn, cancelAddCircle, circleRadius, clearConvertedTableBtn, clearSourceTableBtn, ConvertParameter (+20 more)
 
 ### Community 3 - "dependencies"
 Cohesion: 0.07
@@ -118,11 +108,11 @@ Nodes (29): big.js, bootstrap, exifr, geo4326, jspreadsheet-ce, jsuites, leaflet
 
 ### Community 4 - "compilerOptions"
 Cohesion: 0.08
-Nodes (25): dist, dom, es2020, node_modules, test/**/*, compileOnSave, compilerOptions, baseUrl (+17 more)
+Nodes (25): dist, dom, es2020, node_modules, src/**/*, test/**/*, compileOnSave, compilerOptions (+17 more)
 
 ### Community 5 - "leaflet.ts"
-Cohesion: 0.09
-Nodes (23): baseMapsWithoutGoogle, blueCenterMarker, blueMarker, centerMarkerAnchor, centerMarkerSize, createGoogleMutantLayers(), getBaseMaps(), greenCenterMarker (+15 more)
+Cohesion: 0.08
+Nodes (25): baseMapsWithoutGoogle, blueCenterMarker, blueMarker, centerMarkerAnchor, centerMarkers, centerMarkerSize, createGoogleMutantLayers(), getBaseMaps() (+17 more)
 
 ### Community 6 - "jspreadsheet.ts"
 Cohesion: 0.13
@@ -133,8 +123,8 @@ Cohesion: 0.13
 Nodes (22): src/css/_layout.scss, Google Maps JavaScript API（APIキー設定時のみ条件付き読み込み）, js/index.ts, afterPrint()関数, applyPrintSize()関数, コミットce39c8b（印刷時の地図中央配置修正）, invalidateSize()呼び出しタイミング問題, @media printのflexセンタリング（用紙中央配置） (+14 more)
 
 ### Community 8 - "package.json"
-Cohesion: 0.09
-Nodes (21): engines, node, pnpm, license, name, glob@^10.0.0, js-yaml, rollup (+13 more)
+Cohesion: 0.12
+Nodes (16): license, name, glob@^10.0.0, js-yaml, rollup, pnpm, overrides, scripts (+8 more)
 
 ### Community 9 - "index.html（メインページ）"
 Cohesion: 0.05
@@ -143,10 +133,6 @@ Nodes (57): Bootstrap, 座標リストからの一括マーカー表示機能, �
 ### Community 10 - "capture-manual-screenshots.mjs"
 Cohesion: 0.19
 Nodes (17): capture(), captureElementWithPadding(), captureScreenshots(), closeMenu(), dropGpsPhotos(), enterSampleLatLngs(), gpsPhotoPaths, openMenu() (+9 more)
-
-### Community 12 - "reinfolibLayer.ts"
-Cohesion: 0.09
-Nodes (30): buildCombinedPopupHtml(), buildLayerInfoInnerHtml(), buildPrintGridHtml(), COMMON_FIELD_LABELS, createReinfolibInfoHandler(), displayValueForKey(), escapeHtml(), EXCLUDED_KEYS (+22 more)
 
 ### Community 13 - "Serena（MCPツール群）"
 Cohesion: 0.17
@@ -157,8 +143,8 @@ Cohesion: 0.23
 Nodes (10): arrayToCSV(), exportCSV(), getArrayDepth(), NestedArray, test1, test2, test3, test4 (+2 more)
 
 ### Community 15 - "proj4.ts"
-Cohesion: 0.50
-Nodes (3): GeodeticSystemName, GeodeticSystems, proj4Defs
+Cohesion: 0.40
+Nodes (4): getParams(), GeodeticSystemName, GeodeticSystems, proj4Defs
 
 ### Community 16 - "buildHeaderText"
 Cohesion: 0.50
@@ -176,57 +162,25 @@ Nodes (3): Circle Radius Feature Screenshot, Measure Any Points Screenshot, Meas
 Cohesion: 0.67
 Nodes (3): isElement(), isNodeList(), setupDialog()
 
-### Community 49 - "Pithagoras によるリポジトリレビューの準備ガイド"
-Cohesion: 0.08
-Nodes (24): 10. リポジトリをworkspaceとして登録する, 11. レビュー用プロンプトテンプレート, 12. routineによる定期確認, 13. セキュリティ上の注意, 14. 導入チェックリスト, 1. 最初に確認する項目, 2. 共通の検証入口を作る, 3. `AGENTS.md` にリポジトリ固有の制約を書く (+16 more)
-
-### Community 50 - "proxy/package.json"
-Cohesion: 0.12
-Nodes (16): @cloudflare/workers-types, devDependencies, @cloudflare/workers-types, typescript, wrangler, typescript, name, private (+8 more)
-
-### Community 51 - "compilerOptions"
-Cohesion: 0.12
-Nodes (15): compilerOptions, esModuleInterop, forceConsistentCasingInFileNames, lib, module, moduleResolution, noEmit, skipLibCheck (+7 more)
-
-### Community 52 - "Dependabot トリアージレポート（第2回更新）"
-Cohesion: 0.15
-Nodes (12): 1. js-yaml — ✅ 完了（#94, #93, #92, #108, #103, #102）, 2. immutable — ✅ 完了（#99, #98, #97, #96, #54）, 3. postcss — ✅ 完了（#109, #104）, 4. brace-expansion — ✅ 完了（#107, #106, #101, #100）, Dependabot トリアージレポート（第2回更新）, PR 一覧テーブル, アラート一覧テーブル, 個別詳細 — 完了済みの対応項目 (+4 more)
-
-### Community 53 - "Project Context: xy-latlng-to-map"
-Cohesion: 0.18
-Nodes (10): Architecture & Technologies, Building for Production, Conventions, Development Workflow, Key Directories & Files, Overview, Project Context: xy-latlng-to-map, Running Development Server (+2 more)
-
-### Community 54 - "HTML Manual Maintainer"
-Cohesion: 0.29
-Nodes (6): Current visual conventions, Fixtures and external resources, Handoff, HTML Manual Maintainer, Project files, Workflow
-
-### Community 55 - "src/index.ts"
-Cohesion: 0.43
-Nodes (6): ALLOWED_API_IDS, buildCorsHeaders(), Env, fetch(), jsonError(), parseAllowedOrigins()
-
-### Community 56 - "Repository instructions"
-Cohesion: 0.40
-Nodes (4): Data and external services, Git and pull requests, Repository instructions, Verification
-
 ## Knowledge Gaps
-- **278 isolated node(s):** `name`, `version`, `license`, `type`, `packageManager` (+273 more)
+- **190 isolated node(s):** `name`, `version`, `license`, `type`, `dev` (+185 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `devDependencies` connect `devDependencies` to `package.json`?**
-  _High betweenness centrality (0.019) - this node is a cross-community bridge._
+  _High betweenness centrality (0.033) - this node is a cross-community bridge._
 - **Why does `dependencies` connect `dependencies` to `package.json`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Why does `index.html（メインページ）` connect `index.html（メインページ）` to `コミットce39c8b（印刷時の地図中央配置修正）`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `xy-latlng-to-map（プロジェクト）` (e.g. with `about.html（このサイトについてページ）` and `index.html（メインページ）`) actually correct?**
   _`xy-latlng-to-map（プロジェクト）` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `name`, `version`, `license` to the rest of the system?**
-  _278 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _190 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `devDependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.044444444444444446 - nodes in this community are weakly interconnected._
 - **Should `map.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.11074197120708748 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13813813813813813 - nodes in this community are weakly interconnected._

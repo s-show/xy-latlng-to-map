@@ -332,11 +332,11 @@
   <header class="cover">
     <p class="cover__eyebrow">User manual</p>
     <h1>座標の地図表示と<br>座標・緯度経度の変換</h1>
-    <p class="cover__lead">座標の入力、地図への図形追加、距離計測、座標変換、CSV出力、写真位置表示の操作マニュアルです。</p>
+    <p class="cover__lead">座標の入力、地図への図形追加、都市計画・防災情報の確認、距離計測、座標変換、CSV出力、写真位置表示の操作マニュアルです。</p>
     <div class="cover__meta">
       <span>デスクトップ版</span>
       <span>HTMLマニュアル</span>
-      <span>画面更新: 2026年7月30日</span>
+      <span>画面更新: 2026年9月15日</span>
     </div>
   </header>
 
@@ -349,6 +349,7 @@
         <li><a href="#input">座標を入力する</a></li>
         <li><a href="#markers">アイコンを一括追加する</a></li>
         <li><a href="#map-tools">地図を右クリックして加工する</a></li>
+        <li><a href="#reinfolib">都市計画・防災情報を確認する</a></li>
         <li><a href="#measure">距離を計測する</a></li>
         <li><a href="#convert">座標を変換・出力する</a></li>
         <li><a href="#photo">写真の撮影場所を表示する</a></li>
@@ -360,7 +361,7 @@
     <main>
       <section id="start">
         <h2>1. はじめに</h2>
-        <p class="lead">このアプリでは、XY座標と緯度経度の相互変換、複数地点の地図表示、円の作成、地点間の距離計測ができます。</p>
+        <p class="lead">このアプリでは、XY座標と緯度経度の相互変換、複数地点の地図表示、円の作成、地点間の距離計測、都市計画・防災情報の確認ができます。</p>
         <ol class="quick-start">
           <li>左上の <strong>≡</strong> からメニューを開きます。</li>
           <li>座標の種類、測地系、系番号を選び、表に値を入力します。</li>
@@ -387,7 +388,7 @@
           <tbody>
             <tr><td>左上の「≡」</td><td>座標条件、データテーブル、地図加工、データ変換を表示します。</td></tr>
             <tr><td>中央の地図</td><td>移動、拡大・縮小、右クリック操作、写真のドロップを行います。</td></tr>
-            <tr><td>地図右上のレイヤーボタン</td><td>標準地図、淡色地図、航空写真などを切り替えます。</td></tr>
+            <tr><td>地図右上のレイヤーボタン</td><td>背景地図の切り替えと、不動産情報ライブラリの都市計画・防災情報の表示を行います。</td></tr>
             <tr><td>右上の「使い方を表示」</td><td>目的別の簡易操作ガイドを表示します。</td></tr>
           </tbody>
         </table>
@@ -395,7 +396,13 @@
           <a href="assets/screenshots/01-layer-button.png" target="_blank">
             <img src="assets/screenshots/01-layer-button.png" alt="地図右上に表示される、四角形が重なった絵柄のレイヤーボタン" width="73" height="76" loading="lazy">
           </a>
-          <figcaption><strong>レイヤーボタン</strong><br>地図右上にある、四角形が重なった絵柄のボタンです。ポインターを合わせると、背景地図の選択肢が開きます。</figcaption>
+          <figcaption><strong>レイヤーボタン</strong><br>地図右上にある、四角形が重なった絵柄のボタンです。ポインターを合わせると、背景地図と都市計画・防災情報の選択肢が開きます。</figcaption>
+        </figure>
+        <figure>
+          <a href="assets/screenshots/01-layer-menu.png" target="_blank">
+            <img src="assets/screenshots/01-layer-menu.png" alt="レイヤーメニューを開き、背景地図と不動産情報ライブラリの6種類の情報を表示した状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>レイヤーメニュー。丸い選択欄で背景地図を切り替え、四角いチェック欄で都市計画・防災情報を重ねて表示します。</figcaption>
         </figure>
         <figure>
           <a href="assets/screenshots/10-help-panel.png" target="_blank">
@@ -492,6 +499,7 @@
           <li>アイコンを追加</li>
           <li>この地点からの距離を計測</li>
           <li>この地点までの距離を計測</li>
+          <li>不動産情報ライブラリの情報を表示</li>
         </ul>
         <figure>
           <a href="assets/screenshots/04-map-context-menu.png" target="_blank">
@@ -526,8 +534,45 @@
         </ol>
       </section>
 
+      <section id="reinfolib">
+        <h2>6. 都市計画・防災情報を確認する</h2>
+        <p>国土交通省「不動産情報ライブラリ」の都市計画・防災情報を、地図への重ね合わせと地点ごとの属性情報で確認できます。</p>
+
+        <h3>情報を地図に重ねて表示する</h3>
+        <ol>
+          <li>地図右上のレイヤーボタンにポインターを合わせます。</li>
+          <li>表示したい情報の四角いチェック欄を選びます。複数の情報を同時に選択できます。</li>
+          <li>情報を非表示にする場合は、同じチェック欄をもう一度選びます。</li>
+        </ol>
+        <p>表示できる情報は、都市計画区域／区域区分、用途地域、防火・準防火地域、地区計画、高度利用地区、土砂災害警戒区域です。</p>
+        <figure>
+          <a href="assets/screenshots/04-reinfolib-layer.png" target="_blank">
+            <img src="assets/screenshots/04-reinfolib-layer.png" alt="淡色地図に用途地域の範囲をオレンジ色で重ねて表示した状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>淡色地図に「用途地域」を重ねて表示した例。情報の種類ごとに異なる色で表示されます。</figcaption>
+        </figure>
+
+        <h3>クリック地点の詳しい情報を確認する</h3>
+        <ol>
+          <li>情報を確認したい地点を右クリックします。</li>
+          <li>「不動産情報ライブラリの情報を表示」を選びます。</li>
+          <li>クリック地点にアイコンが追加され、6種類の情報が1つのポップアップに表示されます。ポップアップ内をスクロールして確認します。</li>
+        </ol>
+        <p>レイヤーメニューで情報を地図に重ねていない場合も、右クリックした地点の情報を確認できます。該当する情報がない項目には「指定無し」と表示されます。ポップアップを閉じると、クリック地点のアイコンも消えます。</p>
+        <figure>
+          <a href="assets/screenshots/04-reinfolib-info.png" target="_blank">
+            <img src="assets/screenshots/04-reinfolib-info.png" alt="地図のクリック地点にアイコンを追加し、不動産情報ライブラリの都市計画・防災情報をポップアップ表示した状態" width="1440" height="1000" loading="lazy">
+          </a>
+          <figcaption>クリック地点の区域区分、用途地域、防火・準防火地域などを確認した例。</figcaption>
+        </figure>
+        <div class="note">
+          <strong>地点情報を印刷する場合</strong>
+          ポップアップを開いたままブラウザの印刷機能を実行すると、地図の次のページに6種類の地点情報が出力されます。
+        </div>
+      </section>
+
       <section id="measure">
-        <h2>6. 距離を計測する</h2>
+        <h2>7. 距離を計測する</h2>
         <h3>地図上の任意の2点を計測する</h3>
         <ol>
           <li>始点を右クリックし、「この地点からの距離を計測」を選びます。</li>
@@ -546,7 +591,7 @@
       </section>
 
       <section id="convert">
-        <h2>7. 座標を変換・出力する</h2>
+        <h2>8. 座標を変換・出力する</h2>
         <ol>
           <li>変換元の種類、測地系、系番号を選び、データテーブルに値を入力します。</li>
           <li>「データ変換」タブを開きます。</li>
@@ -574,7 +619,7 @@
       </section>
 
       <section id="photo">
-        <h2>8. 写真の撮影場所を表示する</h2>
+        <h2>9. 写真の撮影場所を表示する</h2>
         <ol>
           <li>GPS位置情報が記録された画像ファイルを用意します。</li>
           <li>画像ファイルを地図上へドラッグ＆ドロップします。複数ファイルもまとめて指定できます。</li>
@@ -593,7 +638,7 @@
       </section>
 
       <section id="print">
-        <h2>9. 地図表示・削除・印刷</h2>
+        <h2>10. 地図表示・削除・印刷</h2>
         <h3>地図の種類を変える</h3>
         <p>地図右上のレイヤーボタンにポインターを合わせ、標準地図、淡色地図、航空写真などから選択します。</p>
 
@@ -607,13 +652,14 @@
         <ol>
           <li>印刷したい範囲が画面に収まるよう、地図を移動・拡大縮小します。</li>
           <li>必要に応じて「地図加工」の「地図を引き伸ばす」を調整します。</li>
+          <li>不動産情報ライブラリの地点情報も印刷する場合は、対象地点の情報ポップアップを開いたままにします。</li>
           <li>ブラウザの印刷機能を開きます。Windows/Linuxは <kbd>Ctrl</kbd> + <kbd>P</kbd>、macOSは <kbd>⌘</kbd> + <kbd>P</kbd> です。</li>
-          <li>プレビューで範囲と地図の出典表示を確認して印刷します。</li>
+          <li>プレビューで範囲と地図の出典表示を確認します。地点情報を開いている場合は、次のページに情報が表示されていることも確認して印刷します。</li>
         </ol>
       </section>
 
       <section id="trouble">
-        <h2>10. 困ったときは</h2>
+        <h2>11. 困ったときは</h2>
         <table>
           <thead>
             <tr><th>症状</th><th>確認すること</th></tr>
@@ -624,6 +670,7 @@
             <tr><td>表へ貼り付けられない</td><td>対象セルを選択し、<kbd>Ctrl</kbd> + <kbd>V</kbd> を使用します。</td></tr>
             <tr><td>地図が表示されない</td><td>ネットワーク接続を確認します。地図タイルは外部サービスから読み込まれます。</td></tr>
             <tr><td>写真の位置が表示されない</td><td>画像にGPS位置情報が記録されているか確認します。</td></tr>
+            <tr><td>都市計画・防災情報が表示されない</td><td>レイヤーメニューのチェック欄とネットワーク接続を確認します。地点に該当する情報がない場合は「指定無し」と表示されます。</td></tr>
             <tr><td>画面上の図形を消したい</td><td>「地図加工」の「全図形を削除」を使用します。</td></tr>
           </tbody>
         </table>

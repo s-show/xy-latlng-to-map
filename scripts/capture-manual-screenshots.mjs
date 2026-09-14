@@ -6,6 +6,7 @@ import { chromium } from '@playwright/test';
 const projectRoot = resolve(import.meta.dirname, '..');
 const outputDirectory = resolve(projectRoot, 'docs/assets/screenshots');
 const applicationUrl = process.env.MANUAL_BASE_URL ?? 'http://127.0.0.1:4173/';
+const mockReinfolibUrl = 'https://manual-reinfolib.invalid';
 
 const samplePoints = [
   ['35.658580', '139.745433'],
@@ -18,6 +19,88 @@ const gpsPhotoPaths = [
   resolve(projectRoot, 'gps_test2.jpg'),
   resolve(projectRoot, 'gps_test3.jpg'),
 ];
+
+const reinfolibFixtures = {
+  XKT001: {
+    _index: 'bs001_city_planning_202609010900',
+    area_classification_ja: '市街化区域',
+  },
+  XKT002: {
+    _index: 'bs001_use_area_202609010900',
+    use_area_ja: '商業地域',
+    u_floor_area_ratio_ja: '500.0%',
+    u_building_coverage_ratio_ja: '80.0%',
+  },
+  XKT014: {
+    _index: 'bs001_fire_prevention_202609010900',
+    fire_prevention_ja: '防火地域',
+  },
+  XKT023: {
+    _index: 'bs001_district_plan_202609010900',
+    plan_name: '芝公園周辺地区地区計画',
+  },
+  XKT024: {
+    _index: 'bs001_advanced_use_202609010900',
+    plan_name: '高度利用地区',
+  },
+  XKT029: {
+    _index: 'ksj_landslide_202609010900',
+    A33_001: '1',
+    A33_002: '1',
+    A33_005: '芝公園周辺',
+  },
+};
+
+function tileCoordsFor(lat, lng, zoom) {
+  const tileCount = 2 ** zoom;
+  const latitudeRadians = (lat * Math.PI) / 180;
+  return {
+    x: Math.floor(((lng + 180) / 360) * tileCount),
+    y: Math.floor(
+      ((1 - Math.log(Math.tan(latitudeRadians) + 1 / Math.cos(latitudeRadians)) / Math.PI) / 2)
+      * tileCount,
+    ),
+  };
+}
+
+function reinfolibFixture(apiId, zoom, x, y) {
+  const fixtureTile = tileCoordsFor(35.6580992222, 139.7413574722, zoom);
+  if (x !== fixtureTile.x || y !== fixtureTile.y || !(apiId in reinfolibFixtures)) {
+    return { type: 'FeatureCollection', features: [] };
+  }
+
+  return {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: reinfolibFixtures[apiId],
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [139.738, 35.654],
+            [139.746, 35.654],
+            [139.746, 35.662],
+            [139.738, 35.662],
+            [139.738, 35.654],
+          ]],
+        },
+      },
+    ],
+  };
+}
+
+async function installReinfolibMock(page) {
+  await page.route(`${mockReinfolibUrl}/tiles/**`, async (route) => {
+    const match = new URL(route.request().url()).pathname.match(
+      /^\/tiles\/(XKT\d+)\/(\d+)\/(\d+)\/(\d+)$/,
+    );
+    const body = match
+      ? reinfolibFixture(match[1], Number(match[2]), Number(match[3]), Number(match[4]))
+      : { type: 'FeatureCollection', features: [] };
+    await route.fulfill({ json: body });
+  });
+}
 
 function chromiumExecutable() {
   const configuredPath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
@@ -234,6 +317,9 @@ async function captureScreenshots(page) {
     page.locator('.leaflet-control-layers-toggle'),
     '01-layer-button.png',
   );
+  await page.locator('.leaflet-control-layers').hover();
+  await capture(page, '01-layer-menu.png');
+  await page.mouse.move(600, 500);
 
   await openMenu(page);
   await enterSampleLatLngs(page);
@@ -269,6 +355,25 @@ async function captureScreenshots(page) {
   const map = page.locator('#map');
   await map.click({ button: 'right', position: { x: 720, y: 430 } });
   await capture(page, '04-map-context-menu.png');
+  await page.getByText('不動産情報ライブラリの情報を表示', { exact: true }).click();
+  await page.locator('.reinfolib-popup').getByText('都市計画区域/区域区分', { exact: true }).waitFor();
+  await capture(page, '04-reinfolib-info.png');
+
+  await reloadApplication(page);
+  const layersControl = page.locator('.leaflet-control-layers');
+  await layersControl.hover();
+  await layersControl
+    .locator('label')
+    .filter({ hasText: '不動産情報ライブラリ (用途地域)' })
+    .locator('input')
+    .check();
+  await page.locator('.leaflet-overlay-pane canvas').waitFor();
+  await page.mouse.move(600, 500);
+  await page.waitForTimeout(1_000);
+  await capture(page, '04-reinfolib-layer.png');
+
+  await reloadApplication(page);
+  await map.click({ button: 'right', position: { x: 720, y: 430 } });
   await page.getByText('円を追加', { exact: true }).click();
   await page.locator('#radius').fill('500');
   await capture(page, '05-circle-radius-dialog.png');
@@ -315,7 +420,11 @@ async function captureScreenshots(page) {
 }
 
 mkdirSync(outputDirectory, { recursive: true });
-execFileSync('pnpm', ['build'], { cwd: projectRoot, stdio: 'inherit' });
+execFileSync('pnpm', ['build'], {
+  cwd: projectRoot,
+  stdio: 'inherit',
+  env: { ...process.env, VITE_REINFOLIB_PROXY_URL: mockReinfolibUrl },
+});
 const previewServer = await startPreviewServer();
 let browser;
 
@@ -332,6 +441,7 @@ try {
   });
   await context.route('**/favicon.ico', (route) => route.fulfill({ status: 204 }));
   const page = await context.newPage();
+  await installReinfolibMock(page);
   page.on('console', (message) => {
     if (message.type() === 'error') console.error(`browser: ${message.text()}`);
   });
