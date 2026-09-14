@@ -379,28 +379,42 @@ const PRINT_INFO_READY_CLASS = 'reinfolib-print-grid--has-content';
  * あわせて、印刷用コンテナ（`#reinfolib-print-info`）にも同じ情報を
  * 3列グリッドで書き込み、印刷時に2ページ目として出力できるようにする。
  * `VITE_REINFOLIB_PROXY_URL` が未設定の場合は何もしない関数を返す。
+ *
+ * 呼び出し側でクリック地点に追加したアイコン（マーカー）を第2引数で渡すと、
+ * そのポップアップが閉じられたタイミング（×ボタン・別地点での再表示等）で
+ * アイコンも一緒に地図から削除する。ポップアップを開いたまま印刷する分には
+ * 削除されない（印刷はポップアップを閉じる操作ではないため）。
  */
 export function createReinfolibInfoHandler(
   map: L.Map,
   baseUrl: string | undefined = import.meta.env?.VITE_REINFOLIB_PROXY_URL,
-): (latlng: L.LatLng) => void {
+): (latlng: L.LatLng, marker?: L.Marker) => void {
   if (!baseUrl) {
     return () => {};
   }
   const trimmedBaseUrl = baseUrl.replace(/\/$/, '');
 
+  // 現在表示中のポップアップに対応するアイコン（無ければ null）
+  let currentMarker: L.Marker | null = null;
+
   // ポップアップが閉じられたら（×ボタン・別の地点での再表示等）印刷用
-  // コンテナもクリアする。ポップアップを表示していない状態で印刷した場合に、
-  // 直前に見ていた地点の情報が印刷されてしまわないようにするため。
+  // コンテナをクリアし、対応するアイコンも地図から削除する。
+  // ポップアップを表示していない状態で印刷した場合に、直前に見ていた
+  // 地点の情報・アイコンが残ってしまわないようにするため。
   map.on('popupclose', () => {
     const printContainer = document.getElementById(PRINT_INFO_CONTAINER_ID);
     if (printContainer) {
       printContainer.innerHTML = '';
       printContainer.classList.remove(PRINT_INFO_READY_CLASS);
     }
+    if (currentMarker) {
+      currentMarker.remove();
+      currentMarker = null;
+    }
   });
 
-  return (latlng: L.LatLng) => {
+  return (latlng: L.LatLng, marker?: L.Marker) => {
+    currentMarker = marker ?? null;
     const zoom = Math.min(Math.max(Math.round(map.getZoom()), MIN_ZOOM), MAX_ZOOM);
     const point: Position = [latlng.lng, latlng.lat];
     const tile = latLngToTileCoords(latlng.lat, latlng.lng, zoom);
