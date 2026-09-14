@@ -372,29 +372,41 @@ export const PRINT_INFO_CONTAINER_ID = 'reinfolib-print-info';
 const PRINT_INFO_READY_CLASS = 'reinfolib-print-grid--has-content';
 
 /**
- * 地図クリック時に、その地点における不動産情報ライブラリ6レイヤー分の情報を
+ * 右クリックメニューの「情報を表示」項目から呼び出す関数を生成する。
+ * 呼び出されると、その地点における不動産情報ライブラリ6レイヤー分の情報を
  * まとめてポップアップ表示する。表示中（チェックボックスON）かどうかに関わらず、
  * 常に全レイヤーの情報を取得する。
  * あわせて、印刷用コンテナ（`#reinfolib-print-info`）にも同じ情報を
  * 3列グリッドで書き込み、印刷時に2ページ目として出力できるようにする。
- * `VITE_REINFOLIB_PROXY_URL` が未設定の場合は何もしない。
+ * `VITE_REINFOLIB_PROXY_URL` が未設定の場合は何もしない関数を返す。
  */
-export function attachReinfolibInfoPopup(
+export function createReinfolibInfoHandler(
   map: L.Map,
   baseUrl: string | undefined = import.meta.env?.VITE_REINFOLIB_PROXY_URL,
-): void {
+): (latlng: L.LatLng) => void {
   if (!baseUrl) {
-    return;
+    return () => {};
   }
   const trimmedBaseUrl = baseUrl.replace(/\/$/, '');
 
-  map.on('click', (e: L.LeafletMouseEvent) => {
+  // ポップアップが閉じられたら（×ボタン・別の地点での再表示等）印刷用
+  // コンテナもクリアする。ポップアップを表示していない状態で印刷した場合に、
+  // 直前に見ていた地点の情報が印刷されてしまわないようにするため。
+  map.on('popupclose', () => {
+    const printContainer = document.getElementById(PRINT_INFO_CONTAINER_ID);
+    if (printContainer) {
+      printContainer.innerHTML = '';
+      printContainer.classList.remove(PRINT_INFO_READY_CLASS);
+    }
+  });
+
+  return (latlng: L.LatLng) => {
     const zoom = Math.min(Math.max(Math.round(map.getZoom()), MIN_ZOOM), MAX_ZOOM);
-    const point: Position = [e.latlng.lng, e.latlng.lat];
-    const tile = latLngToTileCoords(e.latlng.lat, e.latlng.lng, zoom);
+    const point: Position = [latlng.lng, latlng.lat];
+    const tile = latLngToTileCoords(latlng.lat, latlng.lng, zoom);
 
     const popup = L.popup({ maxWidth: 320, minWidth: 240 })
-      .setLatLng(e.latlng)
+      .setLatLng(latlng)
       .setContent('<div class="reinfolib-popup"><p>読み込み中...</p></div>')
       .openOn(map);
 
@@ -404,9 +416,9 @@ export function attachReinfolibInfoPopup(
       ),
     ).then((results) => {
       const currentLatLng = popup.getLatLng();
-      // 取得中に別の場所がクリックされ、このポップアップが既に閉じられている/
+      // 取得中に別の場所が選択され、このポップアップが既に閉じられている/
       // 移動している場合は反映しない（印刷用コンテナも同様に反映しない）。
-      if (map.hasLayer(popup) && currentLatLng && currentLatLng.equals(e.latlng)) {
+      if (map.hasLayer(popup) && currentLatLng && currentLatLng.equals(latlng)) {
         popup.setContent(buildCombinedPopupHtml(results));
 
         const printContainer = document.getElementById(PRINT_INFO_CONTAINER_ID);
@@ -416,18 +428,7 @@ export function attachReinfolibInfoPopup(
         }
       }
     });
-  });
-
-  // ポップアップが閉じられたら（×ボタン・地図クリック等）印刷用コンテナも
-  // クリアする。ポップアップを表示していない状態で印刷した場合に、
-  // 直前に見ていた地点の情報が印刷されてしまわないようにするため。
-  map.on('popupclose', () => {
-    const printContainer = document.getElementById(PRINT_INFO_CONTAINER_ID);
-    if (printContainer) {
-      printContainer.innerHTML = '';
-      printContainer.classList.remove(PRINT_INFO_READY_CLASS);
-    }
-  });
+  };
 }
 
 class ReinfolibTileLayer extends L.GridLayer {
@@ -464,9 +465,9 @@ class ReinfolibTileLayer extends L.GridLayer {
   protected createTile(coords: L.Coords, done: L.DoneCallback): HTMLElement {
     // 実際の描画は緯度経度ベースの featureGroup に対して行うため、
     // GridLayer が管理するタイル要素自体は何も表示しないプレースホルダーでよい。
-    // 色分け表示はあくまで視覚的な補助であり、詳細情報はクリック時のポップアップ
-    // （attachReinfolibInfoPopup）で表示するため、個々の図形にはポップアップを
-    // 紐付けない。
+    // 色分け表示はあくまで視覚的な補助であり、詳細情報は右クリックメニューから
+    // 表示するポップアップ（createReinfolibInfoHandler）で表示するため、
+    // 個々の図形にはポップアップを紐付けない。
     const tile = document.createElement('div');
     const key = `${coords.z}/${coords.x}/${coords.y}`;
     const url = `${this.baseUrl}/tiles/${this.definition.apiId}/${coords.z}/${coords.x}/${coords.y}`;

@@ -1,7 +1,7 @@
 import { gsiStandard, baseMapsWithoutGoogle, getBaseMaps } from './leaflet.js';
 import { createMarker, MarkerColor } from './marker.js';
 import { measureLength } from './measurement.js';
-import { getReinfolibOverlays, attachReinfolibInfoPopup } from './reinfolibLayer.js';
+import { getReinfolibOverlays, createReinfolibInfoHandler } from './reinfolibLayer.js';
 import 'leaflet-contextmenu';
 import L from 'leaflet';
 import { ContextMenuEvent } from './interface.js';
@@ -31,13 +31,17 @@ export const map = L.map('map', {
       text: 'この地点までの距離を計測',
       callback: measureToThisPoint,
     },
+    {
+      text: '不動産情報ライブラリの情報を表示',
+      callback: showReinfolibInfoAtPoint,
+    },
   ],
 }).setView([35.6580992222, 139.7413574722], 15);
 // 不動産情報ライブラリのレイヤー（プロキシURL未設定時は空になる）
 const reinfolibOverlays = getReinfolibOverlays();
-// 地図をクリックした地点の不動産情報ライブラリ情報をポップアップ表示する
+// 右クリックメニューの「不動産情報ライブラリの情報を表示」から呼び出す関数
 // （レイヤーの表示/非表示に関わらず、常に全レイヤー分の情報を取得する）
-attachReinfolibInfoPopup(map);
+const showReinfolibInfo = createReinfolibInfoHandler(map);
 
 // 初期状態では地理院地図のみでレイヤーコントロールを作成
 let layersControl = L.control.layers(baseMapsWithoutGoogle, reinfolibOverlays).addTo(map);
@@ -119,6 +123,27 @@ function addMarker(e: ContextMenuEvent) {
       window.alert('アイコンの色を選択してください')
     }
   }
+}
+
+/**
+ * 右クリックした地点にアイコンを追加したうえで、不動産情報ライブラリの
+ * 情報をポップアップ表示する処理。アイコンの色は #select-marker-icon の
+ * 選択値を使う（アイコンの一括追加等と同じ挙動）。
+ * @param {object} e クリックした場所の緯度経度、ピクセル形式の場所情報、親要素のピクセル形式の場所情報
+ */
+function showReinfolibInfoAtPoint(e: ContextMenuEvent) {
+  const selectMarkerIcon = document.querySelector<HTMLSelectElement>('#select-marker-icon');
+  if (selectMarkerIcon !== null) {
+    const iconColor = selectMarkerIcon.value;
+    if (iconColor !== 'none' && iconColor !== null) {
+      const marker = createMarker(Number(e.latlng.lat), Number(e.latlng.lng), iconColor as MarkerColor);
+      marker.addTo(map);
+    } else {
+      window.alert('アイコンの色を選択してください');
+      return;
+    }
+  }
+  showReinfolibInfo(e.latlng);
 }
 
 /**
