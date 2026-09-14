@@ -1,0 +1,4 @@
+interface:
+  display_name: "HTML操作マニュアル保守"
+  short_description: "最新画面のスクリーンショット付きHTML操作マニュアルを更新"
+  default_prompt: "$html-manual-maintainer を使って、最新画面に合わせてHTML操作マニュアルを更新してください。"
