@@ -141,10 +141,13 @@
             <div id="address-search" class="address-search d-print-none">
               <form id="address-search-form" class="address-search__form" role="search">
                 <input type="search" id="address-search-input" class="form-control address-search__input"
-                  placeholder="住所を入力して検索（例: 広島県広島市）" aria-label="住所検索" autocomplete="off">
+                  placeholder="住所を入力して検索（例: 広島県広島市）" aria-label="住所検索" autocomplete="off"
+                  role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-autocomplete="list"
+                  aria-controls="address-search-results">
                 <button type="submit" class="btn btn-primary address-search__submit">検索</button>
               </form>
-              <ul id="address-search-results" class="list-group address-search__results visually-hidden"></ul>
+              <ul id="address-search-results" class="list-group address-search__results visually-hidden"
+                role="listbox" aria-label="住所の候補"></ul>
               <p id="address-search-message" class="address-search__message visually-hidden" role="status"></p>
             </div>
           </div>
