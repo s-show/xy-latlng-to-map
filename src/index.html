@@ -138,6 +138,15 @@
       <div id="main-content">
           <div class="map-container">
             <div id="map" class="map"></div>
+            <div id="address-search" class="address-search d-print-none">
+              <form id="address-search-form" class="address-search__form" role="search">
+                <input type="search" id="address-search-input" class="form-control address-search__input"
+                  placeholder="住所を入力して検索（例: 広島県広島市）" aria-label="住所検索" autocomplete="off">
+                <button type="submit" class="btn btn-primary address-search__submit">検索</button>
+              </form>
+              <ul id="address-search-results" class="list-group address-search__results visually-hidden"></ul>
+              <p id="address-search-message" class="address-search__message visually-hidden" role="status"></p>
+            </div>
           </div>
           <div id="error-message-wrap" class="alert alert-danger visually-hidden" role="alert">
             <h4 class="alert-heading">エラーメッセージ</h4>

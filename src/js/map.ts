@@ -14,6 +14,8 @@ import { ContextMenuEvent } from './interface.js';
 export const map = L.map('map', {
   preferCanvas: true,
   contextmenu: true,
+  // 住所検索欄を左上に配置するため、ズームコントロールは左下に移動する
+  zoomControl: false,
   contextmenuItems: [
     {
       text: '円を追加',
@@ -37,6 +39,7 @@ export const map = L.map('map', {
     },
   ],
 }).setView([35.6580992222, 139.7413574722], 15);
+L.control.zoom({ position: 'bottomleft' }).addTo(map);
 // 不動産情報ライブラリのレイヤー（プロキシURL未設定時は空になる）
 const reinfolibOverlays = getReinfolibOverlays();
 // 右クリックメニューの「不動産情報ライブラリの情報を表示」から呼び出す関数

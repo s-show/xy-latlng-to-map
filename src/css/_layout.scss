@@ -337,6 +337,51 @@ body {
   overflow: hidden;
 }
 
+// Address Search（地図左上に重ねる住所検索欄）
+// --------------------------------------------------------------------------
+.address-search {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 50px; // 右上のレイヤーコントロールと重ならないよう余白を残す
+  max-width: 320px;
+  z-index: 1000;
+
+  &__form {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    max-height: 240px;
+    overflow-y: auto;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+
+    .list-group-item {
+      cursor: pointer;
+    }
+  }
+
+  &__message {
+    margin-top: 4px;
+    margin-bottom: 0;
+    padding: 4px 8px;
+    background-color: $color-white;
+    border-radius: $border-radius-sm;
+    font-size: 0.875rem;
+  }
+}
+
 .map {
   border: solid 0.1em $color-black;
 }

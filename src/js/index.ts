@@ -8,6 +8,7 @@ import { isValidNumber } from './isvalidNumber.js';
 import { exportCSV } from "./exportCSV.js";
 import { createMarker } from './marker.js';
 import { map } from "./map.js";
+import { searchAddress, AddressSearchResult } from './addressSearch.js';
 import { addCircle } from "./circle.js";
 import { addPhotoPoint } from "./importPhoto.js";
 import { isImageFile } from "./isImageFile.js";
@@ -641,6 +642,95 @@ if (
     circleRadius.value = '0';
     e.preventDefault();
   })
+}
+
+/*
+ * 住所検索（入力した住所を緯度経度に変換して地図の中心に移動する）に関連する処理
+ */
+const addressSearchContainer = document.querySelector<HTMLDivElement>('#address-search');
+const addressSearchForm = document.querySelector<HTMLFormElement>('#address-search-form');
+const addressSearchInput = document.querySelector<HTMLInputElement>('#address-search-input');
+const addressSearchResultsList = document.querySelector<HTMLUListElement>('#address-search-results');
+const addressSearchMessage = document.querySelector<HTMLParagraphElement>('#address-search-message');
+if (
+  addressSearchContainer !== null &&
+  addressSearchForm !== null &&
+  addressSearchInput !== null &&
+  addressSearchResultsList !== null &&
+  addressSearchMessage !== null
+) {
+  // 住所検索結果を地図に反映する際のズームレベル（初期表示と同じ縮尺）
+  const ADDRESS_SEARCH_ZOOM = 15;
+
+  const hideAddressSearchResults = () => {
+    addressSearchResultsList.replaceChildren();
+    addressSearchResultsList.classList.add('visually-hidden');
+  };
+
+  const showAddressSearchMessage = (message: string) => {
+    addressSearchMessage.textContent = message;
+    addressSearchMessage.classList.remove('visually-hidden');
+  };
+
+  const hideAddressSearchMessage = () => {
+    addressSearchMessage.textContent = '';
+    addressSearchMessage.classList.add('visually-hidden');
+  };
+
+  const moveMapToAddressResult = (result: AddressSearchResult) => {
+    map.setView([result.lat, result.lng], ADDRESS_SEARCH_ZOOM);
+    addressSearchInput.value = result.title;
+    hideAddressSearchResults();
+    hideAddressSearchMessage();
+  };
+
+  const renderAddressSearchResults = (results: AddressSearchResult[]) => {
+    addressSearchResultsList.replaceChildren();
+    results.forEach((result) => {
+      const item = document.createElement('li');
+      item.className = 'list-group-item';
+      item.textContent = result.title;
+      item.addEventListener('click', () => moveMapToAddressResult(result));
+      addressSearchResultsList.appendChild(item);
+    });
+    addressSearchResultsList.classList.remove('visually-hidden');
+  };
+
+  // 入力された住所を検索し、1件のみ該当した場合は即座に地図を移動、
+  // 複数該当した場合は候補一覧から選ばせる
+  const runAddressSearch = async () => {
+    const query = addressSearchInput.value.trim();
+    hideAddressSearchMessage();
+    hideAddressSearchResults();
+    if (query === '') {
+      return;
+    }
+    try {
+      const results = await searchAddress(query);
+      if (results.length === 0) {
+        showAddressSearchMessage('該当する住所が見つかりませんでした');
+      } else if (results.length === 1) {
+        moveMapToAddressResult(results[0]);
+      } else {
+        renderAddressSearchResults(results);
+      }
+    } catch (error) {
+      showAddressSearchMessage('住所検索に失敗しました。しばらくしてから再度お試しください');
+      console.warn('住所検索に失敗しました:', error);
+    }
+  };
+
+  addressSearchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    void runAddressSearch();
+  });
+
+  // 検索欄の外側をクリックしたら候補一覧を閉じる
+  document.addEventListener('click', (e) => {
+    if (e.target instanceof Node && !addressSearchContainer.contains(e.target)) {
+      hideAddressSearchResults();
+    }
+  });
 }
 
 /**
