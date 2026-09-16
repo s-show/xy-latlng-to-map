@@ -278,6 +278,28 @@ async function dropGpsPhotos(page) {
   await waitForMap(page);
 }
 
+// 住所検索は国土地理院の住所検索APIを直接呼び出すため、候補一覧が表示されるまで待ってから撮影する。
+async function captureAddressSearch(page) {
+  const searchInput = page.locator('#address-search-input');
+  const searchResults = page.locator('#address-search-results');
+  // ポインターが候補一覧に重なるとホバーのハイライトが残るため、地図側へ退避させてから検索する
+  await page.mouse.move(900, 700);
+  await searchInput.fill('芝公園');
+  await searchInput.press('Enter');
+  await searchResults.locator('li').first().waitFor();
+  await page.waitForTimeout(300);
+  await capture(page, '13-address-search.png');
+
+  // 矢印キーで先頭の候補を選び、Enterで地図を移動する
+  await searchInput.press('ArrowDown');
+  await searchInput.press('Enter');
+  await page.waitForFunction(
+    () => document.querySelectorAll('#address-search-results li').length === 0,
+  );
+  await waitForMap(page);
+  await capture(page, '14-address-search-result.png');
+}
+
 async function capture(page, fileName) {
   await page.screenshot({
     path: resolve(outputDirectory, fileName),
@@ -409,6 +431,9 @@ async function captureScreenshots(page) {
   await help.locator('#xy-or-latlng-to-marker').click();
   await page.waitForTimeout(300);
   await capture(page, '10-help-panel.png');
+
+  await reloadApplication(page);
+  await captureAddressSearch(page);
 
   if (gpsPhotoPaths.every(existsSync)) {
     await reloadApplication(page);
