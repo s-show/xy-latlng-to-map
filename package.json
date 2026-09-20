@@ -14,6 +14,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "manual:screenshots": "node scripts/capture-manual-screenshots.mjs",
+    "benchmark:vector": "node scripts/benchmark-vector-rendering.mjs",
     "lint": "eslint .",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
   },
