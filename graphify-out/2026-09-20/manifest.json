@@ -24,10 +24,10 @@
     "semantic_hash": "c178de3c9b1e86e6961dc89664f43d93"
   },
   "package.json": {
-    "mtime": 1789887829.3415806,
-    "seen": 1789898717.6970055,
-    "ast_hash": "5b81c3bc52b4a42c481a6473a5819b95",
-    "semantic_hash": ""
+    "mtime": 1789044883.7938576,
+    "seen": 1789832318.2855337,
+    "ast_hash": "b286615ea1c982a3f7c9fab0e5cd96bc",
+    "semantic_hash": "b286615ea1c982a3f7c9fab0e5cd96bc"
   },
   "src/js/DMSLatLngParser.ts": {
     "mtime": 1787401794.883735,
@@ -102,10 +102,10 @@
     "semantic_hash": "311759ccbf9ab5190ac02708952644ae"
   },
   "src/js/map.ts": {
-    "mtime": 1789888240.0441015,
-    "seen": 1789898717.6970205,
-    "ast_hash": "eb95a840f1aa638b74b9e0328129fd06",
-    "semantic_hash": ""
+    "mtime": 1789830918.6635303,
+    "seen": 1789832318.285543,
+    "ast_hash": "0836aa800ec3b6af6f050eed79a77ec8",
+    "semantic_hash": "0836aa800ec3b6af6f050eed79a77ec8"
   },
   "src/js/marker.ts": {
     "mtime": 1787401794.8839407,
@@ -724,23 +724,5 @@
     "seen": 1789832318.2855752,
     "ast_hash": "6c3b4941c9d89e26b01c6bb994b420fa",
     "semantic_hash": "6c3b4941c9d89e26b01c6bb994b420fa"
-  },
-  "scripts/benchmark-vector-rendering.mjs": {
-    "mtime": 1789888116.4085364,
-    "seen": 1789898717.6970096,
-    "ast_hash": "c60318ab0f112d49c2311b2b4257325b",
-    "semantic_hash": ""
-  },
-  "css_emulation_print.png": {
-    "mtime": 1789882052.0,
-    "seen": 1789898717.6970499,
-    "ast_hash": "d26c51e79740f3a0ae86894269c7c040",
-    "semantic_hash": ""
-  },
-  "print_preview_no_map.png": {
-    "mtime": 1789882001.0,
-    "seen": 1789898717.697061,
-    "ast_hash": "dc5ef7a21823edc357ce86d63b8cef59",
-    "semantic_hash": ""
   }
 }
