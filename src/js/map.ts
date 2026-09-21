@@ -11,8 +11,11 @@ import { ContextMenuEvent } from './interface.js';
 // 初期位置は日本緯度経度原点
 // 北緯35度39分29.1572秒, 東経139度44分28.8869秒
 ---------------------------------------------------------*/
+// ベクターレイヤーは Leaflet の SVG レンダラに統一する。
+// Canvas レンダラ（preferCanvas: true）だと、Chromium の印刷プレビューで
+// リサイズされた canvas の透明部分が不透明な白として印刷され、ベース地図が
+// 白く消える（Blink の既知不具合: https://issues.chromium.org/issues/40788827）。
 export const map = L.map('map', {
-  preferCanvas: true,
   contextmenu: true,
   // 住所検索欄を左上に配置するため、ズームコントロールは左下に移動する
   zoomControl: false,

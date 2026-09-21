@@ -1,31 +1,24 @@
-# Graph Report - xy-latlng-to-map  (2026-09-20)
+# Graph Report - xy-latlng-to-map  (2026-09-19)
 
 ## Corpus Check
-- 72 files · ~1,444,914 words
-- Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 16 file(s) not represented in the graph (top: .scss 7, (none) 4, .lock 1)
+- Large corpus: 121 files · ~1,185,580 words. Semantic extraction will be expensive (many Claude tokens). Consider running on a subfolder.
 
 ## Summary
-- 600 nodes · 789 edges · 72 communities (33 shown, 35 thin omitted)
-- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 72 edges (avg confidence: 0.81)
+- 574 nodes · 759 edges · 71 communities (32 shown, 35 thin omitted)
+- Extraction: 90% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 72 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
-## Graph Freshness
-- Built from commit: `e18207d7`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
-
 ## Community Hubs (Navigation)
-- map.ts
+- Circle Drawing & Map Libraries
 - Repo Instructions & Manual Maintenance
-- js/index.ts
+- Main App Entry & Address Search UI
 - Reinfolib Layer & Popup Rendering
 - Coordinate & Map Feature Concepts (GEMINI.md)
-- leaflet.ts
+- Mapping Engine & Build Tooling (GEMINI.md)
 - Manual UI Feature Descriptions
-- package.json
+- Root package.json Metadata
 - DMS/Coordinate Parsing Utilities
-- capture-manual-screenshots.mjs
+- Manual Screenshot Capture Script
 - Dev Dependencies (Lint/Test)
 - Root tsconfig.json Options
 - Proxy Worker package.json
@@ -33,7 +26,7 @@
 - Root package.json Dependencies
 - Serena Mode/Tool Commands
 - Secondary tsconfig.json Options
-- scripts
+- npm Scripts
 - Proxy Worker CORS/API Handler
 - GSI Address Search Module
 - pnpm Dependency Overrides
@@ -83,7 +76,6 @@
 - Red Center Marker Icon
 - Photo On Map Screenshot
 - Yellow Center Marker Icon
-- benchmark-vector-rendering.mjs
 
 ## God Nodes (most connected - your core abstractions)
 1. `compilerOptions` - 16 edges
@@ -91,17 +83,17 @@
 3. `docs/manual.html (Operation Manual)` - 14 edges
 4. `about.html（このサイトについてページ）` - 13 edges
 5. `createMarker()` - 12 edges
-6. `captureScreenshots()` - 11 edges
-7. `compilerOptions` - 11 edges
+6. `compilerOptions` - 11 edges
+7. `captureScreenshots()` - 11 edges
 8. `leaflet` - 10 edges
 9. `measureLength()` - 10 edges
 10. `src/index.html (Main Page)` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Marker/Line Settings Screenshot` --references--> `src/index.html (Main Page)`  [INFERRED]
-  docs/assets/screenshots/03-marker-line-settings.png → src/index.html
 - `CI Head SHA Match Verification Rule` --semantically_similar_to--> `Repository Instructions (AGENTS.md)`  [INFERRED] [semantically similar]
   .pi/prompts/dependabot-review.md → AGENTS.md
+- `Marker/Line Settings Screenshot` --references--> `src/index.html (Main Page)`  [INFERRED]
+  docs/assets/screenshots/03-marker-line-settings.png → src/index.html
 - `座標リストからの一括マーカー表示機能` --semantically_similar_to--> `XY座標・緯度経度リストからの一括アイコン追加`  [INFERRED] [semantically similar]
   README.md → src/about.html
 - `円やマーカーの表示機能` --semantically_similar_to--> `指定した半径の円の追加`  [INFERRED] [semantically similar]
@@ -114,23 +106,23 @@
 
 ## Hyperedges (group relationships)
 - **Serena モード切替スラッシュコマンド群** — claude_commands_mode_and_tool_command, claude_commands_mode_to_editing_command, claude_commands_mode_to_interactive_command, claude_commands_mode_to_onboarding_command, claude_commands_mode_to_planning_command, claude_commands_serena [EXTRACTED 0.90]
-- **Cross-Agent Repository Instruction Set** — agents, gemini, agents_skills_html_manual_maintainer_skill_html_manual_maintainer, pi_prompts_dependabot_review [INFERRED 0.75]
 - **Dependabot to Review CI Governance Flow** — github_dependabot, github_workflows_review, pi_prompts_dependabot_review, agents_untrusted_pr_input_rationale [INFERRED 0.85]
+- **Cross-Agent Repository Instruction Set** — agents, gemini, agents_skills_html_manual_maintainer_skill_html_manual_maintainer, pi_prompts_dependabot_review [INFERRED 0.75]
 - **UI-to-Manual Documentation Pipeline** — agents_skills_html_manual_maintainer_skill_html_manual_maintainer, src_index, docs_manual [INFERRED 0.85]
 
-## Communities (72 total, 35 thin omitted)
+## Communities (71 total, 35 thin omitted)
 
-### Community 0 - "map.ts"
-Cohesion: 0.12
-Nodes (31): geo4326, leaflet, leaflet-contextmenu, circleMenuItems, isInnerCircle(), measureFromThisCircle(), measureToThisCircle(), removeCircle() (+23 more)
+### Community 0 - "Circle Drawing & Map Libraries"
+Cohesion: 0.09
+Nodes (38): exifr, geo4326, leaflet, leaflet-arrowheads, leaflet-contextmenu, addCircle(), circleMenuItems, isInnerCircle() (+30 more)
 
 ### Community 1 - "Repo Instructions & Manual Maintenance"
 Cohesion: 0.06
 Nodes (46): Repository Instructions (AGENTS.md), check.sh Verification Requirement, Empty Google Maps API Key Disables Layer, HTML Manual Maintainer OpenAI Agent Interface, Manual Screenshot Capture Workflow, HTML Manual Maintainer Skill, Treat PR Content as Untrusted Input, Marker/Line Settings Screenshot (+38 more)
 
-### Community 2 - "js/index.ts"
+### Community 2 - "Main App Entry & Address Search UI"
 Cohesion: 0.05
-Nodes (33): addCircle(), addCircleToMap, addMarkerBtn, addressSearchContainer, addressSearchForm, addressSearchInput, addressSearchMessage, addressSearchResultsList (+25 more)
+Nodes (32): addCircleToMap, addMarkerBtn, addressSearchContainer, addressSearchForm, addressSearchInput, addressSearchMessage, addressSearchResultsList, cancelAddCircle (+24 more)
 
 ### Community 3 - "Reinfolib Layer & Popup Rendering"
 Cohesion: 0.09
@@ -140,25 +132,25 @@ Nodes (30): buildCombinedPopupHtml(), buildLayerInfoInnerHtml(), buildPrintGridH
 Cohesion: 0.09
 Nodes (28): Bootstrap, 座標リストからの一括マーカー表示機能, 円やマーカーの表示機能, 距離計測機能, 日本測地系と世界測地系の相互変換機能, XY座標と緯度経度の相互変換機能, geo4326, Jspreadsheet CE (+20 more)
 
-### Community 5 - "leaflet.ts"
-Cohesion: 0.07
-Nodes (30): Project Context (GEMINI.md), Leaflet Mapping Engine, Proj4 Coordinate Transformation, Vite Build Tool, leaflet.gridlayer.googlemutant, baseMapsWithoutGoogle, blueCenterMarker, blueMarker (+22 more)
+### Community 5 - "Mapping Engine & Build Tooling (GEMINI.md)"
+Cohesion: 0.08
+Nodes (26): Project Context (GEMINI.md), Leaflet Mapping Engine, Proj4 Coordinate Transformation, Vite Build Tool, leaflet.gridlayer.googlemutant, blueCenterMarker, blueMarker, centerMarkerAnchor (+18 more)
 
 ### Community 6 - "Manual UI Feature Descriptions"
 Cohesion: 0.10
 Nodes (26): Add Circle to Map, Add Icon Marker to Map, Address Search Box (住所検索), Address Search Input and Button (住所検索), Application Header Bar with Title and Menu, Distance Measurement From/To Point, Footer with MIT License and Source Code Links, Usage Guide Toggle Button ("使い方を表示") (+18 more)
 
-### Community 7 - "package.json"
-Cohesion: 0.07
-Nodes (26): license, name, packageManager, type, version, eslint, exifr, jest (+18 more)
+### Community 7 - "Root package.json Metadata"
+Cohesion: 0.08
+Nodes (25): typescript, license, name, packageManager, type, version, eslint, jest (+17 more)
 
 ### Community 8 - "DMS/Coordinate Parsing Utilities"
 Cohesion: 0.13
 Nodes (15): big.js, dms2deg(), extractNumber(), dataCleansing(), isValidNumber(), beforechangeSourceTable(), clearTable(), columnsConfig (+7 more)
 
-### Community 9 - "capture-manual-screenshots.mjs"
-Cohesion: 0.15
-Nodes (23): @playwright/test, capture(), captureAddressSearch(), captureElementWithPadding(), captureScreenshots(), closeMenu(), dropGpsPhotos(), enterSampleLatLngs() (+15 more)
+### Community 9 - "Manual Screenshot Capture Script"
+Cohesion: 0.16
+Nodes (22): capture(), captureAddressSearch(), captureElementWithPadding(), captureScreenshots(), closeMenu(), dropGpsPhotos(), enterSampleLatLngs(), gpsPhotoPaths (+14 more)
 
 ### Community 10 - "Dev Dependencies (Lint/Test)"
 Cohesion: 0.09
@@ -188,9 +180,9 @@ Nodes (13): get_current_config ツール, 「モードとツールを確認」�
 Cohesion: 0.15
 Nodes (12): compilerOptions, esModuleInterop, forceConsistentCasingInFileNames, lib, module, moduleResolution, noEmit, skipLibCheck (+4 more)
 
-### Community 17 - "scripts"
-Cohesion: 0.22
-Nodes (9): scripts, benchmark:vector, build, check, dev, lint, manual:screenshots, preview (+1 more)
+### Community 17 - "npm Scripts"
+Cohesion: 0.25
+Nodes (8): scripts, build, check, dev, lint, manual:screenshots, preview, test
 
 ### Community 18 - "Proxy Worker CORS/API Handler"
 Cohesion: 0.48
@@ -248,19 +240,15 @@ Nodes (3): Circle Radius Feature Screenshot, Measure Any Points Screenshot, Meas
 Cohesion: 0.67
 Nodes (3): isElement(), isNodeList(), setupDialog()
 
-### Community 71 - "benchmark-vector-rendering.mjs"
-Cohesion: 0.09
-Nodes (11): installNetworkMock(), MOCK_TILE_PNG, mockFeaturesForTile(), options, output, projectRoot, result, roundNumbers() (+3 more)
-
 ## Ambiguous Edges - Review These
 - `check.sh Verification Requirement` → `Separate pnpm Workspace to Avoid Parent Misdetection`  [AMBIGUOUS]
   proxy/pnpm-workspace.yaml · relation: conceptually_related_to
-- `Address Search Input and Button (住所検索)` → `Layer Menu Screenshot (01-layer-menu.png)`  [AMBIGUOUS]
+- `Layer Menu Screenshot (01-layer-menu.png)` → `Address Search Input and Button (住所検索)`  [AMBIGUOUS]
   docs/assets/screenshots/01-layer-menu.png · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **293 isolated node(s):** `name`, `version`, `license`, `type`, `packageManager` (+288 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 333 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **287 isolated node(s):** `name`, `version`, `license`, `type`, `packageManager` (+282 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 314 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **35 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
@@ -268,15 +256,15 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `check.sh Verification Requirement` and `Separate pnpm Workspace to Avoid Parent Misdetection`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **What is the exact relationship between `Address Search Input and Button (住所検索)` and `Layer Menu Screenshot (01-layer-menu.png)`?**
+- **What is the exact relationship between `Layer Menu Screenshot (01-layer-menu.png)` and `Address Search Input and Button (住所検索)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `leaflet` connect `map.ts` to `js/index.ts`, `Reinfolib Layer & Popup Rendering`, `leaflet.ts`, `package.json`?**
-  _High betweenness centrality (0.111) - this node is a cross-community bridge._
-- **Why does `@playwright/test` connect `capture-manual-screenshots.mjs` to `benchmark-vector-rendering.mjs`, `package.json`?**
-  _High betweenness centrality (0.109) - this node is a cross-community bridge._
+- **Why does `leaflet` connect `Circle Drawing & Map Libraries` to `Main App Entry & Address Search UI`, `Reinfolib Layer & Popup Rendering`, `Mapping Engine & Build Tooling (GEMINI.md)`, `Root package.json Metadata`?**
+  _High betweenness centrality (0.104) - this node is a cross-community bridge._
+- **Why does `bootstrap` connect `Coordinate & Map Feature Concepts (GEMINI.md)` to `Main App Entry & Address Search UI`, `Root package.json Metadata`?**
+  _High betweenness centrality (0.078) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `license` to the rest of the system?**
-  _293 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `map.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.1184939091915836 - nodes in this community are weakly interconnected._
+  _287 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Circle Drawing & Map Libraries` be split into smaller, more focused modules?**
+  _Cohesion score 0.09306122448979592 - nodes in this community are weakly interconnected._
 - **Should `Repo Instructions & Manual Maintenance` be split into smaller, more focused modules?**
   _Cohesion score 0.05507246376811594 - nodes in this community are weakly interconnected._
