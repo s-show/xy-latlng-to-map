@@ -1,5 +1,6 @@
 import { isValidNumber } from './isvalidNumber';
 import { zen2han } from './zen2han';
+import { sanitizeMemo } from './sanitizeMemo';
 import { dms2deg } from '../js/DMSLatLngParser.js';
 import 'jsuites/dist/jsuites.js';
 import 'jsuites/dist/jsuites.css';
@@ -14,6 +15,11 @@ import { CellValue } from 'jspreadsheet-ce';
  * ただし、桁区切りの `,` を取り除けば数値とみなせる値は受け入れる。
  * 入力値または貼り付け値に「度 or °」が含まれていれば、
  * 度分秒形式の緯度経度を十進数形式の緯度経度に変換している。
+ *
+ * 3列目 memo (tooltip_text) は自由記述の文字列として受け付けるため、
+ * HTML インジェクションや CSV 数式インジェクションの受け口になる。
+ * onbeforechange は入力・貼り付けの両方で全セルに対して呼ばれるため、
+ * ここで sanitizeMemo() による無害化を行っている。
  */
 const beforechangeSourceTable = (
   _instance: WorksheetInstance,
@@ -22,16 +28,22 @@ const beforechangeSourceTable = (
   _y: string | number,
   value: CellValue
 ) => {
-  if (typeof value === 'string' && value !== null && value.match(/度|°/) == null) {
-    // 桁区切りのカンマを取り除く
-    value = value.replace(',', '');
-    if (isValidNumber(zen2han(value))) {
-      return zen2han(value);
-    } else {
-      return '';
+  if (typeof _x === 'number' && _x < 2) {
+    if (typeof value === 'string' && value !== null && value.match(/度|°/) == null) {
+      // 桁区切りのカンマを取り除く
+      value = value.replace(',', '');
+      if (isValidNumber(zen2han(value))) {
+        return zen2han(value);
+      } else {
+        return '';
+      }
+    } else if (typeof value === 'string') {
+      return dms2deg(value);
     }
-  } else if (typeof value === 'string') {
-    return dms2deg(value);
+  }
+  if (typeof _x === 'number' && _x === 2) {
+    // 3列目 memo は文字列を受け付ける列。素のテキストに無害化してから採用する。
+    return sanitizeMemo(value);
   }
   return value;
 };
@@ -147,6 +159,12 @@ const columnsConfig = [
     width: 110,
     name: 'y_longitude',
   },
+  {
+    type: 'text' as const,
+    title: 'memo',
+    width: 110,
+    name: 'tooltip_text',
+  },
 ];
 
 // convertedTable用に readonly を追加
@@ -191,24 +209,24 @@ export function resizeTable(viewPortWidth: number): void {
   // viewPortWidth <= 992 で col-lg-* が適用される
   // viewPortWidth < 992 でデータテーブルと地図が縦並びになるのでテーブルの幅を戻している。
   if (viewPortWidth < 992) {
-    sourceTable[0].setWidth([0, 1], [180, 180]);
+    sourceTable[0].setWidth([0, 1], [75, 75, 70]);
     sourceTable[0].hideIndex();
-    convertedTable[0].setWidth([0, 1], [180, 180]);
+    convertedTable[0].setWidth([0, 1], [60, 60, 60]);
     convertedTable[0].hideIndex();
   } else if (viewPortWidth <= 1400) {
-    sourceTable[0].setWidth([0, 1], [110, 110]);
+    sourceTable[0].setWidth([0, 1], [105, 105, 105]);
     sourceTable[0].hideIndex();
-    convertedTable[0].setWidth([0, 1], [110, 110]);
+    convertedTable[0].setWidth([0, 1], [90, 90, 80]);
     convertedTable[0].hideIndex();
   } else if (viewPortWidth <= 1800) {
-    sourceTable[0].setWidth([0, 1], [110, 110]);
+    sourceTable[0].setWidth([0, 1], [125, 125, 135]);
     sourceTable[0].showIndex();
-    convertedTable[0].setWidth([0, 1], [110, 110]);
+    convertedTable[0].setWidth([0, 1], [125, 125, 135]);
     convertedTable[0].showIndex();
   } else {
-    sourceTable[0].setWidth([0, 1], [180, 180]);
+    sourceTable[0].setWidth([0, 1], [140, 140, 160]);
     sourceTable[0].showIndex();
-    convertedTable[0].setWidth([0, 1], [180, 180]);
+    convertedTable[0].setWidth([0, 1], [140, 140, 160]);
     convertedTable[0].showIndex();
   }
 }

@@ -228,17 +228,17 @@ if (addMarkerBtn !== null) {
         const iconColor = document.querySelector<HTMLSelectElement>('#select-marker-icon')!.value
         const lineColor = selectLineColor(false);
         // fitBounds 用に全グループの変換後データをまとめて保持する
-        const allConvertedData: [number, number][] = [];
+        const allConvertedData: [number, number, string][] = [];
 
         dataGroups.forEach((group) => {
           const convertedData = convertData(convertParameter, group);
           allConvertedData.push(...convertedData);
           convertedData.forEach((data, index) => {
             if (iconColor != 'none') {
-              createMarker(data[0], data[1], iconColor as 'red' | 'blue' | 'yellow' | 'green').addTo(map);
+              createMarker(data[0], data[1], data[2], iconColor as 'red' | 'blue' | 'yellow' | 'green').addTo(map);
             }
             if (lineColor != 'no' && convertedData[index + 1] != undefined) {
-              L.polyline([convertedData[index], convertedData[index + 1]],
+              L.polyline([toLatLngTuple(convertedData[index]), toLatLngTuple(convertedData[index + 1])],
                 {
                   attribution: 'markerPolyline',
                   color: lineColor
@@ -523,12 +523,12 @@ function dataCleansing(sourceData: CellValue[][]) {
  * 変換元テーブルのデータをパラメータに従って変換する関数
  * @param  convertParameter 変換元・変換先データの EPSG コード
  * @param  sourceData 変換元データ（緯度経度の配列）
- * @return 変換後データ。配列の各要素は[緯度, 経度]のタプル。
+ * @return 変換後データ。配列の各要素は[緯度, 経度, memo]のタプル。
  */
 function convertData(
   convertParameter: ConvertParameter,
   sourceData: CellValue[][]
-): [number, number][] {
+): [number, number, string][] {
   return sourceData.map((data) => {
     const temp = proj4(
       convertParameter.fromProjection,
@@ -539,9 +539,20 @@ function convertData(
       ]
     );
     // proj4 で変換された値は「経度・緯度」の順番になっているので、「緯度・経度」に並べ替える
-    return [Number(temp[1]), Number(temp[0])];
+    return [Number(temp[1]), Number(temp[0]), String(data[2])];
   });
 };
+
+/**
+ * 変換後データから Leaflet の座標タプルを取り出す。
+ * LatLngTuple は [number, number, number?] の形式で、3番目の要素は高度として扱われるため、
+ * memo を含んだタプルをそのまま渡すと高度に文字列（実行時は NaN）が入ってしまう。
+ * @param  data 変換後データの1行分 [緯度, 経度, memo]
+ * @return Leaflet に渡せる [緯度, 経度] のタプル
+ */
+function toLatLngTuple(data: [number, number, string]): [number, number] {
+  return [data[0], data[1]];
+}
 
 /**
  * 印刷しないパーツを非表示にする処理
