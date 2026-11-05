@@ -84,6 +84,7 @@ export type MarkerColor = 'red' | 'blue' | 'yellow' | 'green' | 'length' | 'phot
 export function createMarker(
   lat: number,
   lng: number,
+  title: string,
   color: MarkerColor
 ): Marker {
   if (color !== 'photo') {
@@ -107,7 +108,7 @@ export function createMarker(
         },
       ],
     };
-    return L.marker([lat, lng], markerOptions)
+    return L.marker([lat, lng], markerOptions).bindPopup(title);
   } else {
     const markerOptions = {
       icon: markers[color],
