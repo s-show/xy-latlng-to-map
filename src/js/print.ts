@@ -111,19 +111,13 @@ export function setupPrint() {
   // beforeprint は1回しか発火しないため、念のためこちらでも同期で再適用する (Issue #11)。
   if (window.matchMedia) {
     const printMQ = window.matchMedia('print');
-    const onPrintChange = (e: MediaQueryListEvent | MediaQueryList) => {
+    printMQ.addEventListener('change', (e) => {
       if (e.matches) {
         applyPrintSize();
         requestAnimationFrame(() => map.invalidateSize({ animate: false }));
       } else {
         removePrintSize();
       }
-    };
-    // ブラウザ互換: addEventListener と addListener の両方を試す
-    if (typeof printMQ.addEventListener === 'function') {
-      printMQ.addEventListener('change', onPrintChange as EventListener);
-    } else if (typeof (printMQ as MediaQueryList).addListener === 'function') {
-      (printMQ as MediaQueryList).addListener(onPrintChange as (mql: MediaQueryList) => void);
-    }
+    });
   }
 }

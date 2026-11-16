@@ -100,7 +100,7 @@ export function addMarkerGroups(
   groups.forEach((points) => {
     points.forEach(([lat, lng, memo], index) => {
       if (style.iconColor !== null) {
-        createMarker(lat, lng, memo, style.iconColor).addTo(map);
+        createMarker(lat, lng, style.iconColor, memo).addTo(map);
       }
       const next = points[index + 1];
       if (style.lineColor !== null && next !== undefined) {
@@ -116,11 +116,14 @@ export function addMarkerGroups(
 }
 
 export type MarkerColor = IconColor | 'length' | 'photo';
+/**
+ * @param title 指定した場合だけ、クリックで開くポップアップにこの文字列を表示する
+ */
 export function createMarker(
   lat: number,
   lng: number,
-  title: string,
-  color: MarkerColor
+  color: MarkerColor,
+  title?: string
 ): Marker {
   if (color !== 'photo') {
     const markerOptions = {
@@ -143,7 +146,8 @@ export function createMarker(
         },
       ],
     };
-    return L.marker([lat, lng], markerOptions).bindPopup(title);
+    const marker = L.marker([lat, lng], markerOptions);
+    return title !== undefined ? marker.bindPopup(title) : marker;
   } else {
     const markerOptions = {
       icon: markers[color],

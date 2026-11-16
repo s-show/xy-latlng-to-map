@@ -16,10 +16,12 @@
     "manual:screenshots": "node scripts/capture-manual-screenshots.mjs",
     "benchmark:vector": "node scripts/benchmark-vector-rendering.mjs",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@jest/globals": "^30.5.2",
     "@playwright/test": "^1.64.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",

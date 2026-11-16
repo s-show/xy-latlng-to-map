@@ -269,11 +269,21 @@ export function extractAsOfFromIndex(index: unknown): string | null {
  * クリック地点の情報取得・ポップアップ組み立て
  * ---------------------------------------------------------------------- */
 
-export interface LayerPointInfo {
-  definition: ReinfolibLayerDefinition;
-  properties: Record<string, unknown> | null;
-  asOf: string | null;
-}
+/**
+ * クリック地点の1レイヤー分の結果。
+ * 取得できた場合、properties が null なら「その地点に指定が無い」ことを表す。
+ * 取得できなかった場合は指定の有無が分からないので、properties を持たない別の形にしている。
+ */
+export type LayerPointInfo =
+  | {
+      definition: ReinfolibLayerDefinition;
+      properties: Record<string, unknown> | null;
+      asOf: string | null;
+    }
+  | {
+      definition: ReinfolibLayerDefinition;
+      fetchFailed: true;
+    };
 
 interface GeoJsonFeatureLike {
   geometry?: GeoJsonGeometryLike | null;
@@ -308,18 +318,19 @@ async function fetchLayerPointInfo(
     };
   } catch (error) {
     console.warn(`${definition.apiId} の取得に失敗しました:`, error);
-    return { definition, properties: null, asOf: null };
+    return { definition, fetchFailed: true };
   }
 }
 
 // ポップアップ・印刷用グリッドの両方で共通して使う、1レイヤー分の中身（見出し・
-// データ基準時点・属性テーブル、または「指定無し」）を組み立てる。
-function buildLayerInfoInnerHtml(
-  definition: ReinfolibLayerDefinition,
-  properties: Record<string, unknown> | null,
-  asOf: string | null,
-): string {
+// データ基準時点・属性テーブル、「指定無し」、または取得失敗の表示）を組み立てる。
+function buildLayerInfoInnerHtml(info: LayerPointInfo): string {
+  const { definition } = info;
   const heading = `<h4 class="reinfolib-info__heading">${escapeHtml(definition.name)}</h4>`;
+  if ('fetchFailed' in info) {
+    return `${heading}<p class="reinfolib-info__error">情報を取得できませんでした</p>`;
+  }
+  const { properties, asOf } = info;
   const asOfHtml = asOf ? `<p class="reinfolib-info__as-of">${escapeHtml(asOf)}時点のデータ</p>` : '';
   if (!properties) {
     return `${heading}<p class="reinfolib-info__empty">指定無し</p>`;
@@ -337,8 +348,7 @@ function buildLayerInfoInnerHtml(
 
 export function buildCombinedPopupHtml(results: LayerPointInfo[]): string {
   const sections = results.map(
-    ({ definition, properties, asOf }) =>
-      `<section class="reinfolib-popup__section">${buildLayerInfoInnerHtml(definition, properties, asOf)}</section>`,
+    (info) => `<section class="reinfolib-popup__section">${buildLayerInfoInnerHtml(info)}</section>`,
   );
   return `<div class="reinfolib-popup">${sections.join('')}</div>`;
 }
@@ -354,10 +364,7 @@ export function buildPrintGridHtml(results: LayerPointInfo[]): string {
   for (let i = 0; i < results.length; i += PRINT_GRID_COLUMNS) {
     const cells = results
       .slice(i, i + PRINT_GRID_COLUMNS)
-      .map(
-        ({ definition, properties, asOf }) =>
-          `<td class="reinfolib-print-grid__cell">${buildLayerInfoInnerHtml(definition, properties, asOf)}</td>`,
-      )
+      .map((info) => `<td class="reinfolib-print-grid__cell">${buildLayerInfoInnerHtml(info)}</td>`)
       .join('');
     rows.push(`<tr>${cells}</tr>`);
   }
