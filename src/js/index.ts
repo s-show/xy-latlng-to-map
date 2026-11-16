@@ -1,12 +1,15 @@
 import L from "leaflet";
-import proj4 from 'proj4';
-import { CellValue } from "jspreadsheet-ce";
-import { geodeticSystems } from './proj4.js';
-import type { GeodeticSystemName } from './proj4.js';
+import {
+  MAP_COORDINATE_SYSTEM,
+  parseCoordinateSystem,
+  removeInvalidRows,
+  convertRows,
+  buildCsvHeader,
+} from './conversion.js';
+import type { Conversion } from './conversion.js';
 import { sourceTable, convertedTable, clearTable, resizeTable } from './jspreadsheet.js';
-import { isValidNumber } from './isvalidNumber.js';
 import { exportCSV } from "./exportCSV.js";
-import { createMarker } from './marker.js';
+import { addMarkerGroups, isIconColor } from './marker.js';
 import { map } from "./map.js";
 import { searchAddress, AddressSearchResult } from './addressSearch.js';
 import { addCircle } from "./circle.js";
@@ -113,7 +116,7 @@ if (zoneNoDialog !== null) {
   zoneNoDialog.addEventListener('command', (event) => {
     if (event.command === 'show-modal') {
       const zoneNoSelectBtns = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
-      const dataType = getParams().source.type;
+      const dataType = checkedRadioValue('source-data-type');
       zoneNoSelectBtns.forEach((btn) => {
         if (btn.parentElement !== null) {
           if (dataType == 'XY') {
@@ -133,28 +136,9 @@ if (zoneNoDialog !== null) {
 const dataConvertBtn = document.querySelector<HTMLButtonElement>('#data-convert-btn')
 if (dataConvertBtn !== null) {
   dataConvertBtn.addEventListener('click', (e) => {
-    const params = getParams()
-    if (
-      params.source.geodeticSystem !== null &&
-      params.convert.geodeticSystem !== null &&
-      params.source.zoneNo !== null &&
-      params.convert.zoneNo !== null
-    ) {
-      const convertParameter = getEspgCodes(
-        params.source.geodeticSystem,
-        params.convert.geodeticSystem,
-        params.source.zoneNo,
-        params.convert.zoneNo
-      );
-      const sourceData = dataCleansing(
-        sourceTable[0].getData(
-          undefined,
-          undefined,
-          undefined,
-          true
-        )
-      );
-      convertedTable[0].setData(convertData(convertParameter, sourceData));
+    const conversion = readConversionForm();
+    if (conversion !== null) {
+      convertedTable[0].setData(convertRows(conversion, removeInvalidRows(readSourceRows())));
       e.preventDefault();
     }
   })
@@ -181,65 +165,24 @@ if (addMarkerBtn !== null) {
   addMarkerBtn.addEventListener('click', (e) => {
     // 空白行を区切りとしてテーブルをグループに分割し、グループごとに
     // 不正データを除去する。線（ポリライン）はグループ内の点だけを結ぶ。
-    const dataGroups = splitDataByBlankRows(sourceTable[0].getData(
-      undefined,
-      undefined,
-      undefined,
-      true
-    )).map((group) => dataCleansing(group))
+    const dataGroups = splitDataByBlankRows(readSourceRows())
+      .map((group) => removeInvalidRows(group))
       .filter((group) => group.length > 0);
-    const params = getParams();
     // 緯度経度テーブルに有効なデータが無い場合 dataGroups.length は 0 になる
     if (dataGroups.length > 0) {
-      // アイコン追加には緯度経度が必要なため、変換先パラメータは緯度経度に固定している
-      if (
-        params.source.geodeticSystem !== null &&
-        params.convert.geodeticSystem !== null &&
-        params.source.zoneNo !== null &&
-        params.convert.zoneNo !== null
-      ) {
-        const convertParameter = getEspgCodes(
-          params.source.geodeticSystem,
-          'JGD2011',
-          params.source.zoneNo,
-          '0'
+      const conversion = readConversionForm();
+      if (conversion !== null) {
+        // アイコン追加には緯度経度が必要なため、変換先は地図の座標系に固定している
+        const toMap = { source: conversion.source, target: MAP_COORDINATE_SYSTEM };
+        const iconColor = document.querySelector<HTMLSelectElement>('#select-marker-icon')!.value;
+        addMarkerGroups(
+          dataGroups.map((group) => convertRows(toMap, group)),
+          { iconColor: isIconColor(iconColor) ? iconColor : null, lineColor: selectedLineColor() }
         );
-        const iconColor = document.querySelector<HTMLSelectElement>('#select-marker-icon')!.value
-        const lineColor = selectLineColor(false);
-        // fitBounds 用に全グループの変換後データをまとめて保持する
-        const allConvertedData: [number, number, string][] = [];
-
-        dataGroups.forEach((group) => {
-          const convertedData = convertData(convertParameter, group);
-          allConvertedData.push(...convertedData);
-          convertedData.forEach((data, index) => {
-            if (iconColor != 'none') {
-              createMarker(data[0], data[1], data[2], iconColor as 'red' | 'blue' | 'yellow' | 'green').addTo(map);
-            }
-            if (lineColor != 'no' && convertedData[index + 1] != undefined) {
-              L.polyline([toLatLngTuple(convertedData[index]), toLatLngTuple(convertedData[index + 1])],
-                {
-                  attribution: 'markerPolyline',
-                  color: lineColor
-                }
-              ).addTo(map);
-            }
-          })
-        })
-        const southWestPoint = L.latLng([
-          allConvertedData.reduce((x, y) => (x[0] < y[0]) ? x : y)[0],
-          allConvertedData.reduce((x, y) => (x[1] < y[1]) ? x : y)[1],
-        ]);
-        const northEastPoint = L.latLng([
-          allConvertedData.reduce((x, y) => (x[0] > y[0]) ? x : y)[0],
-          allConvertedData.reduce((x, y) => (x[1] > y[1]) ? x : y)[1],
-        ]);
-        map.fitBounds(L.latLngBounds(southWestPoint, northEastPoint));
       }
       e.preventDefault();
     }
   })
-
 }
 // アイコン全削除
 const removeMarkerBtn = document.querySelector<HTMLButtonElement>('#remove-marker-btn')
@@ -370,146 +313,31 @@ if (mapDiv !== null) {
   })
 }
 
-/**
- * データタイプの種類
- */
-type DataType = 'XY' | 'latlng';
-
-/**
- * データの種類（変換元・変換先）
- */
-type DataTypeName = 'source' | 'convert';
-
-/**
- * パラメータの型定義
- */
-type ParamsType = Record<DataTypeName, {
-  type: DataType | null;
-  geodeticSystem: GeodeticSystemName | null;
-  zoneNo: string | null;
-}>;
-
-/**
- * 変換パラメータの型定義
- */
-type ConvertParameter = {
-  fromProjection: string;
-  toProjection: string;
-};
-
-function getParams(): ParamsType {
-  const params: ParamsType = {
-    'source': {
-      'type': null,
-      'geodeticSystem': null,
-      'zoneNo': null
-    },
-    'convert': {
-      'type': null,
-      'geodeticSystem': null,
-      'zoneNo': null
-    }
-  };
-  const sourceDataType = document.querySelectorAll<HTMLInputElement>('[name="source-data-type"]')
-  const convertDataType = document.querySelectorAll<HTMLInputElement>('[name="convert-to-data-type"]')
-  const sourceGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="source-geodetic-system"]')
-  const convertToGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="convert-to-geodetic-system"]')
-  const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no')
-  const convertZoneNo = document.querySelector<HTMLSelectElement>('#convert-zone-no')
-  sourceDataType.forEach((currentNode) => {
-    if (currentNode.checked) {
-      params['source']['type'] = currentNode.value as DataType;
-    }
-  });
-  convertDataType.forEach((currentNode) => {
-    if (currentNode.checked) {
-      params['convert']['type'] = currentNode.value as DataType;
-    }
-  });
-  sourceGeodeticSystem.forEach((currentNode) => {
-    if (currentNode.checked) {
-      params['source']['geodeticSystem'] = currentNode.value as GeodeticSystemName;
-    }
-  });
-  convertToGeodeticSystem.forEach((currentNode) => {
-    if (currentNode.checked) {
-      params['convert']['geodeticSystem'] = currentNode.value as GeodeticSystemName;
-    }
-  });
-  if (sourceZoneNo !== null && convertZoneNo !== null) {
-    params['source']['zoneNo'] = String(sourceZoneNo.value);
-    params['convert']['zoneNo'] = String(convertZoneNo.value);
-  }
-  return params;
+function checkedRadioValue(name: string): string | null {
+  return document.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value ?? null;
 }
 
 /**
- * 測地系と系番号から `proj4.js` で定義した測地系データを取り出す
- * @param {GeodeticSystemName} sourceGeodeticSystem 変換元データの測地系の種類
- * @param {GeodeticSystemName} convertGeodeticSystem 変換先データの測地系の種類
- * @param {string} sourceZoneNo 変換元データの測地系の系番号
- * @param {string} convertZoneNo 変換先データの測地系の系番号
- * @return {ConvertParameter} ESPG コード。データ変換のパラメータとして使う。
+ * 変換元・変換先のフォームを読み取る。
+ * @return 未選択の項目や扱えない値がある場合は null
  */
-function getEspgCodes(
-  sourceGeodeticSystem: GeodeticSystemName,
-  convertGeodeticSystem: GeodeticSystemName,
-  sourceZoneNo: string,
-  convertZoneNo: string
-): ConvertParameter {
-  const convertParameter: ConvertParameter = {
-    fromProjection: geodeticSystems[sourceGeodeticSystem][Number(sourceZoneNo)],
-    toProjection: geodeticSystems[convertGeodeticSystem][Number(convertZoneNo)]
-  };
-  return convertParameter;
-}
-
-/**
- * 変換元テーブルに入力された値のチェック
- * @param  sourceData 変換元データ（緯度経度の配列）
- * @return 不正なデータを削除したデータ。配列の形式は変換元と同じ。
- */
-function dataCleansing(sourceData: CellValue[][]) {
-  return sourceData.filter((data) => {
-    if (isValidNumber(data[0] as string) && isValidNumber(data[1] as string)) {
-      return data;
-    }
-  })
-}
-
-/**
- * 変換元テーブルのデータをパラメータに従って変換する関数
- * @param  convertParameter 変換元・変換先データの EPSG コード
- * @param  sourceData 変換元データ（緯度経度の配列）
- * @return 変換後データ。配列の各要素は[緯度, 経度, memo]のタプル。
- */
-function convertData(
-  convertParameter: ConvertParameter,
-  sourceData: CellValue[][]
-): [number, number, string][] {
-  return sourceData.map((data) => {
-    const temp = proj4(
-      convertParameter.fromProjection,
-      convertParameter.toProjection,
-      [
-        Number(data[1]),
-        Number(data[0])
-      ]
-    );
-    // proj4 で変換された値は「経度・緯度」の順番になっているので、「緯度・経度」に並べ替える
-    return [Number(temp[1]), Number(temp[0]), String(data[2])];
+function readConversionForm(): Conversion | null {
+  const source = parseCoordinateSystem({
+    type: checkedRadioValue('source-data-type'),
+    geodeticSystem: checkedRadioValue('source-geodetic-system'),
+    zoneNo: document.querySelector<HTMLSelectElement>('#source-zone-no')?.value,
   });
-};
+  const target = parseCoordinateSystem({
+    type: checkedRadioValue('convert-to-data-type'),
+    geodeticSystem: checkedRadioValue('convert-to-geodetic-system'),
+    zoneNo: document.querySelector<HTMLSelectElement>('#convert-zone-no')?.value,
+  });
+  return source !== null && target !== null ? { source, target } : null;
+}
 
-/**
- * 変換後データから Leaflet の座標タプルを取り出す。
- * LatLngTuple は [number, number, number?] の形式で、3番目の要素は高度として扱われるため、
- * memo を含んだタプルをそのまま渡すと高度に文字列（実行時は NaN）が入ってしまう。
- * @param  data 変換後データの1行分 [緯度, 経度, memo]
- * @return Leaflet に渡せる [緯度, 経度] のタプル
- */
-function toLatLngTuple(data: [number, number, string]): [number, number] {
-  return [data[0], data[1]];
+// 第4引数の true は、セルの入力値ではなく表示用に加工された値を取得する指定
+function readSourceRows() {
+  return sourceTable[0].getData(undefined, undefined, undefined, true);
 }
 
 /**
@@ -584,7 +412,7 @@ if (
   // 円の半径を入力するダイアログの「追加」ボタンをクリックしたときの処理
   addCircleToMap.addEventListener('click', (e) => {
     const latlng = L.latLng(Number(latitude.value), Number(longitude.value))
-    const lineColor = selectLineColor()
+    const lineColor = selectedLineColor() ?? DEFAULT_CIRCLE_LINE_COLOR;
     let markerColor = selectLineColorSelector.value;
     if (markerColor == 'no') {
       markerColor = 'red';
@@ -782,83 +610,13 @@ if (
   });
 }
 
-/**
- * 座標タイプに応じた軸ラベルを取得
- * @param  type - 'XY' または 'latlng'
- * @return 軸ラベルの配列
- */
-function getAxisLabels(type: string) {
-  type axisLabels = Record<string, string[]>
-  const axisLabels: axisLabels = {
-    'XY': ['X', 'Y'],
-    'latlng': ['緯度', '経度']
-  };
-  return axisLabels[type] || ['緯度', '経度'];
-}
-
-/**
- * 測地系に応じたラベルを取得
- * @param  geodeticSystem - 'TOKYO', 'JGD2000', または 'JGD2011'
- * @return 測地系ラベル
- */
-function getGeodeticLabel(geodeticSystem: string) {
-  type geodeticLabels = Record<string, string>;
-  const geodeticLabels: geodeticLabels = {
-    'TOKYO': '日本測地系',
-    'JGD2000': '世界測地系（JGD2000）',
-    'JGD2011': '世界測地系（JGD2011）'
-  };
-  return geodeticLabels[geodeticSystem] || '世界測地系（JGD2011）';
-}
-
-/**
- * 系番号に応じたラベルを取得
- * @param  zoneNo - 系番号
- * @return 系番号ラベル
- */
-function getZoneLabel(zoneNo: string) {
-  return zoneNo !== '0' ? `${zoneNo}系` : '';
-}
-
-/**
- * CSVヘッダーテキストを構築
- * @param {object} params - getParams()の戻り値
- * @return {Array<Array<string>>} CSVヘッダー配列
- */
-function buildHeaderText(params: ParamsType): string[][] {
-  if (
-    params.source.type !== null &&
-    params.convert.type !== null &&
-    params.source.geodeticSystem !== null &&
-    params.convert.geodeticSystem !== null &&
-    params.source.zoneNo !== null &&
-    params.convert.zoneNo !== null
-  ) {
-    const sourceAxisLabels = getAxisLabels(params.source.type);
-    const convertAxisLabels = getAxisLabels(params.convert.type);
-    const sourceGeodeticLabel = getGeodeticLabel(params.source.geodeticSystem);
-    const convertGeodeticLabel = getGeodeticLabel(params.convert.geodeticSystem);
-    const sourceZoneLabel = getZoneLabel(params.source.zoneNo);
-    const convertZoneLabel = getZoneLabel(params.convert.zoneNo);
-
-    return [
-      ['変換元', '変換元', '変換後', '変換後'],
-      [...sourceAxisLabels, ...convertAxisLabels],
-      [sourceGeodeticLabel, sourceGeodeticLabel, convertGeodeticLabel, convertGeodeticLabel],
-      [sourceZoneLabel, sourceZoneLabel, convertZoneLabel, convertZoneLabel]
-    ];
-  }
-  // デフォルト値を返す
-  return [['', '', '', '']];
-}
-
 // 変換前後のデータをCSVでexportする
 const exportCSVBtn = document.querySelector<HTMLButtonElement>('#export-csv-btn');
 const dataConvertDiv = document.querySelector<HTMLDivElement>('#data-convert-pane')
 if (exportCSVBtn !== null) {
   exportCSVBtn.addEventListener('click', () => {
-    const params = getParams();
-    const headerText = buildHeaderText(params);
+    const conversion = readConversionForm();
+    const headerText = conversion !== null ? buildCsvHeader(conversion) : [['', '', '', '']];
     const sourceData = sourceTable[0].getData();
     const convertData = convertedTable[0].getData();
     sourceData.forEach((data, index) => {
@@ -883,30 +641,22 @@ if (exportCSVBtn !== null) {
   })
 }
 
-// 線の色を選択する処理
-function selectLineColor(shouldReturnDefaultColor = true) {
-  const selectLineColor = document.querySelector<HTMLSelectElement>('#select-line-color');
-  if (!selectLineColor) return shouldReturnDefaultColor ? '#8b4513' : 'no';
-  let lineColor = ''
-  switch (selectLineColor.value) {
-    case 'red':
-      lineColor = '#ff4500';
-      break;
-    case 'blue':
-      lineColor = '#1e90ff';
-      break;
-    case 'yellow':
-      lineColor = '#FFDF00';
-      break;
-    case 'green':
-      lineColor = '#006400';
-      break;
-    default:
-      lineColor = shouldReturnDefaultColor ? '#8b4513' : 'no'
-      break;
-  }
-  return lineColor;
-};
+const LINE_COLORS = new Map([
+  ['red', '#ff4500'],
+  ['blue', '#1e90ff'],
+  ['yellow', '#FFDF00'],
+  ['green', '#006400'],
+]);
+// 線の色に「線無し」を選んでいても、円には輪郭線が必要
+const DEFAULT_CIRCLE_LINE_COLOR = '#8b4513';
+
+/**
+ * @return 「線無し」を選択している場合は null
+ */
+function selectedLineColor(): string | null {
+  const value = document.querySelector<HTMLSelectElement>('#select-line-color')?.value;
+  return LINE_COLORS.get(value ?? '') ?? null;
+}
 
 window.onerror = function myErrorHandler(errorMsg) {
   const errorMessageDiv = document.querySelector<HTMLDivElement>('#error-message')
