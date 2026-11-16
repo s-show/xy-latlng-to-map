@@ -83,7 +83,7 @@ describe('searchAddress', () => {
   });
 
   it('正常なレスポンスをパースして返す', async () => {
-    const fetchMock = jest.fn().mockResolvedValue({
+    const fetchMock = jest.fn<() => Promise<unknown>>().mockResolvedValue({
       ok: true,
       json: async () => [
         { geometry: { coordinates: [139.7, 35.6] }, properties: { title: '東京都' } },
@@ -97,7 +97,7 @@ describe('searchAddress', () => {
   });
 
   it('HTTPエラー時は例外を投げる', async () => {
-    const fetchMock = jest.fn().mockResolvedValue({ ok: false, status: 500 });
+    const fetchMock = jest.fn<() => Promise<unknown>>().mockResolvedValue({ ok: false, status: 500 });
     global.fetch = fetchMock as unknown as typeof fetch;
 
     await expect(searchAddress('広島県')).rejects.toThrow('住所検索に失敗しました (HTTP 500)');

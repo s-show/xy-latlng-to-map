@@ -21,7 +21,7 @@ test('数値と真偽値は文字列化される', () => {
 test('配列やオブジェクトなどの構造化データは空文字として破棄される', () => {
   expect(sanitizeMemo(['a', 'b'] as unknown as CellValue)).toBe('');
   expect(sanitizeMemo({ toString: () => 'x' } as unknown as CellValue)).toBe('');
-  expect(sanitizeMemo(() => 'x' as unknown as CellValue)).toBe('');
+  expect(sanitizeMemo((() => 'x') as unknown as CellValue)).toBe('');
 });
 
 test('script要素はタグだけが除去され残ったテキストは実行できない', () => {

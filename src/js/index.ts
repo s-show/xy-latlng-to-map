@@ -107,7 +107,7 @@ function changeZoneNo(selectedBtn: HTMLInputElement, selectMenu: HTMLSelectEleme
 const zoneNoDialog = document.querySelector<HTMLDialogElement>('#zone-no-dialog')
 if (zoneNoDialog !== null) {
   zoneNoDialog.addEventListener('command', (event) => {
-    if (event.command === 'show-modal') {
+    if (event instanceof CommandEvent && event.command === 'show-modal') {
       const zoneNoSelectBtns = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
       const dataType = checkedRadioValue('source-data-type');
       zoneNoSelectBtns.forEach((btn) => {
@@ -213,7 +213,7 @@ if (zoomRangeInput !== null && mapDiv !== null && zoomRangeValue !== null) {
 const menuColumn = document.querySelector('#menu-column');
 if (menuColumn !== null) {
   menuColumn.addEventListener('command', (event) => {
-    if (event.command === 'show-popover' || event.command === 'hide-popover') {
+    if (event instanceof CommandEvent && (event.command === 'show-popover' || event.command === 'hide-popover')) {
       map.invalidateSize();
       resizeTable(getMenuColumnWidth());
     }

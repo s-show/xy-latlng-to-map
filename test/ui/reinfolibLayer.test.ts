@@ -47,8 +47,9 @@ describe('getReinfolibOverlays', () => {
     const overlays = getReinfolibOverlays('https://example.com/proxy');
     for (const layer of Object.values(overlays)) {
       expect(layer).toBeInstanceOf(L.GridLayer);
-      expect(layer.options.minZoom).toBe(11);
-      expect(layer.options.maxZoom).toBe(15);
+      const options: L.GridLayerOptions = layer.options;
+      expect(options.minZoom).toBe(11);
+      expect(options.maxZoom).toBe(15);
     }
   });
 
@@ -346,7 +347,14 @@ describe('createReinfolibInfoHandler', () => {
 
   it('取得に失敗したレイヤーは「指定無し」ではなく取得失敗と表示する', async () => {
     document.body.innerHTML = `<div id="map"></div><div id="${PRINT_INFO_CONTAINER_ID}"></div>`;
-    const map = L.map('map', { center: [35.68, 139.76], zoom: 14, zoomAnimation: false, fadeAnimation: false });
+    const map = L.map('map', {
+      center: [35.68, 139.76],
+      zoom: 14,
+      zoomAnimation: false,
+      fadeAnimation: false,
+      contextmenu: false,
+      contextmenuItems: [],
+    });
     globalThis.fetch = (async (input: unknown) => {
       const url = String(input);
       if (url.includes('/XKT001/')) throw new TypeError('Failed to fetch');
