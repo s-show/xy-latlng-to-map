@@ -5,6 +5,7 @@ import 'leaflet-contextmenu';
 import { isNearlyEqual } from './nearlyEqual.js';
 import L, { Marker, ContextMenuItemClickEvent } from 'leaflet'
 import { hasLatLng, hasLatLngs } from './util.js';
+import type { ConvertedPoint } from './conversion.js';
 
 // 選択したアイコンを削除する処理
 function removeSelectedMarker(e: ContextMenuItemClickEvent): void {
@@ -80,7 +81,41 @@ function measureToThisMarker(e: ContextMenuItemClickEvent): void {
   }
 }
 
-export type MarkerColor = 'red' | 'blue' | 'yellow' | 'green' | 'length' | 'photo';
+const ICON_COLORS = ['red', 'blue', 'yellow', 'green'] as const;
+export type IconColor = (typeof ICON_COLORS)[number];
+export function isIconColor(value: string): value is IconColor {
+  return ICON_COLORS.some((color) => color === value);
+}
+
+/**
+ * 点のグループごとにアイコンと線を地図へ追加し、全ての点が収まるように地図を移動する。
+ * 線は同じグループ内の隣り合う点だけを結ぶ。
+ * @param groups 世界測地系の緯度経度に変換済みの点。少なくとも1点が必要。
+ * @param style iconColor が null ならアイコンを、lineColor が null なら線を追加しない
+ */
+export function addMarkerGroups(
+  groups: ConvertedPoint[][],
+  style: { iconColor: IconColor | null; lineColor: string | null }
+): void {
+  groups.forEach((points) => {
+    points.forEach(([lat, lng, memo], index) => {
+      if (style.iconColor !== null) {
+        createMarker(lat, lng, memo, style.iconColor).addTo(map);
+      }
+      const next = points[index + 1];
+      if (style.lineColor !== null && next !== undefined) {
+        // Leaflet は座標タプルの3番目を高度として扱うため、memo を除いた [緯度, 経度] だけを渡す
+        L.polyline([[lat, lng], [next[0], next[1]]], {
+          attribution: 'markerPolyline',
+          color: style.lineColor,
+        }).addTo(map);
+      }
+    });
+  });
+  map.fitBounds(L.latLngBounds(groups.flat().map(([lat, lng]): [number, number] => [lat, lng])));
+}
+
+export type MarkerColor = IconColor | 'length' | 'photo';
 export function createMarker(
   lat: number,
   lng: number,

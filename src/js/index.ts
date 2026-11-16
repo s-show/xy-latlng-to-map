@@ -1,46 +1,24 @@
 import L from "leaflet";
-import proj4 from 'proj4';
-import { CellValue } from "jspreadsheet-ce";
-import { geodeticSystems } from './proj4.js';
-import type { GeodeticSystemName } from './proj4.js';
+import {
+  MAP_COORDINATE_SYSTEM,
+  parseCoordinateSystem,
+  removeInvalidRows,
+  convertRows,
+  buildCsvHeader,
+} from './conversion.js';
+import type { Conversion } from './conversion.js';
 import { sourceTable, convertedTable, clearTable, resizeTable } from './jspreadsheet.js';
-import { isValidNumber } from './isvalidNumber.js';
 import { exportCSV } from "./exportCSV.js";
-import { createMarker } from './marker.js';
+import { addMarkerGroups, isIconColor } from './marker.js';
 import { map } from "./map.js";
-import { searchAddress, AddressSearchResult } from './addressSearch.js';
+import { setupAddressSearch } from './addressSearchUi.js';
+import { setupPrint } from './print.js';
 import { addCircle } from "./circle.js";
 import { addPhotoPoint } from "./importPhoto.js";
 import { isImageFile } from "./isImageFile.js";
 import { splitDataByBlankRows } from "./splitTableData.js";
 import 'bootstrap';
 import 'leaflet/dist/leaflet.css';
-
-// 印刷モード時に非表示にするラジオボタンのリスト
-const noPrintRadioBtn: string[] = [
-  'source-data-type',
-  'source-geodetic-system',
-  'convert-to-data-type',
-  'convert-to-geodetic-system'
-];
-
-/**
- * DOM要素がnullまたはundefinedでないことを確認する型ガード関数
- * @param element - チェックする要素
- * @return 要素が存在する場合true
- */
-function isElement<T extends Element>(element: T | null | undefined): element is T {
-  return element !== null && element !== undefined;
-}
-
-/**
- * NodeListがnullまたはundefinedでなく、要素を含むことを確認する型ガード関数
- * @param nodeList - チェックするNodeList
- * @return NodeListが存在し要素を含む場合true
- */
-function isNodeList<T extends Element>(nodeList: NodeListOf<T> | null | undefined): nodeList is NodeListOf<T> {
-  return nodeList !== null && nodeList !== undefined && nodeList.length > 0;
-}
 
 /*---------------------------------------------------------
 // アプリ実装開始
@@ -70,7 +48,7 @@ function setupDialog() {
   // 測地系の説明画面の処理
   const geodeticSystemSelectBtn = document.querySelectorAll<HTMLButtonElement>('[data-geodetic-system]')
   const geodeticSystemRadioBtn = document.querySelectorAll<HTMLInputElement>('input[name="source-geodetic-system"]');
-  if (isNodeList(geodeticSystemSelectBtn) && isNodeList(geodeticSystemRadioBtn)) {
+  if (geodeticSystemRadioBtn.length > 0) {
     geodeticSystemSelectBtn.forEach((btn) => {
       btn.addEventListener('click', () => {
         geodeticSystemRadioBtn.forEach((radioBtn) => {
@@ -85,7 +63,7 @@ function setupDialog() {
   // 系番号の説明画面の処理
   const zoneNoSelectBtn = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
   const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no');
-  if (isNodeList(zoneNoSelectBtn) && isElement(sourceZoneNo)) {
+  if (sourceZoneNo !== null) {
     zoneNoSelectBtn.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         if (e.currentTarget instanceof HTMLButtonElement) {
@@ -101,13 +79,13 @@ function setupDialog() {
 // 変換元・変換先データのXY座標・緯度経度の選択に応じて系番号を変更する
 document.querySelectorAll<HTMLInputElement>('[name="source-data-type"]').forEach((selectedBtn) => {
   const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no')
-  if (isElement(sourceZoneNo)) {
+  if (sourceZoneNo !== null) {
     changeZoneNo(selectedBtn, sourceZoneNo);
   }
 })
 document.querySelectorAll<HTMLInputElement>('[name="convert-to-data-type"]').forEach((selectedBtn) => {
   const convertZoneNo = document.querySelector<HTMLSelectElement>('#convert-zone-no')
-  if (isElement(convertZoneNo)) {
+  if (convertZoneNo !== null) {
     changeZoneNo(selectedBtn, convertZoneNo);
   }
 })
@@ -130,22 +108,19 @@ const zoneNoDialog = document.querySelector<HTMLDialogElement>('#zone-no-dialog'
 if (zoneNoDialog !== null) {
   zoneNoDialog.addEventListener('command', (event) => {
     if (event.command === 'show-modal') {
-      console.table(event);
       const zoneNoSelectBtns = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
-      const dataType = getParams().source.type;
-      if (isNodeList(zoneNoSelectBtns)) {
-        zoneNoSelectBtns.forEach((btn) => {
-          if (btn.parentElement !== null) {
-            if (dataType == 'XY') {
-              btn.parentElement.classList.remove('d-none');
-              btn.classList.remove('d-none');
-            } else {
-              btn.parentElement.classList.add('d-none');
-              btn.classList.add('d-none');
-            }
+      const dataType = checkedRadioValue('source-data-type');
+      zoneNoSelectBtns.forEach((btn) => {
+        if (btn.parentElement !== null) {
+          if (dataType == 'XY') {
+            btn.parentElement.classList.remove('d-none');
+            btn.classList.remove('d-none');
+          } else {
+            btn.parentElement.classList.add('d-none');
+            btn.classList.add('d-none');
           }
-        })
-      }
+        }
+      })
     }
   })
 }
@@ -154,28 +129,9 @@ if (zoneNoDialog !== null) {
 const dataConvertBtn = document.querySelector<HTMLButtonElement>('#data-convert-btn')
 if (dataConvertBtn !== null) {
   dataConvertBtn.addEventListener('click', (e) => {
-    const params = getParams()
-    if (
-      params.source.geodeticSystem !== null &&
-      params.convert.geodeticSystem !== null &&
-      params.source.zoneNo !== null &&
-      params.convert.zoneNo !== null
-    ) {
-      const convertParameter = getEspgCodes(
-        params.source.geodeticSystem,
-        params.convert.geodeticSystem,
-        params.source.zoneNo,
-        params.convert.zoneNo
-      );
-      const sourceData = dataCleansing(
-        sourceTable[0].getData(
-          undefined,
-          undefined,
-          undefined,
-          true
-        )
-      );
-      convertedTable[0].setData(convertData(convertParameter, sourceData));
+    const conversion = readConversionForm();
+    if (conversion !== null) {
+      convertedTable[0].setData(convertRows(conversion, removeInvalidRows(readSourceRows())));
       e.preventDefault();
     }
   })
@@ -202,65 +158,24 @@ if (addMarkerBtn !== null) {
   addMarkerBtn.addEventListener('click', (e) => {
     // 空白行を区切りとしてテーブルをグループに分割し、グループごとに
     // 不正データを除去する。線（ポリライン）はグループ内の点だけを結ぶ。
-    const dataGroups = splitDataByBlankRows(sourceTable[0].getData(
-      undefined,
-      undefined,
-      undefined,
-      true
-    )).map((group) => dataCleansing(group))
+    const dataGroups = splitDataByBlankRows(readSourceRows())
+      .map((group) => removeInvalidRows(group))
       .filter((group) => group.length > 0);
-    const params = getParams();
     // 緯度経度テーブルに有効なデータが無い場合 dataGroups.length は 0 になる
     if (dataGroups.length > 0) {
-      // アイコン追加には緯度経度が必要なため、変換先パラメータは緯度経度に固定している
-      if (
-        params.source.geodeticSystem !== null &&
-        params.convert.geodeticSystem !== null &&
-        params.source.zoneNo !== null &&
-        params.convert.zoneNo !== null
-      ) {
-        const convertParameter = getEspgCodes(
-          params.source.geodeticSystem,
-          'JGD2011',
-          params.source.zoneNo,
-          '0'
+      const conversion = readConversionForm();
+      if (conversion !== null) {
+        // アイコン追加には緯度経度が必要なため、変換先は地図の座標系に固定している
+        const toMap = { source: conversion.source, target: MAP_COORDINATE_SYSTEM };
+        const iconColor = document.querySelector<HTMLSelectElement>('#select-marker-icon')!.value;
+        addMarkerGroups(
+          dataGroups.map((group) => convertRows(toMap, group)),
+          { iconColor: isIconColor(iconColor) ? iconColor : null, lineColor: selectedLineColor() }
         );
-        const iconColor = document.querySelector<HTMLSelectElement>('#select-marker-icon')!.value
-        const lineColor = selectLineColor(false);
-        // fitBounds 用に全グループの変換後データをまとめて保持する
-        const allConvertedData: [number, number, string][] = [];
-
-        dataGroups.forEach((group) => {
-          const convertedData = convertData(convertParameter, group);
-          allConvertedData.push(...convertedData);
-          convertedData.forEach((data, index) => {
-            if (iconColor != 'none') {
-              createMarker(data[0], data[1], data[2], iconColor as 'red' | 'blue' | 'yellow' | 'green').addTo(map);
-            }
-            if (lineColor != 'no' && convertedData[index + 1] != undefined) {
-              L.polyline([toLatLngTuple(convertedData[index]), toLatLngTuple(convertedData[index + 1])],
-                {
-                  attribution: 'markerPolyline',
-                  color: lineColor
-                }
-              ).addTo(map);
-            }
-          })
-        })
-        const southWestPoint = L.latLng([
-          allConvertedData.reduce((x, y) => (x[0] < y[0]) ? x : y)[0],
-          allConvertedData.reduce((x, y) => (x[1] < y[1]) ? x : y)[1],
-        ]);
-        const northEastPoint = L.latLng([
-          allConvertedData.reduce((x, y) => (x[0] > y[0]) ? x : y)[0],
-          allConvertedData.reduce((x, y) => (x[1] > y[1]) ? x : y)[1],
-        ]);
-        map.fitBounds(L.latLngBounds(southWestPoint, northEastPoint));
       }
       e.preventDefault();
     }
   })
-
 }
 // アイコン全削除
 const removeMarkerBtn = document.querySelector<HTMLButtonElement>('#remove-marker-btn')
@@ -277,85 +192,7 @@ if (removeMarkerBtn !== null) {
   })
 }
 
-// 印刷用のスタイル変更処理
-// 処理1: 印刷時にデータテーブルの幅を狭くし、印刷終了後に幅を戻す処理
-// 処理2: 選択していないラジオボタンを印刷時に非表示にし、印刷終了後に戻す処理。
-window.addEventListener("beforeprint", () => {
-  preparePrint();
-});
-window.addEventListener("afterprint", () => {
-  afterPrint();
-});
-
-// 印刷用サイズ定数（A4 横・余白 10mm の印刷可能領域）
-// _layout.scss の @page (size: A4 landscape; margin: 10mm) と一致させること。
-const PRINT_PAPER_MM = { w: 297, h: 210 }; // A4 landscape
-const PRINT_MARGIN_MM = 10;
-const PRINT_AREA_W = (PRINT_PAPER_MM.w - 2 * PRINT_MARGIN_MM) + 'mm'; // 277mm
-const PRINT_AREA_H = (PRINT_PAPER_MM.h - 2 * PRINT_MARGIN_MM) + 'mm'; // 190mm
-const mapContainer = document.querySelector<HTMLElement>('.map-container');
-let printSizeApplied = false;
-
-// 印刷時に地図コンテナを用紙サイズへ固定し、Leaflet に「同期的に」サイズ再計算させる。
-// 【背景】@media print でコンテナを縮小しても、beforeprint の時点では印刷レイアウトが
-// 未適用のため map.invalidateSize() が画面サイズを読んでしまい再配置されない。setTimeout
-// で遅延させると今度は印刷スナップショットに間に合わず、タイルが画面サイズ時の配置の
-// まま残って「左上だけが印刷される」現象になる。
-// 【対策】beforeprint 内でインラインstyleにより確定サイズ(mm)を与えてから invalidateSize
-// を同期呼び出しする。mm 単位は @page の余白と一致するため用紙とぴったり合う。
-function applyPrintSize() {
-  if (printSizeApplied || !mapContainer) return;
-  mapContainer.style.flex = 'none';
-  mapContainer.style.width = PRINT_AREA_W;
-  mapContainer.style.height = PRINT_AREA_H;
-  // 新しい寸法を確定させるため強制リフロー
-  void mapContainer.offsetHeight;
-  map.invalidateSize({ animate: false });
-  printSizeApplied = true;
-}
-
-function removePrintSize() {
-  if (!printSizeApplied || !mapContainer) return;
-  mapContainer.style.flex = '';
-  mapContainer.style.width = '';
-  mapContainer.style.height = '';
-  void mapContainer.offsetHeight;
-  map.invalidateSize({ animate: false });
-  printSizeApplied = false;
-}
-
-// 印刷プレビューのリフロー追従のため matchMedia('print') でもサイズ再計算する。
-// beforeprint は1回しか発火しないため、念のためこちらでも同期で再適用する (Issue #11)。
-if (window.matchMedia) {
-  const printMQ = window.matchMedia('print');
-  const onPrintChange = (e: MediaQueryListEvent | MediaQueryList) => {
-    if (e.matches) {
-      applyPrintSize();
-      requestAnimationFrame(() => map.invalidateSize({ animate: false }));
-    } else {
-      removePrintSize();
-    }
-  };
-  // ブラウザ互換: addEventListener と addListener の両方を試す
-  if (typeof printMQ.addEventListener === 'function') {
-    printMQ.addEventListener('change', onPrintChange as EventListener);
-  } else if (typeof (printMQ as MediaQueryList).addListener === 'function') {
-    (printMQ as MediaQueryList).addListener(onPrintChange as (mql: MediaQueryList) => void);
-  }
-}
-// 印刷プレビュー画面の作成
-const printPreviewBtn = document.querySelector<HTMLButtonElement>('#print-preview-btn')
-if (printPreviewBtn !== null) {
-  printPreviewBtn.addEventListener('input', (e) => {
-    if (e.currentTarget instanceof HTMLInputElement) {
-      if (e.currentTarget.checked) {
-        preparePrint();
-      } else {
-        afterPrint();
-      }
-    }
-  })
-}
+setupPrint();
 
 // 地図引き伸ばし
 const zoomRangeInput = document.querySelector<HTMLInputElement>('#zoom-range')
@@ -375,20 +212,12 @@ if (zoomRangeInput !== null && mapDiv !== null && zoomRangeValue !== null) {
 // Leaflet の内部サイズを更新し、表の幅もメニュー幅基準で再調整する。
 const menuColumn = document.querySelector('#menu-column');
 if (menuColumn !== null) {
-  // menuColumn.addEventListener('shown.bs.offcanvas', () => {
   menuColumn.addEventListener('command', (event) => {
-    if (event.command === 'show-popover') {
-      map.invalidateSize();
-      resizeTable(getMenuColumnWidth());
-    } else if (event.command === 'hide-popover') {
+    if (event.command === 'show-popover' || event.command === 'hide-popover') {
       map.invalidateSize();
       resizeTable(getMenuColumnWidth());
     }
   });
-  // menuColumn.addEventListener('hidden.bs.offcanvas', () => {
-  //   map.invalidateSize();
-  //   resizeTable(getMenuColumnWidth());
-  // });
 }
 
 // 写真のGPSデータを読み込んで地図に表示する処理
@@ -412,196 +241,31 @@ if (mapDiv !== null) {
   })
 }
 
-/**
- * データタイプの種類
- */
-type DataType = 'XY' | 'latlng';
-
-/**
- * データの種類（変換元・変換先）
- */
-type DataTypeName = 'source' | 'convert';
-
-/**
- * パラメータの型定義
- */
-type ParamsType = Record<DataTypeName, {
-  type: DataType | null;
-  geodeticSystem: GeodeticSystemName | null;
-  zoneNo: string | null;
-}>;
-
-/**
- * 変換パラメータの型定義
- */
-type ConvertParameter = {
-  fromProjection: string;
-  toProjection: string;
-};
-
-function getParams(): ParamsType {
-  const params: ParamsType = {
-    'source': {
-      'type': null,
-      'geodeticSystem': null,
-      'zoneNo': null
-    },
-    'convert': {
-      'type': null,
-      'geodeticSystem': null,
-      'zoneNo': null
-    }
-  };
-  const sourceDataType = document.querySelectorAll<HTMLInputElement>('[name="source-data-type"]')
-  const convertDataType = document.querySelectorAll<HTMLInputElement>('[name="convert-to-data-type"]')
-  const sourceGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="source-geodetic-system"]')
-  const convertToGeodeticSystem = document.querySelectorAll<HTMLInputElement>('[name="convert-to-geodetic-system"]')
-  const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no')
-  const convertZoneNo = document.querySelector<HTMLSelectElement>('#convert-zone-no')
-  sourceDataType.forEach((currentNode) => {
-    if (currentNode.checked) {
-      params['source']['type'] = currentNode.value as DataType;
-    }
-  });
-  convertDataType.forEach((currentNode) => {
-    if (currentNode.checked) {
-      params['convert']['type'] = currentNode.value as DataType;
-    }
-  });
-  sourceGeodeticSystem.forEach((currentNode) => {
-    if (currentNode.checked) {
-      params['source']['geodeticSystem'] = currentNode.value as GeodeticSystemName;
-    }
-  });
-  convertToGeodeticSystem.forEach((currentNode) => {
-    if (currentNode.checked) {
-      params['convert']['geodeticSystem'] = currentNode.value as GeodeticSystemName;
-    }
-  });
-  if (sourceZoneNo !== null && convertZoneNo !== null) {
-    params['source']['zoneNo'] = String(sourceZoneNo.value);
-    params['convert']['zoneNo'] = String(convertZoneNo.value);
-  }
-  return params;
+function checkedRadioValue(name: string): string | null {
+  return document.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value ?? null;
 }
 
 /**
- * 測地系と系番号から `proj4.js` で定義した測地系データを取り出す
- * @param {GeodeticSystemName} sourceGeodeticSystem 変換元データの測地系の種類
- * @param {GeodeticSystemName} convertGeodeticSystem 変換先データの測地系の種類
- * @param {string} sourceZoneNo 変換元データの測地系の系番号
- * @param {string} convertZoneNo 変換先データの測地系の系番号
- * @return {ConvertParameter} ESPG コード。データ変換のパラメータとして使う。
+ * 変換元・変換先のフォームを読み取る。
+ * @return 未選択の項目や扱えない値がある場合は null
  */
-function getEspgCodes(
-  sourceGeodeticSystem: GeodeticSystemName,
-  convertGeodeticSystem: GeodeticSystemName,
-  sourceZoneNo: string,
-  convertZoneNo: string
-): ConvertParameter {
-  const convertParameter: ConvertParameter = {
-    fromProjection: geodeticSystems[sourceGeodeticSystem][Number(sourceZoneNo)],
-    toProjection: geodeticSystems[convertGeodeticSystem][Number(convertZoneNo)]
-  };
-  return convertParameter;
-}
-
-/**
- * 変換元テーブルに入力された値のチェック
- * @param  sourceData 変換元データ（緯度経度の配列）
- * @return 不正なデータを削除したデータ。配列の形式は変換元と同じ。
- */
-function dataCleansing(sourceData: CellValue[][]) {
-  return sourceData.filter((data) => {
-    if (isValidNumber(data[0] as string) && isValidNumber(data[1] as string)) {
-      return data;
-    }
-  })
-}
-
-/**
- * 変換元テーブルのデータをパラメータに従って変換する関数
- * @param  convertParameter 変換元・変換先データの EPSG コード
- * @param  sourceData 変換元データ（緯度経度の配列）
- * @return 変換後データ。配列の各要素は[緯度, 経度, memo]のタプル。
- */
-function convertData(
-  convertParameter: ConvertParameter,
-  sourceData: CellValue[][]
-): [number, number, string][] {
-  return sourceData.map((data) => {
-    const temp = proj4(
-      convertParameter.fromProjection,
-      convertParameter.toProjection,
-      [
-        Number(data[1]),
-        Number(data[0])
-      ]
-    );
-    // proj4 で変換された値は「経度・緯度」の順番になっているので、「緯度・経度」に並べ替える
-    return [Number(temp[1]), Number(temp[0]), String(data[2])];
+function readConversionForm(): Conversion | null {
+  const source = parseCoordinateSystem({
+    type: checkedRadioValue('source-data-type'),
+    geodeticSystem: checkedRadioValue('source-geodetic-system'),
+    zoneNo: document.querySelector<HTMLSelectElement>('#source-zone-no')?.value,
   });
-};
-
-/**
- * 変換後データから Leaflet の座標タプルを取り出す。
- * LatLngTuple は [number, number, number?] の形式で、3番目の要素は高度として扱われるため、
- * memo を含んだタプルをそのまま渡すと高度に文字列（実行時は NaN）が入ってしまう。
- * @param  data 変換後データの1行分 [緯度, 経度, memo]
- * @return Leaflet に渡せる [緯度, 経度] のタプル
- */
-function toLatLngTuple(data: [number, number, string]): [number, number] {
-  return [data[0], data[1]];
+  const target = parseCoordinateSystem({
+    type: checkedRadioValue('convert-to-data-type'),
+    geodeticSystem: checkedRadioValue('convert-to-geodetic-system'),
+    zoneNo: document.querySelector<HTMLSelectElement>('#convert-zone-no')?.value,
+  });
+  return source !== null && target !== null ? { source, target } : null;
 }
 
-/**
- * 印刷しないパーツを非表示にする処理
- */
-function preparePrint() {
-  sourceTable[0].setWidth(0, 110);
-  sourceTable[0].setWidth(1, 110);
-  sourceTable[0].hideIndex();
-  const notPrintDoms = document.querySelectorAll('.d-print-none');
-  notPrintDoms.forEach((notPrintDom) => {
-    notPrintDom.classList.add('d-none');
-  })
-  noPrintRadioBtn.forEach((radioBtn) => {
-    document.querySelectorAll<HTMLInputElement>('input[name=' + radioBtn + ']').forEach((radioBtn) => {
-      if (!radioBtn.checked && radioBtn.parentElement !== null) {
-        radioBtn.parentElement.classList.add('d-none')
-      }
-    })
-  })
-  // 地図コンテナを印刷用サイズへ固定し、同期的に Leaflet に再計算させる。
-  // インラインで確定サイズを与えることで印刷スナップショット前にタイルが再配置され、
-  // 現在の地図中心が用紙中央に来る（左上切り出し問題の修正）。
-  applyPrintSize();
-  // プレビューのリフロー追従のため次フレームでも再計算
-  requestAnimationFrame(() => map.invalidateSize({ animate: false }));
-}
-
-/**
- * 非表示にした印刷しないパーツを表示する処理
- */
-function afterPrint() {
-  sourceTable[0].setWidth(0, 180);
-  sourceTable[0].setWidth(1, 180);
-  sourceTable[0].showIndex();
-  const notPrintDoms = document.querySelectorAll('.d-print-none');
-  notPrintDoms.forEach((notPrintDom) => {
-    notPrintDom.classList.remove('d-none');
-  })
-  noPrintRadioBtn.forEach((radioBtn) => {
-    document.querySelectorAll<HTMLInputElement>('input[name=' + radioBtn + ']').forEach((radioBtn) => {
-      if (!radioBtn.checked && radioBtn.parentElement !== null) {
-        radioBtn.parentElement.classList.remove('d-none')
-      }
-    })
-  })
-  // 印刷用サイズを解除し、画面サイズへ復元する
-  removePrintSize();
-  // 念のため遅延再計算（フレックスレイアウトの復元追従）
-  setTimeout(() => map.invalidateSize(), 100);
+// 第4引数の true は、セルの入力値ではなく表示用に加工された値を取得する指定
+function readSourceRows() {
+  return sourceTable[0].getData(undefined, undefined, undefined, true);
 }
 
 /*
@@ -626,7 +290,7 @@ if (
   // 円の半径を入力するダイアログの「追加」ボタンをクリックしたときの処理
   addCircleToMap.addEventListener('click', (e) => {
     const latlng = L.latLng(Number(latitude.value), Number(longitude.value))
-    const lineColor = selectLineColor()
+    const lineColor = selectedLineColor() ?? DEFAULT_CIRCLE_LINE_COLOR;
     let markerColor = selectLineColorSelector.value;
     if (markerColor == 'no') {
       markerColor = 'red';
@@ -655,252 +319,15 @@ if (
   })
 }
 
-/*
- * 住所検索（入力した住所を緯度経度に変換して地図の中心に移動する）に関連する処理
- */
-const addressSearchContainer = document.querySelector<HTMLDivElement>('#address-search');
-const addressSearchForm = document.querySelector<HTMLFormElement>('#address-search-form');
-const addressSearchInput = document.querySelector<HTMLInputElement>('#address-search-input');
-const addressSearchResultsList = document.querySelector<HTMLUListElement>('#address-search-results');
-const addressSearchMessage = document.querySelector<HTMLParagraphElement>('#address-search-message');
-if (
-  addressSearchContainer !== null &&
-  addressSearchForm !== null &&
-  addressSearchInput !== null &&
-  addressSearchResultsList !== null &&
-  addressSearchMessage !== null
-) {
-  // 住所検索結果を地図に反映する際のズームレベル（初期表示と同じ縮尺）
-  const ADDRESS_SEARCH_ZOOM = 15;
-  // 現在表示中の候補一覧と、矢印キーで選択中の候補のインデックス（未選択は-1）
-  let currentResults: AddressSearchResult[] = [];
-  let activeIndex = -1;
-
-  const getAddressSearchOptionId = (index: number) => `address-search-result-${index}`;
-
-  // 矢印キーでの選択状態を候補一覧のハイライトと aria-activedescendant に反映する
-  const setActiveAddressSearchIndex = (index: number) => {
-    activeIndex = index;
-    const items = addressSearchResultsList.querySelectorAll<HTMLLIElement>('li');
-    items.forEach((item, i) => {
-      const isActive = i === index;
-      item.classList.toggle('active', isActive);
-      item.setAttribute('aria-selected', String(isActive));
-      if (isActive) {
-        item.scrollIntoView({ block: 'nearest' });
-      }
-    });
-    if (index >= 0) {
-      addressSearchInput.setAttribute('aria-activedescendant', getAddressSearchOptionId(index));
-    } else {
-      addressSearchInput.removeAttribute('aria-activedescendant');
-    }
-  };
-
-  // 矢印キーでの選択位置を移動する（末尾/先頭で循環する）
-  const moveActiveAddressSearchIndex = (delta: 1 | -1) => {
-    if (currentResults.length === 0) {
-      return;
-    }
-    const next = activeIndex === -1
-      ? (delta > 0 ? 0 : currentResults.length - 1)
-      : (activeIndex + delta + currentResults.length) % currentResults.length;
-    setActiveAddressSearchIndex(next);
-  };
-
-  const hideAddressSearchResults = () => {
-    addressSearchResultsList.replaceChildren();
-    addressSearchResultsList.classList.add('visually-hidden');
-    addressSearchInput.setAttribute('aria-expanded', 'false');
-    addressSearchInput.removeAttribute('aria-activedescendant');
-    currentResults = [];
-    activeIndex = -1;
-  };
-
-  const showAddressSearchMessage = (message: string) => {
-    addressSearchMessage.textContent = message;
-    addressSearchMessage.classList.remove('visually-hidden');
-  };
-
-  const hideAddressSearchMessage = () => {
-    addressSearchMessage.textContent = '';
-    addressSearchMessage.classList.add('visually-hidden');
-  };
-
-  const moveMapToAddressResult = (result: AddressSearchResult) => {
-    map.setView([result.lat, result.lng], ADDRESS_SEARCH_ZOOM);
-    addressSearchInput.value = result.title;
-    hideAddressSearchResults();
-    hideAddressSearchMessage();
-  };
-
-  const renderAddressSearchResults = (results: AddressSearchResult[]) => {
-    currentResults = results;
-    addressSearchResultsList.replaceChildren();
-    results.forEach((result, index) => {
-      const item = document.createElement('li');
-      item.id = getAddressSearchOptionId(index);
-      item.className = 'list-group-item';
-      item.setAttribute('role', 'option');
-      item.setAttribute('aria-selected', 'false');
-      item.textContent = result.title;
-      // マウスホバーでも矢印キーと同じハイライト状態にする
-      item.addEventListener('mouseenter', () => setActiveAddressSearchIndex(index));
-      item.addEventListener('click', () => moveMapToAddressResult(result));
-      addressSearchResultsList.appendChild(item);
-    });
-    addressSearchResultsList.classList.remove('visually-hidden');
-    addressSearchInput.setAttribute('aria-expanded', 'true');
-    setActiveAddressSearchIndex(-1);
-    // 検索ボタンのクリックで送信した場合にフォーカスがボタン側に残ると矢印キーが効かないため、
-    // 候補表示時は入力欄にフォーカスを戻す（ARIA combobox パターンでは実フォーカスを入力欄に保つ）
-    addressSearchInput.focus();
-  };
-
-  // 入力された住所を検索し、1件のみ該当した場合は即座に地図を移動、
-  // 複数該当した場合は候補一覧から選ばせる
-  const runAddressSearch = async () => {
-    const query = addressSearchInput.value.trim();
-    hideAddressSearchMessage();
-    hideAddressSearchResults();
-    if (query === '') {
-      return;
-    }
-    try {
-      const results = await searchAddress(query);
-      if (results.length === 0) {
-        showAddressSearchMessage('該当する住所が見つかりませんでした');
-      } else if (results.length === 1) {
-        moveMapToAddressResult(results[0]);
-      } else {
-        renderAddressSearchResults(results);
-      }
-    } catch (error) {
-      showAddressSearchMessage('住所検索に失敗しました。しばらくしてから再度お試しください');
-      console.warn('住所検索に失敗しました:', error);
-    }
-  };
-
-  addressSearchForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    void runAddressSearch();
-  });
-
-  // 候補一覧を矢印キーで選択するための処理（ARIA combobox パターン）
-  addressSearchInput.addEventListener('keydown', (e) => {
-    if (currentResults.length === 0) {
-      return;
-    }
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        moveActiveAddressSearchIndex(1);
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        moveActiveAddressSearchIndex(-1);
-        break;
-      case 'Enter':
-        // 候補を選択中の場合はそれを確定し、通常のフォーム送信（再検索）は行わない
-        if (activeIndex >= 0) {
-          e.preventDefault();
-          moveMapToAddressResult(currentResults[activeIndex]);
-        }
-        break;
-      case 'Escape':
-        e.preventDefault();
-        hideAddressSearchResults();
-        break;
-      default:
-        break;
-    }
-  });
-
-  // 検索欄の外側をクリックしたら候補一覧を閉じる
-  document.addEventListener('click', (e) => {
-    if (e.target instanceof Node && !addressSearchContainer.contains(e.target)) {
-      hideAddressSearchResults();
-    }
-  });
-}
-
-/**
- * 座標タイプに応じた軸ラベルを取得
- * @param  type - 'XY' または 'latlng'
- * @return 軸ラベルの配列
- */
-function getAxisLabels(type: string) {
-  type axisLabels = Record<string, string[]>
-  const axisLabels: axisLabels = {
-    'XY': ['X', 'Y'],
-    'latlng': ['緯度', '経度']
-  };
-  return axisLabels[type] || ['緯度', '経度'];
-}
-
-/**
- * 測地系に応じたラベルを取得
- * @param  geodeticSystem - 'TOKYO', 'JGD2000', または 'JGD2011'
- * @return 測地系ラベル
- */
-function getGeodeticLabel(geodeticSystem: string) {
-  type geodeticLabels = Record<string, string>;
-  const geodeticLabels: geodeticLabels = {
-    'TOKYO': '日本測地系',
-    'JGD2000': '世界測地系（JGD2000）',
-    'JGD2011': '世界測地系（JGD2011）'
-  };
-  return geodeticLabels[geodeticSystem] || '世界測地系（JGD2011）';
-}
-
-/**
- * 系番号に応じたラベルを取得
- * @param  zoneNo - 系番号
- * @return 系番号ラベル
- */
-function getZoneLabel(zoneNo: string) {
-  return zoneNo !== '0' ? `${zoneNo}系` : '';
-}
-
-/**
- * CSVヘッダーテキストを構築
- * @param {object} params - getParams()の戻り値
- * @return {Array<Array<string>>} CSVヘッダー配列
- */
-function buildHeaderText(params: ParamsType): string[][] {
-  if (
-    params.source.type !== null &&
-    params.convert.type !== null &&
-    params.source.geodeticSystem !== null &&
-    params.convert.geodeticSystem !== null &&
-    params.source.zoneNo !== null &&
-    params.convert.zoneNo !== null
-  ) {
-    const sourceAxisLabels = getAxisLabels(params.source.type);
-    const convertAxisLabels = getAxisLabels(params.convert.type);
-    const sourceGeodeticLabel = getGeodeticLabel(params.source.geodeticSystem);
-    const convertGeodeticLabel = getGeodeticLabel(params.convert.geodeticSystem);
-    const sourceZoneLabel = getZoneLabel(params.source.zoneNo);
-    const convertZoneLabel = getZoneLabel(params.convert.zoneNo);
-
-    return [
-      ['変換元', '変換元', '変換後', '変換後'],
-      [...sourceAxisLabels, ...convertAxisLabels],
-      [sourceGeodeticLabel, sourceGeodeticLabel, convertGeodeticLabel, convertGeodeticLabel],
-      [sourceZoneLabel, sourceZoneLabel, convertZoneLabel, convertZoneLabel]
-    ];
-  }
-  // デフォルト値を返す
-  return [['', '', '', '']];
-}
+setupAddressSearch();
 
 // 変換前後のデータをCSVでexportする
 const exportCSVBtn = document.querySelector<HTMLButtonElement>('#export-csv-btn');
 const dataConvertDiv = document.querySelector<HTMLDivElement>('#data-convert-pane')
 if (exportCSVBtn !== null) {
   exportCSVBtn.addEventListener('click', () => {
-    const params = getParams();
-    const headerText = buildHeaderText(params);
+    const conversion = readConversionForm();
+    const headerText = conversion !== null ? buildCsvHeader(conversion) : [['', '', '', '']];
     const sourceData = sourceTable[0].getData();
     const convertData = convertedTable[0].getData();
     sourceData.forEach((data, index) => {
@@ -925,30 +352,22 @@ if (exportCSVBtn !== null) {
   })
 }
 
-// 線の色を選択する処理
-function selectLineColor(shouldReturnDefaultColor = true) {
-  const selectLineColor = document.querySelector<HTMLSelectElement>('#select-line-color');
-  if (!selectLineColor) return shouldReturnDefaultColor ? '#8b4513' : 'no';
-  let lineColor = ''
-  switch (selectLineColor.value) {
-    case 'red':
-      lineColor = '#ff4500';
-      break;
-    case 'blue':
-      lineColor = '#1e90ff';
-      break;
-    case 'yellow':
-      lineColor = '#FFDF00';
-      break;
-    case 'green':
-      lineColor = '#006400';
-      break;
-    default:
-      lineColor = shouldReturnDefaultColor ? '#8b4513' : 'no'
-      break;
-  }
-  return lineColor;
-};
+const LINE_COLORS = new Map([
+  ['red', '#ff4500'],
+  ['blue', '#1e90ff'],
+  ['yellow', '#FFDF00'],
+  ['green', '#006400'],
+]);
+// 線の色に「線無し」を選んでいても、円には輪郭線が必要
+const DEFAULT_CIRCLE_LINE_COLOR = '#8b4513';
+
+/**
+ * @return 「線無し」を選択している場合は null
+ */
+function selectedLineColor(): string | null {
+  const value = document.querySelector<HTMLSelectElement>('#select-line-color')?.value;
+  return LINE_COLORS.get(value ?? '') ?? null;
+}
 
 window.onerror = function myErrorHandler(errorMsg) {
   const errorMessageDiv = document.querySelector<HTMLDivElement>('#error-message')
