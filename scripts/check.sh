@@ -44,6 +44,7 @@ pnpm install --frozen-lockfile
 
 if [ "$mode" = "all" ] || [ "$mode" = "checks" ]; then
   pnpm lint
+  pnpm typecheck
   CI=1 pnpm test --runInBand
 fi
 

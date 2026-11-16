@@ -4,15 +4,18 @@
 
 - Use Node.js 24 and pnpm 10.17.0. The versions are declared in `package.json`.
 - Run `./scripts/check.sh` after changes. It installs from `pnpm-lock.yaml` with
-  `--frozen-lockfile`, then runs lint, tests, and the production build.
+  `--frozen-lockfile`, then runs lint, the type check (`pnpm typecheck`), tests, and the
+  production build.
 - CI uses `./scripts/check.sh checks` for the `Checks` job and
   `./scripts/check.sh build` for the `Production build` job.
 - Run the production build for changes to source files, assets, templates, package metadata,
   or build configuration. `dist/` is generated and must not be committed.
 - Update dependencies and `pnpm-lock.yaml` only with pnpm commands. Do not edit the lockfile
   manually or introduce another package-manager lockfile.
-- Type checking and automated Prettier checks are not currently established project checks;
-  do not report them as passing unless they have actually been run successfully.
+- The type check covers `src/` and `test/`. The Vite build does not stop on type errors, so
+  do not skip `pnpm typecheck` or silence an error with a cast.
+- Automated Prettier checks are not currently an established project check; do not report
+  them as passing unless they have actually been run successfully.
 
 ## Data and external services
 

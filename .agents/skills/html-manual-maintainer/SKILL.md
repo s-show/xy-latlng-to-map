@@ -26,7 +26,7 @@ Reuse the capture script instead of duplicating its Playwright workflow in the s
 4. When adding a capture, implement a deterministic Playwright interaction in `scripts/capture-manual-screenshots.mjs`. Prefer accessible roles, labels, and stable IDs. Wait for the target UI and map tiles to finish rendering before capture.
 5. Update `docs/manual.html` with concise Japanese instructions that match the captured state. Keep image links relative, provide accurate `alt` text and captions, and set `width` and `height` to the actual image dimensions.
 6. Visually inspect every new or changed screenshot and the affected manual section in a browser. Reject captures with blank tiles, stale dialogs, obscuring overlays, clipped controls, unintended hover panels, or unreadable markers and lines.
-7. Run `./scripts/check.sh` after changes. Do not report type checking or Prettier as passing unless separately run. Check `git status --short --branch` again and ensure `dist/` is not staged or committed.
+7. Run `./scripts/check.sh` after changes. Do not report Prettier as passing unless separately run. Check `git status --short --branch` again and ensure `dist/` is not staged or committed.
 
 ## Current visual conventions
 
