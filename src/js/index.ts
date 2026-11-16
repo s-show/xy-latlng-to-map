@@ -24,24 +24,6 @@ const noPrintRadioBtn: string[] = [
   'convert-to-geodetic-system'
 ];
 
-/**
- * DOM要素がnullまたはundefinedでないことを確認する型ガード関数
- * @param element - チェックする要素
- * @return 要素が存在する場合true
- */
-function isElement<T extends Element>(element: T | null | undefined): element is T {
-  return element !== null && element !== undefined;
-}
-
-/**
- * NodeListがnullまたはundefinedでなく、要素を含むことを確認する型ガード関数
- * @param nodeList - チェックするNodeList
- * @return NodeListが存在し要素を含む場合true
- */
-function isNodeList<T extends Element>(nodeList: NodeListOf<T> | null | undefined): nodeList is NodeListOf<T> {
-  return nodeList !== null && nodeList !== undefined && nodeList.length > 0;
-}
-
 /*---------------------------------------------------------
 // アプリ実装開始
 ---------------------------------------------------------*/
@@ -70,7 +52,7 @@ function setupDialog() {
   // 測地系の説明画面の処理
   const geodeticSystemSelectBtn = document.querySelectorAll<HTMLButtonElement>('[data-geodetic-system]')
   const geodeticSystemRadioBtn = document.querySelectorAll<HTMLInputElement>('input[name="source-geodetic-system"]');
-  if (isNodeList(geodeticSystemSelectBtn) && isNodeList(geodeticSystemRadioBtn)) {
+  if (geodeticSystemRadioBtn.length > 0) {
     geodeticSystemSelectBtn.forEach((btn) => {
       btn.addEventListener('click', () => {
         geodeticSystemRadioBtn.forEach((radioBtn) => {
@@ -85,7 +67,7 @@ function setupDialog() {
   // 系番号の説明画面の処理
   const zoneNoSelectBtn = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
   const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no');
-  if (isNodeList(zoneNoSelectBtn) && isElement(sourceZoneNo)) {
+  if (sourceZoneNo !== null) {
     zoneNoSelectBtn.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         if (e.currentTarget instanceof HTMLButtonElement) {
@@ -101,13 +83,13 @@ function setupDialog() {
 // 変換元・変換先データのXY座標・緯度経度の選択に応じて系番号を変更する
 document.querySelectorAll<HTMLInputElement>('[name="source-data-type"]').forEach((selectedBtn) => {
   const sourceZoneNo = document.querySelector<HTMLSelectElement>('#source-zone-no')
-  if (isElement(sourceZoneNo)) {
+  if (sourceZoneNo !== null) {
     changeZoneNo(selectedBtn, sourceZoneNo);
   }
 })
 document.querySelectorAll<HTMLInputElement>('[name="convert-to-data-type"]').forEach((selectedBtn) => {
   const convertZoneNo = document.querySelector<HTMLSelectElement>('#convert-zone-no')
-  if (isElement(convertZoneNo)) {
+  if (convertZoneNo !== null) {
     changeZoneNo(selectedBtn, convertZoneNo);
   }
 })
@@ -130,22 +112,19 @@ const zoneNoDialog = document.querySelector<HTMLDialogElement>('#zone-no-dialog'
 if (zoneNoDialog !== null) {
   zoneNoDialog.addEventListener('command', (event) => {
     if (event.command === 'show-modal') {
-      console.table(event);
       const zoneNoSelectBtns = document.querySelectorAll<HTMLButtonElement>('[data-zone-no-btn]')
       const dataType = getParams().source.type;
-      if (isNodeList(zoneNoSelectBtns)) {
-        zoneNoSelectBtns.forEach((btn) => {
-          if (btn.parentElement !== null) {
-            if (dataType == 'XY') {
-              btn.parentElement.classList.remove('d-none');
-              btn.classList.remove('d-none');
-            } else {
-              btn.parentElement.classList.add('d-none');
-              btn.classList.add('d-none');
-            }
+      zoneNoSelectBtns.forEach((btn) => {
+        if (btn.parentElement !== null) {
+          if (dataType == 'XY') {
+            btn.parentElement.classList.remove('d-none');
+            btn.classList.remove('d-none');
+          } else {
+            btn.parentElement.classList.add('d-none');
+            btn.classList.add('d-none');
           }
-        })
-      }
+        }
+      })
     }
   })
 }
@@ -343,19 +322,6 @@ if (window.matchMedia) {
     (printMQ as MediaQueryList).addListener(onPrintChange as (mql: MediaQueryList) => void);
   }
 }
-// 印刷プレビュー画面の作成
-const printPreviewBtn = document.querySelector<HTMLButtonElement>('#print-preview-btn')
-if (printPreviewBtn !== null) {
-  printPreviewBtn.addEventListener('input', (e) => {
-    if (e.currentTarget instanceof HTMLInputElement) {
-      if (e.currentTarget.checked) {
-        preparePrint();
-      } else {
-        afterPrint();
-      }
-    }
-  })
-}
 
 // 地図引き伸ばし
 const zoomRangeInput = document.querySelector<HTMLInputElement>('#zoom-range')
@@ -375,20 +341,12 @@ if (zoomRangeInput !== null && mapDiv !== null && zoomRangeValue !== null) {
 // Leaflet の内部サイズを更新し、表の幅もメニュー幅基準で再調整する。
 const menuColumn = document.querySelector('#menu-column');
 if (menuColumn !== null) {
-  // menuColumn.addEventListener('shown.bs.offcanvas', () => {
   menuColumn.addEventListener('command', (event) => {
-    if (event.command === 'show-popover') {
-      map.invalidateSize();
-      resizeTable(getMenuColumnWidth());
-    } else if (event.command === 'hide-popover') {
+    if (event.command === 'show-popover' || event.command === 'hide-popover') {
       map.invalidateSize();
       resizeTable(getMenuColumnWidth());
     }
   });
-  // menuColumn.addEventListener('hidden.bs.offcanvas', () => {
-  //   map.invalidateSize();
-  //   resizeTable(getMenuColumnWidth());
-  // });
 }
 
 // 写真のGPSデータを読み込んで地図に表示する処理
