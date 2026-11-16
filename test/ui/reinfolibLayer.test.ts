@@ -8,6 +8,7 @@
  * - `_index` からのデータ基準時点の抽出
  * - クリック地点情報からのポップアップHTML組み立て（日本語ラベル・指定無し・XSS対策）
  * - 印刷用グリッドHTML組み立て（3列グリッド用のセル構造）
+ * - 取得に失敗したレイヤーと「指定無し」の表示の区別（fetch を差し替えて確認）
  *
  * 検証限界（手動確認対象）:
  * - 実際の地図クリックからポップアップ表示までの一連の動作
@@ -16,8 +17,11 @@
  * このテストはネットワークアクセスを一切行わない。
  */
 import L from 'leaflet';
+import { waitFor } from '@testing-library/dom';
 import {
   getReinfolibOverlays,
+  createReinfolibInfoHandler,
+  PRINT_INFO_CONTAINER_ID,
   REINFOLIB_LAYER_DEFINITIONS,
   latLngToTileCoords,
   isPointInGeometry,
@@ -329,5 +333,49 @@ describe('buildPrintGridHtml', () => {
     expect(html).toContain('2026年7月23日 11:42');
     expect(html).not.toContain('<script>');
     expect(html).toContain('&lt;script&gt;');
+  });
+});
+
+describe('createReinfolibInfoHandler', () => {
+  const originalFetch = globalThis.fetch;
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    document.body.innerHTML = '';
+  });
+
+  it('取得に失敗したレイヤーは「指定無し」ではなく取得失敗と表示する', async () => {
+    document.body.innerHTML = `<div id="map"></div><div id="${PRINT_INFO_CONTAINER_ID}"></div>`;
+    const map = L.map('map', { center: [35.68, 139.76], zoom: 14, zoomAnimation: false, fadeAnimation: false });
+    globalThis.fetch = (async (input: unknown) => {
+      const url = String(input);
+      if (url.includes('/XKT001/')) throw new TypeError('Failed to fetch');
+      if (url.includes('/XKT002/')) return { ok: false, status: 502, json: async () => ({}) };
+      return { ok: true, status: 200, json: async () => ({ features: [] }) };
+    }) as unknown as typeof fetch;
+
+    createReinfolibInfoHandler(map, 'https://proxy.invalid')(L.latLng(35.68, 139.76));
+
+    const sectionTexts = await waitFor(() => {
+      const sections = [...document.querySelectorAll('.reinfolib-popup__section')];
+      expect(sections).toHaveLength(REINFOLIB_LAYER_DEFINITIONS.length);
+      return sections.map((section) => section.textContent ?? '');
+    });
+    const [networkError, httpError, ...succeeded] = sectionTexts;
+    for (const failed of [networkError, httpError]) {
+      expect(failed).toContain('情報を取得できませんでした');
+      expect(failed).not.toContain('指定無し');
+    }
+    for (const empty of succeeded) {
+      expect(empty).toContain('指定無し');
+      expect(empty).not.toContain('情報を取得できませんでした');
+    }
+
+    const printCells = [...document.querySelectorAll('.reinfolib-print-grid__cell')].map(
+      (cell) => cell.textContent ?? '',
+    );
+    expect(printCells[0]).toContain('情報を取得できませんでした');
+    expect(printCells[0]).not.toContain('指定無し');
+    expect(printCells[2]).toContain('指定無し');
   });
 });
