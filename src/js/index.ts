@@ -499,7 +499,10 @@ export function bootstrapApp(options: BootstrapOptions = {}): AppHandle {
 
   const previousOnError = win.onerror;
   win.onerror = function myErrorHandler(errorMsg) {
-    showErrorBanner(doc, String(errorMsg));
+    const errorMessageDiv = doc.querySelector<HTMLParagraphElement>('#error-message');
+    if (errorMessageDiv !== null) {
+      errorMessageDiv.textContent = String(errorMsg);
+    }
     return false;
   };
 

@@ -47,6 +47,18 @@ export function createMapContext(
 
   let disposed = false;
   let showReinfolibInfo: (latlng: L.LatLng, marker?: L.Marker) => void = () => {};
+  const controller = new AbortController();
+
+  const radiusDialog = doc.querySelector<HTMLDialogElement>('#input-diameter');
+  radiusDialog?.addEventListener(
+    'click',
+    (clickEvent: MouseEvent) => {
+      if (clickEvent.target instanceof HTMLElement && clickEvent.target.id === 'input-diameter') {
+        radiusDialog.close();
+      }
+    },
+    { signal: controller.signal },
+  );
 
   const openRadiusInputDialog = (e: ContextMenuEvent): void => {
     const dialog = doc.querySelector<HTMLDialogElement>('#input-diameter');
@@ -59,15 +71,6 @@ export function createMapContext(
       inputLatitude.value = String(e.latlng.lat);
       inputLongitude.value = String(e.latlng.lng);
     }
-    dialog?.addEventListener(
-      'click',
-      (clickEvent: PointerEvent) => {
-        if (clickEvent.target instanceof HTMLElement && clickEvent.target.id === 'input-diameter') {
-          dialog.close();
-        }
-      },
-      { once: true },
-    );
   };
 
   const addMarkerAtPoint = (e: ContextMenuEvent): void => {
@@ -202,6 +205,7 @@ export function createMapContext(
         return;
       }
       disposed = true;
+      controller.abort();
       map.remove();
     },
   };

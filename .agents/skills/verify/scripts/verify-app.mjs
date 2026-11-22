@@ -76,8 +76,14 @@ function parseArgs(argv) {
 
 function requireRunId(flags) {
   const runId = flags['run-id'];
-  if (typeof runId !== 'string' || !/^[a-zA-Z0-9._-]+$/.test(runId)) {
-    throw new Error('Provide --run-id with characters matching [a-zA-Z0-9._-]+');
+  if (
+    typeof runId !== 'string' ||
+    !/^[a-zA-Z0-9][a-zA-Z0-9_-]*$/.test(runId) ||
+    runId === 'evidence'
+  ) {
+    throw new Error(
+      'Provide --run-id matching ^[a-zA-Z0-9][a-zA-Z0-9_-]*$ (and not "evidence")',
+    );
   }
   return runId;
 }
@@ -475,7 +481,7 @@ async function cmdStop(flags) {
     }
   }
 
-  if (existsSync(runDir)) {
+  if (existsSync(runDir) && runDir.startsWith(`${VERIFY_ROOT}/`) && runDir !== EVIDENCE_ROOT) {
     rmSync(runDir, { recursive: true, force: true });
   }
 
@@ -929,9 +935,9 @@ const BUILTIN_SCENARIOS = {
 async function cmdDrive(flags) {
   const runId = requireRunId(flags);
   const scenario = flags.scenario;
-  if (typeof scenario !== 'string' || !/^[a-zA-Z0-9._-]+$/.test(scenario)) {
+  if (typeof scenario !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_-]*$/.test(scenario)) {
     throw new Error(
-      `Provide --scenario (${Object.keys(BUILTIN_SCENARIOS).join(', ')}, or a name with --custom <path>).`,
+      `Provide --scenario (${Object.keys(BUILTIN_SCENARIOS).join(', ')}, or a name matching ^[a-zA-Z0-9][a-zA-Z0-9_-]*$ with --custom <path>).`,
     );
   }
 
