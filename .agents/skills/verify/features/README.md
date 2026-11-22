@@ -43,3 +43,4 @@ Keep implementation details out of the map. Name only user paths, stable handles
 - [Map context menu](./map-context-menu.md) covers right-click single marker creation, radius circle dialog, and point-to-point distance measurement.
 - [Address search](./address-search.md) covers combobox search, keyboard candidate selection, map recentering, and empty-result status.
 - [Reinfolib urban planning info](./reinfolib-info.md) covers querying 6 urban planning/hazard layers at a clicked point, print-grid population, and cleanup on popup close.
+- [Icon-Add API](./icon-api.md) covers URL query hydration, `window.xyLatLngToMap` runtime operations, XSS-safe popups, and invalid-query error banners.

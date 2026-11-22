@@ -60,6 +60,7 @@ Built-in scenarios:
 - `map-context-menu`
 - `address-search`
 - `reinfolib-info`
+- `icon-api`
 
 For a new or custom journey not yet in the built-in list, pass a custom ES module via `--custom`:
 

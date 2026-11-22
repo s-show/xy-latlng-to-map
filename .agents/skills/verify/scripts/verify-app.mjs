@@ -852,6 +852,78 @@ const BUILTIN_SCENARIOS = {
       },
     };
   },
+
+  async 'icon-api'({ page, url, evidenceDir }) {
+    const assertions = [];
+    await page.screenshot({ path: resolve(evidenceDir, 'before.png'), animations: 'disabled' });
+
+    const validUrl = `${url}?x=-37875.1959&y=-7958.6436&zone=9&geodetic=JGD2011&color=blue&memo=-1F%20%E5%85%A5%E5%8F%A3`;
+    await page.goto(validUrl, { waitUntil: 'networkidle' });
+    await waitForMapReady(page);
+
+    const urlMarkerCount = await page.locator('.leaflet-marker-icon').count();
+    assertions.push(assertCondition(urlMarkerCount === 1, `expected 1 URL marker, got ${urlMarkerCount}`));
+    await page.locator('.leaflet-marker-icon').first().click();
+    const popupText = (await page.locator('.leaflet-popup-content').textContent())?.trim() ?? '';
+    assertions.push(
+      assertCondition(popupText === '-1F 入口', `expected popup "-1F 入口", got "${popupText}"`),
+    );
+    await page.screenshot({ path: resolve(evidenceDir, 'after.png'), animations: 'disabled' });
+
+    const jsOutcome = await page.evaluate(() => {
+      const api = window.xyLatLngToMap;
+      const before = api.getMarkers().length;
+      const added = api.addMarkers({
+        points: [
+          { first: 35.65858, second: 139.745433, memo: '<img src=x onerror=alert(1)>' },
+          { first: 35.65749, second: 139.74824, memo: '増上寺' },
+        ],
+        iconColor: 'green',
+        lineColor: 'yellow',
+      });
+      const afterAdd = api.getMarkers().length;
+      const cleared = api.clearMarkers();
+      const afterClear = api.getMarkers().length;
+      return { before, addedOk: added.ok, afterAdd, cleared, afterClear };
+    });
+    assertions.push(
+      assertCondition(
+        jsOutcome.before === 1 &&
+          jsOutcome.addedOk &&
+          jsOutcome.afterAdd === 3 &&
+          jsOutcome.cleared.clearedMarkers === 3 &&
+          jsOutcome.afterClear === 0,
+        `expected JS API lifecycle 1 -> 3 -> 0, got ${JSON.stringify(jsOutcome)}`,
+      ),
+    );
+
+    await page.goto(`${url}?x=-37900&y=-8300`, { waitUntil: 'networkidle' });
+    await waitForMapReady(page);
+    const errorVisible = await page
+      .locator('#error-message-wrap')
+      .evaluate((el) => !el.classList.contains('visually-hidden'));
+    const errorText = (await page.locator('#error-message').textContent())?.trim() ?? '';
+    const invalidMarkerCount = await page.locator('.leaflet-marker-icon').count();
+    assertions.push(assertCondition(errorVisible, 'expected #error-message-wrap visible on invalid URL'));
+    assertions.push(assertCondition(errorText.includes('zone'), `expected zone error message, got "${errorText}"`));
+    assertions.push(
+      assertCondition(invalidMarkerCount === 0, `expected 0 markers on invalid URL, got ${invalidMarkerCount}`),
+    );
+    await page.screenshot({ path: resolve(evidenceDir, 'after-invalid-url.png'), animations: 'disabled' });
+
+    return {
+      entryPoint: 'URL query hydration (?x&y&zone) + window.xyLatLngToMap',
+      assertions,
+      observations: {
+        urlMarkerCount,
+        popupText,
+        jsOutcome,
+        errorVisible,
+        errorText,
+        invalidMarkerCount,
+      },
+    };
+  },
 };
 
 async function cmdDrive(flags) {

@@ -15,6 +15,9 @@ import { DEFAULT_CIRCLE_LINE_COLOR, isIconColor, isLineColorName, LINE_COLORS } 
 import { createMapContext } from './map.js';
 import type { MapIcons } from './mapIcons.js';
 import type { MeasurementState } from './measurement.js';
+import { createMarkerApiController, formatApiErrors } from './markerApi.js';
+import type { XyLatLngToMapApi } from './markerApi.js';
+import { hasMarkerQueryParams } from './markerApiSchema.js';
 import { setupAddressSearch } from './addressSearchUi.js';
 import { setupPrint } from './print.js';
 import { addCircle } from './circle.js';
@@ -27,6 +30,7 @@ import 'leaflet/dist/leaflet.css';
 export interface BootstrapOptions {
   readonly doc?: Document;
   readonly win?: Window;
+  readonly search?: string;
   readonly createTables?: (doc: Document) => AppTables;
   readonly reinfolibProxyUrl?: string;
   readonly googleMapsApiKey?: string;
@@ -38,6 +42,7 @@ export interface AppHandle {
   readonly measurementState: MeasurementState;
   readonly icons: MapIcons;
   readonly tables: AppTables;
+  readonly markerApi: XyLatLngToMapApi;
   dispose(): void;
 }
 
@@ -91,6 +96,12 @@ export function bootstrapApp(options: BootstrapOptions = {}): AppHandle {
   const { map, measurementState, icons } = mapContext;
   const tables = (options.createTables ?? createAppTables)(doc);
   const { sourceTable, convertedTable } = tables;
+  const markerApiController = createMarkerApiController({
+    map,
+    measurementState,
+    icons: icons.markers,
+  });
+  win.xyLatLngToMap = markerApiController.publicApi;
 
   const getMenuColumnWidth = (): number => {
     const menuColumn = doc.querySelector('#menu-column');
@@ -305,6 +316,7 @@ export function bootstrapApp(options: BootstrapOptions = {}): AppHandle {
     removeMarkerBtn.addEventListener(
       'click',
       (e) => {
+        markerApiController.clearMarkers();
         map.eachLayer((layer) => {
           // `layer._url` が定義されているのは地図タイルのみ。
           if (!('_url' in layer)) {
@@ -475,6 +487,16 @@ export function bootstrapApp(options: BootstrapOptions = {}): AppHandle {
     );
   }
 
+  const initialSearch = options.search !== undefined ? options.search : (win.location?.search ?? '');
+  if (hasMarkerQueryParams(initialSearch)) {
+    const hydrationResult = markerApiController.applyQueryParams(initialSearch);
+    if (!hydrationResult.ok) {
+      showErrorBanner(doc, formatApiErrors(hydrationResult.errors));
+    } else {
+      hideErrorBanner(doc);
+    }
+  }
+
   const previousOnError = win.onerror;
   win.onerror = function myErrorHandler(errorMsg) {
     showErrorBanner(doc, String(errorMsg));
@@ -487,12 +509,17 @@ export function bootstrapApp(options: BootstrapOptions = {}): AppHandle {
     measurementState,
     icons,
     tables,
+    markerApi: markerApiController.publicApi,
     dispose() {
       if (disposed) {
         return;
       }
       disposed = true;
       controller.abort();
+      markerApiController.clearMarkers();
+      if (win.xyLatLngToMap === markerApiController.publicApi) {
+        delete win.xyLatLngToMap;
+      }
       disposeAddressSearch();
       disposePrint();
       tables.dispose();
