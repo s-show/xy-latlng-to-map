@@ -1,15 +1,27 @@
-import { map } from './map.js';
+import L from 'leaflet';
 import { searchAddress, AddressSearchResult } from './addressSearch.js';
 
-/*
- * 住所検索（入力した住所を緯度経度に変換して地図の中心に移動する）に関連する処理
+export interface AddressSearchUiOptions {
+  readonly doc?: Document;
+  readonly search?: (query: string) => Promise<AddressSearchResult[]>;
+}
+
+/**
+ * 住所入力欄から国土地理院の住所検索APIを使って緯度経度を取得し、地図中心を移動する UI を初期化する。
+ * 返り値の関数を呼ぶと登録したイベントリスナーをすべて解除できる。
  */
-export function setupAddressSearch() {
-  const addressSearchContainer = document.querySelector<HTMLDivElement>('#address-search');
-  const addressSearchForm = document.querySelector<HTMLFormElement>('#address-search-form');
-  const addressSearchInput = document.querySelector<HTMLInputElement>('#address-search-input');
-  const addressSearchResultsList = document.querySelector<HTMLUListElement>('#address-search-results');
-  const addressSearchMessage = document.querySelector<HTMLParagraphElement>('#address-search-message');
+export function setupAddressSearch(map: L.Map, options: AddressSearchUiOptions = {}): () => void {
+  const doc = options.doc ?? document;
+  const search = options.search ?? searchAddress;
+  const controller = new AbortController();
+  const { signal } = controller;
+
+  const addressSearchContainer = doc.querySelector<HTMLDivElement>('#address-search');
+  const addressSearchForm = doc.querySelector<HTMLFormElement>('#address-search-form');
+  const addressSearchInput = doc.querySelector<HTMLInputElement>('#address-search-input');
+  const addressSearchResultsList = doc.querySelector<HTMLUListElement>('#address-search-results');
+  const addressSearchMessage = doc.querySelector<HTMLParagraphElement>('#address-search-message');
+
   if (
     addressSearchContainer !== null &&
     addressSearchForm !== null &&
@@ -17,15 +29,12 @@ export function setupAddressSearch() {
     addressSearchResultsList !== null &&
     addressSearchMessage !== null
   ) {
-    // 住所検索結果を地図に反映する際のズームレベル（初期表示と同じ縮尺）
     const ADDRESS_SEARCH_ZOOM = 15;
-    // 現在表示中の候補一覧と、矢印キーで選択中の候補のインデックス（未選択は-1）
     let currentResults: AddressSearchResult[] = [];
     let activeIndex = -1;
 
     const getAddressSearchOptionId = (index: number) => `address-search-result-${index}`;
 
-    // 矢印キーでの選択状態を候補一覧のハイライトと aria-activedescendant に反映する
     const setActiveAddressSearchIndex = (index: number) => {
       activeIndex = index;
       const items = addressSearchResultsList.querySelectorAll<HTMLLIElement>('li');
@@ -33,7 +42,7 @@ export function setupAddressSearch() {
         const isActive = i === index;
         item.classList.toggle('active', isActive);
         item.setAttribute('aria-selected', String(isActive));
-        if (isActive) {
+        if (isActive && typeof item.scrollIntoView === 'function') {
           item.scrollIntoView({ block: 'nearest' });
         }
       });
@@ -44,14 +53,16 @@ export function setupAddressSearch() {
       }
     };
 
-    // 矢印キーでの選択位置を移動する（末尾/先頭で循環する）
     const moveActiveAddressSearchIndex = (delta: 1 | -1) => {
       if (currentResults.length === 0) {
         return;
       }
-      const next = activeIndex === -1
-        ? (delta > 0 ? 0 : currentResults.length - 1)
-        : (activeIndex + delta + currentResults.length) % currentResults.length;
+      const next =
+        activeIndex === -1
+          ? delta > 0
+            ? 0
+            : currentResults.length - 1
+          : (activeIndex + delta + currentResults.length) % currentResults.length;
       setActiveAddressSearchIndex(next);
     };
 
@@ -85,13 +96,12 @@ export function setupAddressSearch() {
       currentResults = results;
       addressSearchResultsList.replaceChildren();
       results.forEach((result, index) => {
-        const item = document.createElement('li');
+        const item = doc.createElement('li');
         item.id = getAddressSearchOptionId(index);
         item.className = 'list-group-item';
         item.setAttribute('role', 'option');
         item.setAttribute('aria-selected', 'false');
         item.textContent = result.title;
-        // マウスホバーでも矢印キーと同じハイライト状態にする
         item.addEventListener('mouseenter', () => setActiveAddressSearchIndex(index));
         item.addEventListener('click', () => moveMapToAddressResult(result));
         addressSearchResultsList.appendChild(item);
@@ -99,13 +109,9 @@ export function setupAddressSearch() {
       addressSearchResultsList.classList.remove('visually-hidden');
       addressSearchInput.setAttribute('aria-expanded', 'true');
       setActiveAddressSearchIndex(-1);
-      // 検索ボタンのクリックで送信した場合にフォーカスがボタン側に残ると矢印キーが効かないため、
-      // 候補表示時は入力欄にフォーカスを戻す（ARIA combobox パターンでは実フォーカスを入力欄に保つ）
       addressSearchInput.focus();
     };
 
-    // 入力された住所を検索し、1件のみ該当した場合は即座に地図を移動、
-    // 複数該当した場合は候補一覧から選ばせる
     const runAddressSearch = async () => {
       const query = addressSearchInput.value.trim();
       hideAddressSearchMessage();
@@ -114,7 +120,7 @@ export function setupAddressSearch() {
         return;
       }
       try {
-        const results = await searchAddress(query);
+        const results = await search(query);
         if (results.length === 0) {
           showAddressSearchMessage('該当する住所が見つかりませんでした');
         } else if (results.length === 1) {
@@ -128,46 +134,59 @@ export function setupAddressSearch() {
       }
     };
 
-    addressSearchForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      void runAddressSearch();
-    });
+    addressSearchForm.addEventListener(
+      'submit',
+      (e) => {
+        e.preventDefault();
+        void runAddressSearch();
+      },
+      { signal },
+    );
 
-    // 候補一覧を矢印キーで選択するための処理（ARIA combobox パターン）
-    addressSearchInput.addEventListener('keydown', (e) => {
-      if (currentResults.length === 0) {
-        return;
-      }
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          moveActiveAddressSearchIndex(1);
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          moveActiveAddressSearchIndex(-1);
-          break;
-        case 'Enter':
-          // 候補を選択中の場合はそれを確定し、通常のフォーム送信（再検索）は行わない
-          if (activeIndex >= 0) {
+    addressSearchInput.addEventListener(
+      'keydown',
+      (e) => {
+        if (currentResults.length === 0) {
+          return;
+        }
+        switch (e.key) {
+          case 'ArrowDown':
             e.preventDefault();
-            moveMapToAddressResult(currentResults[activeIndex]);
-          }
-          break;
-        case 'Escape':
-          e.preventDefault();
-          hideAddressSearchResults();
-          break;
-        default:
-          break;
-      }
-    });
+            moveActiveAddressSearchIndex(1);
+            break;
+          case 'ArrowUp':
+            e.preventDefault();
+            moveActiveAddressSearchIndex(-1);
+            break;
+          case 'Enter':
+            if (activeIndex >= 0) {
+              e.preventDefault();
+              moveMapToAddressResult(currentResults[activeIndex]);
+            }
+            break;
+          case 'Escape':
+            e.preventDefault();
+            hideAddressSearchResults();
+            break;
+          default:
+            break;
+        }
+      },
+      { signal },
+    );
 
-    // 検索欄の外側をクリックしたら候補一覧を閉じる
-    document.addEventListener('click', (e) => {
-      if (e.target instanceof Node && !addressSearchContainer.contains(e.target)) {
-        hideAddressSearchResults();
-      }
-    });
+    doc.addEventListener(
+      'click',
+      (e) => {
+        if (e.target instanceof Node && !addressSearchContainer.contains(e.target)) {
+          hideAddressSearchResults();
+        }
+      },
+      { signal },
+    );
   }
+
+  return () => {
+    controller.abort();
+  };
 }

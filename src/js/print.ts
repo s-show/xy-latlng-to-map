@@ -1,5 +1,5 @@
+import L from 'leaflet';
 import { sourceTable } from './jspreadsheet.js';
-import { map } from './map.js';
 
 // 印刷モード時に非表示にするラジオボタンのリスト
 const noPrintRadioBtn: string[] = [
@@ -25,7 +25,7 @@ let printSizeApplied = false;
 // まま残って「左上だけが印刷される」現象になる。
 // 【対策】beforeprint 内でインラインstyleにより確定サイズ(mm)を与えてから invalidateSize
 // を同期呼び出しする。mm 単位は @page の余白と一致するため用紙とぴったり合う。
-function applyPrintSize() {
+function applyPrintSize(map: L.Map) {
   if (printSizeApplied || !mapContainer) return;
   mapContainer.style.flex = 'none';
   mapContainer.style.width = PRINT_AREA_W;
@@ -36,7 +36,7 @@ function applyPrintSize() {
   printSizeApplied = true;
 }
 
-function removePrintSize() {
+function removePrintSize(map: L.Map) {
   if (!printSizeApplied || !mapContainer) return;
   mapContainer.style.flex = '';
   mapContainer.style.width = '';
@@ -49,7 +49,7 @@ function removePrintSize() {
 /**
  * 印刷しないパーツを非表示にする処理
  */
-function preparePrint() {
+function preparePrint(map: L.Map) {
   sourceTable[0].setWidth(0, 110);
   sourceTable[0].setWidth(1, 110);
   sourceTable[0].hideIndex();
@@ -67,7 +67,7 @@ function preparePrint() {
   // 地図コンテナを印刷用サイズへ固定し、同期的に Leaflet に再計算させる。
   // インラインで確定サイズを与えることで印刷スナップショット前にタイルが再配置され、
   // 現在の地図中心が用紙中央に来る（左上切り出し問題の修正）。
-  applyPrintSize();
+  applyPrintSize(map);
   // プレビューのリフロー追従のため次フレームでも再計算
   requestAnimationFrame(() => map.invalidateSize({ animate: false }));
 }
@@ -75,7 +75,7 @@ function preparePrint() {
 /**
  * 非表示にした印刷しないパーツを表示する処理
  */
-function afterPrint() {
+function afterPrint(map: L.Map) {
   sourceTable[0].setWidth(0, 180);
   sourceTable[0].setWidth(1, 180);
   sourceTable[0].showIndex();
@@ -91,7 +91,7 @@ function afterPrint() {
     })
   })
   // 印刷用サイズを解除し、画面サイズへ復元する
-  removePrintSize();
+  removePrintSize(map);
   // 念のため遅延再計算（フレックスレイアウトの復元追従）
   setTimeout(() => map.invalidateSize(), 100);
 }
@@ -99,12 +99,12 @@ function afterPrint() {
 // 印刷用のスタイル変更処理
 // 処理1: 印刷時にデータテーブルの幅を狭くし、印刷終了後に幅を戻す処理
 // 処理2: 選択していないラジオボタンを印刷時に非表示にし、印刷終了後に戻す処理。
-export function setupPrint() {
+export function setupPrint(map: L.Map) {
   window.addEventListener("beforeprint", () => {
-    preparePrint();
+    preparePrint(map);
   });
   window.addEventListener("afterprint", () => {
-    afterPrint();
+    afterPrint(map);
   });
 
   // 印刷プレビューのリフロー追従のため matchMedia('print') でもサイズ再計算する。
@@ -113,10 +113,10 @@ export function setupPrint() {
     const printMQ = window.matchMedia('print');
     printMQ.addEventListener('change', (e) => {
       if (e.matches) {
-        applyPrintSize();
+        applyPrintSize(map);
         requestAnimationFrame(() => map.invalidateSize({ animate: false }));
       } else {
-        removePrintSize();
+        removePrintSize(map);
       }
     });
   }

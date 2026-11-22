@@ -24,7 +24,12 @@ export default {
       preset: 'ts-jest/presets/default-esm',
       testEnvironment: 'jsdom',
       extensionsToTreatAsEsm: ['.ts'],
+      setupFiles: ['<rootDir>/test/ui/polyfills.ts'],
       moduleNameMapper: {
+        '\\.css$': '<rootDir>/test/ui/__mocks__/emptyMock.ts',
+        '^leaflet-arrowheads$': '<rootDir>/test/ui/__mocks__/leafletArrowheadsMock.ts',
+        '^leaflet-contextmenu$': '<rootDir>/test/ui/__mocks__/emptyMock.ts',
+        '^leaflet\\.gridlayer\\.googlemutant$': '<rootDir>/test/ui/__mocks__/googleMutantMock.ts',
         '^(\\.{1,2}/.*)\\.js$': '$1',
       },
       transform: {

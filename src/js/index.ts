@@ -11,7 +11,7 @@ import { sourceTable, convertedTable, clearTable, resizeTable } from './jspreads
 import { exportCSV } from "./exportCSV.js";
 import { addMarkerGroups } from './marker.js';
 import { DEFAULT_CIRCLE_LINE_COLOR, isIconColor, isLineColorName, LINE_COLORS } from './colors.js';
-import { map } from "./map.js";
+import { createMapContext } from "./map.js";
 import { setupAddressSearch } from './addressSearchUi.js';
 import { setupPrint } from './print.js';
 import { addCircle } from "./circle.js";
@@ -24,6 +24,7 @@ import 'leaflet/dist/leaflet.css';
 /*---------------------------------------------------------
 // アプリ実装開始
 ---------------------------------------------------------*/
+const { map, measurementState, icons } = createMapContext('map');
 // ウィンドウサイズに応じてデータテーブルの大きさを変える
 // Offcanvas 化により表はオーバーレイメニュー内にあるため、
 // ウィンドウ幅ではなくメニューカラムの実際の表示幅を基準にする。
@@ -170,8 +171,10 @@ if (addMarkerBtn !== null) {
         const toMap = { source: conversion.source, target: MAP_COORDINATE_SYSTEM };
         const iconColor = document.querySelector<HTMLSelectElement>('#select-marker-icon')!.value;
         addMarkerGroups(
+          map,
           dataGroups.map((group) => convertRows(toMap, group)),
-          { iconColor: isIconColor(iconColor) ? iconColor : null, lineColor: selectedLineColor() }
+          { iconColor: isIconColor(iconColor) ? iconColor : null, lineColor: selectedLineColor() },
+          { measurementState, icons: icons.markers },
         );
       }
       e.preventDefault();
@@ -193,7 +196,7 @@ if (removeMarkerBtn !== null) {
   })
 }
 
-setupPrint();
+setupPrint(map);
 
 // 地図引き伸ばし
 const zoomRangeInput = document.querySelector<HTMLInputElement>('#zoom-range')
@@ -236,7 +239,7 @@ if (mapDiv !== null) {
         alert(`画像ファイル以外は読み込めません。${rejectedCount}件のファイルを除外しました。`);
       }
       if (imageFiles.length > 0) {
-        addPhotoPoint(map, imageFiles);
+        void addPhotoPoint(map, imageFiles, { measurementState, icons: icons.markers });
       }
     }
   })
@@ -300,7 +303,11 @@ if (
     if (Number(circleRadius.value) >= 0) {
       radius = Number(circleRadius.value);
     }
-    const circle = addCircle(latlng, radius, lineColor, markerColor);
+    const circle = addCircle(latlng, radius, lineColor, markerColor, {
+      map,
+      measurementState,
+      icons: icons.centerMarkers,
+    });
     circle.circle.addTo(map);
     circle.marker.addTo(map);
     circle.tooltip.addTo(map);
@@ -320,7 +327,7 @@ if (
   })
 }
 
-setupAddressSearch();
+setupAddressSearch(map);
 
 // 変換前後のデータをCSVでexportする
 const exportCSVBtn = document.querySelector<HTMLButtonElement>('#export-csv-btn');
