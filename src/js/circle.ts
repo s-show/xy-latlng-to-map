@@ -1,6 +1,7 @@
 import { map, measureMarkers } from './map';
 import { measureLength } from './measurement';
-import { centerMarkers } from './leaflet';
+import { centerMarkers } from './mapIcons';
+import { isIconColor } from './colors';
 import 'leaflet-contextmenu';
 import { spheroid } from 'geo4326';
 import { isNearlyEqual } from './nearlyEqual';
@@ -35,9 +36,7 @@ export function addCircle(
   markerColor: string
 ) {
   // 有効な色かチェックし、無効な場合はredをデフォルトとして使用
-  const validColor = ['red', 'blue', 'yellow', 'green'].includes(markerColor) 
-    ? (markerColor as 'red' | 'blue' | 'yellow' | 'green')
-    : 'red';
+  const validColor = isIconColor(markerColor) ? markerColor : 'red';
 
   const circleOption = {
     radius: radius,

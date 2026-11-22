@@ -1,17 +1,8 @@
 import L from "leaflet";
 import GoogleMutant from "leaflet.gridlayer.googlemutant";
+import { defaultAssetUrlResolver, markers, centerMarkers } from "./mapIcons.js";
 
-const getImage = (fileName: string, fileType = 'png') => {
-  if (fileType == 'jpg') {
-    return new URL(`../assets/${fileName}.jpg`, import.meta.url).href;
-  } else if (fileType == 'jpeg') {
-    return new URL(`../assets/${fileName}.jpeg`, import.meta.url).href;
-  } else if (fileType == 'svg') {
-    return new URL(`../assets/${fileName}.svg`, import.meta.url).href;
-  } else {
-    return new URL(`../assets/${fileName}.png`, import.meta.url).href;
-  }
-};
+const getImage = defaultAssetUrlResolver;
 
 // GoogleMutant インスタンスをキャッシュする変数
 let googleMapRoadmap: L.GridLayer | null = null;
@@ -137,87 +128,5 @@ async function getBaseMaps(): Promise<Record<string, L.TileLayer | L.GridLayer>>
     'Google Map (地形図)': googleMapTerrain!,
   };
 }
-
-interface markers {
-  red: L.Icon
-  blue: L.Icon
-  yellow: L.Icon
-  green: L.Icon
-  length?: L.Icon
-  photo?: L.Icon
-}
-
-const markerSize = L.point(25, 25);
-const markerAnchor = L.point(12.5, 12.5);
-const redMarker = L.icon({
-  iconUrl: getImage('circle_icon_red', 'svg'),
-  iconSize: markerSize,
-  iconAnchor: markerAnchor,
-});
-const blueMarker = L.icon({
-  iconUrl: getImage('circle_icon_blue', 'svg'),
-  iconSize: markerSize,
-  iconAnchor: markerAnchor,
-});
-const yellowMarker = L.icon({
-  iconUrl: getImage('circle_icon_yellow', 'svg'),
-  iconSize: markerSize,
-  iconAnchor: markerAnchor,
-});
-const greenMarker = L.icon({
-  iconUrl: getImage('circle_icon_green', 'svg'),
-  iconSize: markerSize,
-  iconAnchor: markerAnchor,
-});
-const lengthMarker = L.icon({
-  iconUrl: getImage('length_pin_icon', 'svg'),
-  iconSize: L.point(30, 30),
-  iconAnchor: L.point(15, 30),
-  className: 'length-start-icon',
-});
-const photoMarker = L.icon({
-  iconUrl: getImage('photo_icon', 'svg'),
-  iconSize: L.point(30, 30),
-  iconAnchor: L.point(15, 30),
-  className: 'photo-icon',
-});
-const markers: markers = {
-  red: redMarker,
-  blue: blueMarker,
-  yellow: yellowMarker,
-  green: greenMarker,
-  length: lengthMarker,
-  photo: photoMarker
-};
-
-const centerMarkerSize = L.point(30, 30);
-const centerMarkerAnchor = L.point(15, 15);
-const redCenterMarker = L.icon({
-  iconUrl: getImage('redCenterMarker', 'svg'),
-  iconSize: centerMarkerSize,
-  iconAnchor: centerMarkerAnchor,
-});
-const blueCenterMarker = L.icon({
-  iconUrl: getImage('blueCenterMarker', 'svg'),
-  iconSize: centerMarkerSize,
-  iconAnchor: centerMarkerAnchor,
-});
-const yellowCenterMarker = L.icon({
-  iconUrl: getImage('yellowCenterMarker', 'svg'),
-  iconSize: centerMarkerSize,
-  iconAnchor: centerMarkerAnchor,
-});
-const greenCenterMarker = L.icon({
-  iconUrl: getImage('greenCenterMarker', 'svg'),
-  iconSize: centerMarkerSize,
-  iconAnchor: centerMarkerAnchor,
-});
-
-const centerMarkers: markers = {
-  red: redCenterMarker,
-  blue: blueCenterMarker,
-  yellow: yellowCenterMarker,
-  green: greenCenterMarker,
-};
 
 export { gsiStandard, baseMapsWithoutGoogle, getBaseMaps, markers, centerMarkers };

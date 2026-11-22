@@ -9,7 +9,8 @@ import {
 import type { Conversion } from './conversion.js';
 import { sourceTable, convertedTable, clearTable, resizeTable } from './jspreadsheet.js';
 import { exportCSV } from "./exportCSV.js";
-import { addMarkerGroups, isIconColor } from './marker.js';
+import { addMarkerGroups } from './marker.js';
+import { DEFAULT_CIRCLE_LINE_COLOR, isIconColor, isLineColorName, LINE_COLORS } from './colors.js';
 import { map } from "./map.js";
 import { setupAddressSearch } from './addressSearchUi.js';
 import { setupPrint } from './print.js';
@@ -352,21 +353,12 @@ if (exportCSVBtn !== null) {
   })
 }
 
-const LINE_COLORS = new Map([
-  ['red', '#ff4500'],
-  ['blue', '#1e90ff'],
-  ['yellow', '#FFDF00'],
-  ['green', '#006400'],
-]);
-// 線の色に「線無し」を選んでいても、円には輪郭線が必要
-const DEFAULT_CIRCLE_LINE_COLOR = '#8b4513';
-
 /**
  * @return 「線無し」を選択している場合は null
  */
 function selectedLineColor(): string | null {
   const value = document.querySelector<HTMLSelectElement>('#select-line-color')?.value;
-  return LINE_COLORS.get(value ?? '') ?? null;
+  return isLineColorName(value) ? (LINE_COLORS.get(value) ?? null) : null;
 }
 
 window.onerror = function myErrorHandler(errorMsg) {

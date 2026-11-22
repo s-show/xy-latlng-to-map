@@ -5,14 +5,14 @@ import {
   buildCsvHeader,
   MAP_COORDINATE_SYSTEM,
 } from '../src/js/conversion';
-import type { CoordinateSystem, ConvertedPoint } from '../src/js/conversion';
+import type { CoordinateSystem, ConvertedPoint, ZoneNo } from '../src/js/conversion';
 
 const latlng = (geodeticSystem: CoordinateSystem['geodeticSystem']): CoordinateSystem => ({
   type: 'latlng',
   geodeticSystem,
   zoneNo: 0,
 });
-const xy = (geodeticSystem: CoordinateSystem['geodeticSystem'], zoneNo: number): CoordinateSystem => ({
+const xy = (geodeticSystem: CoordinateSystem['geodeticSystem'], zoneNo: ZoneNo): CoordinateSystem => ({
   type: 'XY',
   geodeticSystem,
   zoneNo,
@@ -41,6 +41,8 @@ describe('parseCoordinateSystem', () => {
     ['未知の測地系', { type: 'XY', geodeticSystem: 'WGS84', zoneNo: '1' }],
     ['Object のプロパティ名と同じ測地系', { type: 'XY', geodeticSystem: 'toString', zoneNo: '1' }],
     ['範囲外の系番号', { type: 'XY', geodeticSystem: 'TOKYO', zoneNo: '20' }],
+    ['XY 座標で系番号 0', { type: 'XY', geodeticSystem: 'JGD2011', zoneNo: '0' }],
+    ['緯度経度で 0 以外の系番号', { type: 'latlng', geodeticSystem: 'JGD2011', zoneNo: '9' }],
     ['負の系番号', { type: 'XY', geodeticSystem: 'TOKYO', zoneNo: '-1' }],
     ['整数でない系番号', { type: 'XY', geodeticSystem: 'TOKYO', zoneNo: '1.5' }],
     ['数値でない系番号', { type: 'XY', geodeticSystem: 'TOKYO', zoneNo: 'abc' }],
@@ -118,6 +120,11 @@ describe('convertRows', () => {
   test('{"0": 値} 形式の行も変換する', () => {
     const conversion = { source: latlng('JGD2011'), target: MAP_COORDINATE_SYSTEM };
     expectPoints(convertRows(conversion, [{ 0: '35.5', 1: '139.5', 2: 'memo' }]), [[35.5, 139.5, 'memo']], 9);
+  });
+
+  test('memo 列が省略された行は "undefined" ではなく空文字になる', () => {
+    const conversion = { source: latlng('JGD2011'), target: MAP_COORDINATE_SYSTEM };
+    expectPoints(convertRows(conversion, [['35.5', '139.5']]), [[35.5, 139.5, '']], 9);
   });
 });
 

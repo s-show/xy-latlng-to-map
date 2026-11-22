@@ -1,4 +1,7 @@
-import { markers } from './leaflet.js';
+import { markers } from './mapIcons.js';
+import { isIconColor } from './colors.js';
+import type { IconColor } from './colors.js';
+import { createSafePopupContent } from './markerPopup.js';
 import { map, measureMarkers } from './map.js';
 import { measureLength } from './measurement.js';
 import 'leaflet-contextmenu';
@@ -81,11 +84,8 @@ function measureToThisMarker(e: ContextMenuItemClickEvent): void {
   }
 }
 
-const ICON_COLORS = ['red', 'blue', 'yellow', 'green'] as const;
-export type IconColor = (typeof ICON_COLORS)[number];
-export function isIconColor(value: string): value is IconColor {
-  return ICON_COLORS.some((color) => color === value);
-}
+export { isIconColor };
+export type { IconColor };
 
 /**
  * 点のグループごとにアイコンと線を地図へ追加し、全ての点が収まるように地図を移動する。
@@ -147,7 +147,7 @@ export function createMarker(
       ],
     };
     const marker = L.marker([lat, lng], markerOptions);
-    return title !== undefined ? marker.bindPopup(title) : marker;
+    return title !== undefined ? marker.bindPopup(createSafePopupContent(title)) : marker;
   } else {
     const markerOptions = {
       icon: markers[color],
