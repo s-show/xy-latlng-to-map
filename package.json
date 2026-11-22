@@ -17,7 +17,8 @@
     "benchmark:vector": "node scripts/benchmark-vector-rendering.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
