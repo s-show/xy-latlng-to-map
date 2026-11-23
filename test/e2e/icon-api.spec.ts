@@ -32,6 +32,36 @@ test.describe('Icon-Add API (URL query and window.xyLatLngToMap)', () => {
     expect(diagnostics.blockedExternalRequests).toEqual([]);
   });
 
+  test('hydrates DMS format latlng from URL query parameters', async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    const diagnostics = await installOfflineMocks(context, page, baseURL!);
+    const query = new URLSearchParams();
+    query.set('type', 'latlng');
+    query.append('p', '北緯35度39分29秒1572,東経139度44分28秒8869,日本経緯度原点');
+    query.append('p', '35°39′53.82″,139°46′13.6″,サンプル地点');
+
+    await page.goto(`/?${query.toString()}`, { waitUntil: 'networkidle' });
+    await waitForMapReady(page);
+
+    await expect(page.locator('.leaflet-marker-icon')).toHaveCount(2);
+    await expect(page.locator('#error-message-wrap')).toHaveClass(/visually-hidden/);
+
+    const markers = await page.evaluate(() => window.xyLatLngToMap?.getMarkers() ?? []);
+    expect(markers).toHaveLength(2);
+    expect(markers[0].lat).toBeCloseTo(35.658099, 5);
+    expect(markers[0].lng).toBeCloseTo(139.741357, 5);
+    expect(markers[0].memo).toBe('日本経緯度原点');
+    expect(markers[1].lat).toBeCloseTo(35.66495, 5);
+    expect(markers[1].lng).toBeCloseTo(139.770444, 5);
+
+    expect(diagnostics.consoleErrors).toEqual([]);
+    expect(diagnostics.pageErrors).toEqual([]);
+    expect(diagnostics.blockedExternalRequests).toEqual([]);
+  });
+
   test('hydrates multi-point URL query with connecting polyline and XSS-safe popup', async ({
     context,
     page,

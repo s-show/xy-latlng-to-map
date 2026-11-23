@@ -7,6 +7,7 @@ import {
 import type { CoordinateSystem, CoordinateType } from './conversion.js';
 import { isIconColor, isLineColorName } from './colors.js';
 import type { IconColor, LineColorName } from './colors.js';
+import { dms2deg, extractNumber } from './DMSLatLngParser.js';
 import { normalizeDisplayMemo } from './markerPopup.js';
 import { geodeticSystems } from './proj4.js';
 import type { GeodeticSystemName } from './proj4.js';
@@ -112,6 +113,7 @@ export type ApiResult<T> =
   | { readonly ok: false; readonly errors: readonly ApiError[] };
 
 const STRICT_DECIMAL_PATTERN = /^[+-]?(?:\d+\.?\d*|\.\d+)$/;
+const DMS_MARKER_PATTERN = /度|°/;
 
 function isGeodeticSystem(value: unknown): value is GeodeticSystemName {
   return typeof value === 'string' && Object.prototype.hasOwnProperty.call(geodeticSystems, value);
@@ -124,6 +126,43 @@ function parseStrictFiniteString(raw: string): number | null {
   }
   const value = Number(trimmed);
   return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * URL パラメータの緯度経度文字列を十進数へ変換する。
+ * 十進数文字列を優先し、「度」または「°」を含む場合は dms2deg() で度分秒形式を解釈する。
+ */
+function parseLatLngCoordinateString(raw: string): number | null {
+  const decimal = parseStrictFiniteString(raw);
+  if (decimal !== null) {
+    return decimal;
+  }
+  const trimmed = raw.trim();
+  if (trimmed === '' || !DMS_MARKER_PATTERN.test(trimmed)) {
+    return null;
+  }
+  const parts = extractNumber(trimmed);
+  if (parts === false || parts.length !== 3) {
+    return null;
+  }
+  const [deg, min, sec] = parts;
+  if (
+    !Number.isFinite(deg) ||
+    !Number.isFinite(min) ||
+    !Number.isFinite(sec) ||
+    min < 0 ||
+    min >= 60 ||
+    sec < 0 ||
+    sec >= 60
+  ) {
+    return null;
+  }
+  try {
+    const converted = dms2deg(trimmed);
+    return typeof converted === 'number' && Number.isFinite(converted) ? converted : null;
+  } catch {
+    return null;
+  }
 }
 
 function parseStrictFiniteNumber(raw: unknown): number | null {
@@ -344,20 +383,20 @@ export function parseMarkerQueryParams(search: string | URLSearchParams): ApiRes
   if (hasLatLng && !hasXY && !hasP) {
     const latRaw = params.get('lat');
     const lngRaw = params.get('lng');
-    const lat = latRaw !== null ? parseStrictFiniteString(latRaw) : null;
-    const lng = lngRaw !== null ? parseStrictFiniteString(lngRaw) : null;
+    const lat = latRaw !== null ? parseLatLngCoordinateString(latRaw) : null;
+    const lng = lngRaw !== null ? parseLatLngCoordinateString(lngRaw) : null;
     if (lat === null) {
       errors.push({
         code: 'INVALID_COORDINATE',
         field: 'lat',
-        message: 'lat には有効な数値を指定してください',
+        message: 'lat には有効な数値または度分秒形式の緯度を指定してください',
       });
     }
     if (lng === null) {
       errors.push({
         code: 'INVALID_COORDINATE',
         field: 'lng',
-        message: 'lng には有効な数値を指定してください',
+        message: 'lng には有効な数値または度分秒形式の経度を指定してください',
       });
     }
     if (lat !== null && lng !== null) {
@@ -393,6 +432,8 @@ export function parseMarkerQueryParams(search: string | URLSearchParams): ApiRes
         message: `一度に追加できる地点数は最大 ${MAX_API_POINTS} 点です`,
       });
     } else {
+      const parseCoord =
+        inferredType === 'XY' ? parseStrictFiniteString : parseLatLngCoordinateString;
       pValues.forEach((rawPoint, index) => {
         const parts = splitPointParam(rawPoint);
         if (parts === null) {
@@ -403,13 +444,16 @@ export function parseMarkerQueryParams(search: string | URLSearchParams): ApiRes
           });
           return;
         }
-        const first = parseStrictFiniteString(parts.firstRaw);
-        const second = parseStrictFiniteString(parts.secondRaw);
+        const first = parseCoord(parts.firstRaw);
+        const second = parseCoord(parts.secondRaw);
         if (first === null || second === null) {
           errors.push({
             code: 'INVALID_COORDINATE',
             field: `p[${index}]`,
-            message: '座標には有効な数値を指定してください',
+            message:
+              inferredType === 'XY'
+                ? '座標には有効な数値を指定してください'
+                : '座標には有効な数値または度分秒形式の緯度経度を指定してください',
           });
           return;
         }

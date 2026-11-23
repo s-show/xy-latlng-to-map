@@ -19,10 +19,11 @@
 
 ### URL クエリパラメータ
 
-#### 単一点（緯度経度）
+#### 単一点（緯度経度・十進数または度分秒）
 
 ```text
 https://xy-latlng-to-map.com/?lat=35.658099&lng=139.741357&color=red&memo=日本経緯度原点&zoom=16
+https://xy-latlng-to-map.com/?lat=北緯35度39分29秒1572&lng=東経139度44分28秒8869&memo=日本経緯度原点
 ```
 
 #### 単一点（平面直角座標 XY）
@@ -43,9 +44,9 @@ https://xy-latlng-to-map.com/?type=latlng&geodetic=JGD2011&p=35.65858,139.745433
 
 | パラメータ | 説明 | 既定値 |
 |---|---|---|
-| `lat`, `lng` | 単一点の緯度・経度（`x`/`y` や `p` との併用不可） | なし |
+| `lat`, `lng` | 単一点の緯度・経度（十進数または度分秒形式、`x`/`y` や `p` との併用不可） | なし |
 | `x`, `y` | 単一点の平面直角座標 X（南北）・Y（東西）。`zone` 必須 | なし |
-| `p` | 複数点指定 `first,second[,memo]`（最大 500 点） | なし |
+| `p` | 複数点指定 `first,second[,memo]`（最大 500 点、`type=latlng` 時は度分秒形式も可） | なし |
 | `type` | `latlng` または `XY`（`lat`/`lng` や `x`/`y` 指定時は自動推定） | `latlng` |
 | `geodetic` | 測地系: `JGD2011` / `JGD2000` / `TOKYO` | `JGD2011` |
 | `zone` | 平面直角座標系の系番号 `1`〜`19`（`XY` 時は必須、`latlng` 時は省略または `0`） | `0`（`latlng` 時） |

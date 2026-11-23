@@ -68,6 +68,57 @@ describe('parseMarkerQueryParams', () => {
     });
   });
 
+  test('単一点の lat/lng で度分秒形式（日本語・記号・全角・南緯西経）をパースする', () => {
+    const jpDms = parseMarkerQueryParams(
+      '?lat=北緯35度39分29秒1572&lng=東経139度44分28秒8869&memo=日本経緯度原点',
+    );
+    expect(jpDms).toEqual({
+      ok: true,
+      data: {
+        system: { type: 'latlng', geodeticSystem: 'JGD2011', zoneNo: 0 },
+        groups: [[{ first: 35.658099, second: 139.741357, memo: '日本経緯度原点' }]],
+        iconColor: 'red',
+        lineColor: null,
+        zoom: null,
+      },
+    });
+
+    const symbolAndSouthWest = parseMarkerQueryParams(
+      '?lat=南緯３５度４０分３９．２秒&lng=西経139°46′13.6″',
+    );
+    expect(symbolAndSouthWest).toEqual({
+      ok: true,
+      data: {
+        system: { type: 'latlng', geodeticSystem: 'JGD2011', zoneNo: 0 },
+        groups: [[{ first: -35.677556, second: -139.770444, memo: '' }]],
+        iconColor: 'red',
+        lineColor: null,
+        zoom: null,
+      },
+    });
+  });
+
+  test('複数点の p パラメータで度分秒形式と十進数形式の混在をパースする', () => {
+    const result = parseMarkerQueryParams(
+      '?type=latlng&p=北緯35度39分53.82秒,東経139度46分13.6秒,地点1&p=40°46′49″,140°49′55″,地点2',
+    );
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        system: { type: 'latlng', geodeticSystem: 'JGD2011', zoneNo: 0 },
+        groups: [
+          [
+            { first: 35.66495, second: 139.770444, memo: '地点1' },
+            { first: 40.780278, second: 140.831944, memo: '地点2' },
+          ],
+        ],
+        iconColor: 'red',
+        lineColor: null,
+        zoom: null,
+      },
+    });
+  });
+
   test.each([
     ['座標なしの color のみ', '?color=red', 'EMPTY_POINTS', 'p'],
     ['XY で系番号欠落', '?x=-37900&y=-8300', 'MISSING_ZONE_NO', 'zone'],
@@ -79,6 +130,10 @@ describe('parseMarkerQueryParams', () => {
     ['未知の座標種別', '?type=utm&p=35.6,139.7', 'INVALID_COORDINATE_TYPE', 'type'],
     ['未知の測地系', '?lat=35.6&lng=139.7&geodetic=WGS84', 'INVALID_GEODETIC_SYSTEM', 'geodetic'],
     ['数値でない緯度', '?lat=abc&lng=139.7', 'INVALID_COORDINATE', 'lat'],
+    ['秒が欠落した度分秒', '?lat=35度40分&lng=139度46分13.6秒', 'INVALID_COORDINATE', 'lat'],
+    ['分が 60 以上の度分秒', '?lat=35度60分0秒&lng=139度46分13.6秒', 'INVALID_COORDINATE', 'lat'],
+    ['秒が 60 以上の度分秒', '?lat=35度40分60秒&lng=139度46分13.6秒', 'INVALID_COORDINATE', 'lat'],
+    ['XY 指定で度分秒を渡す', '?type=XY&zone=9&p=35度40分39.2秒,139度46分13.6秒', 'INVALID_COORDINATE', 'p[0]'],
     ['カンマ無しの p', '?p=35.6', 'INVALID_QUERY_SYNTAX', 'p[0]'],
     ['未対応の色（none も拒否）', '?lat=35.6&lng=139.7&color=none', 'INVALID_ICON_COLOR', 'color'],
     ['未対応の線色', '?lat=35.6&lng=139.7&line=purple', 'INVALID_LINE_COLOR', 'line'],
