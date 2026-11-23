@@ -16,7 +16,6 @@ function extractNumber(latlngStr: string) {
   // 北緯35度39分29秒1572 → [35, 39, 29.1572]
   // 南緯35度40分39.2秒 → [-35, 40, 39.2]
   const array = tempStr4.match(/[-－]?([0-9０-９]*[.．])?[0-9０-９]+/gu);
-  console.info(array)
 
   if (array !== null) {
     return array.map(x => Number(x));
