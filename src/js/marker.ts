@@ -23,6 +23,7 @@ export interface MarkerDeps {
   readonly title?: string;
   readonly attribution?: string;
   readonly onRemove?: (marker: L.Marker) => void;
+  readonly onShowReinfolibInfo?: (latlng: L.LatLng) => void;
 }
 
 function removeSelectedMarker(
@@ -132,6 +133,7 @@ export interface AddMarkerGroupsOptions {
   readonly markerAttribution?: string;
   readonly polylineAttribution?: string;
   readonly onMarkerRemove?: (marker: L.Marker) => void;
+  readonly onShowReinfolibInfo?: (latlng: L.LatLng) => void;
 }
 
 /**
@@ -160,6 +162,7 @@ export function addMarkerGroups(
           title: memo,
           attribution: options.markerAttribution,
           onRemove: options.onMarkerRemove,
+          onShowReinfolibInfo: options.onShowReinfolibInfo,
         }).addTo(map);
         createdMarkers.push(marker);
       }
@@ -205,27 +208,41 @@ export function createMarker(
     });
 
   if (color !== 'photo') {
+    const contextmenuItems = [
+      {
+        text: 'アイコンを削除',
+        callback: onRemoveHandler,
+      },
+      {
+        text: 'このアイコンからの距離を計測',
+        callback: (e: ContextMenuItemClickEvent) =>
+          measureFromThisMarker(e, deps.map, deps.measurementState),
+      },
+      {
+        text: 'このアイコンまでの距離を計測',
+        callback: (e: ContextMenuItemClickEvent) =>
+          measureToThisMarker(e, deps.map, deps.measurementState),
+      },
+    ];
+    if (isIconColor(color) && deps.onShowReinfolibInfo !== undefined) {
+      const showInfo = deps.onShowReinfolibInfo;
+      contextmenuItems.push({
+        text: '不動産情報ライブラリの情報を表示',
+        callback: (e: ContextMenuItemClickEvent) => {
+          const targetLatLng =
+            e.relatedTarget !== undefined && hasLatLng(e.relatedTarget)
+              ? e.relatedTarget.getLatLng()
+              : L.latLng(lat, lng);
+          showInfo(targetLatLng);
+        },
+      });
+    }
     const markerOptions = {
       icon: icons[color],
       attribution,
       contextmenu: true,
       contextmenuInheritItems: false,
-      contextmenuItems: [
-        {
-          text: 'アイコンを削除',
-          callback: onRemoveHandler,
-        },
-        {
-          text: 'このアイコンからの距離を計測',
-          callback: (e: ContextMenuItemClickEvent) =>
-            measureFromThisMarker(e, deps.map, deps.measurementState),
-        },
-        {
-          text: 'このアイコンまでの距離を計測',
-          callback: (e: ContextMenuItemClickEvent) =>
-            measureToThisMarker(e, deps.map, deps.measurementState),
-        },
-      ],
+      contextmenuItems,
     };
     const marker = L.marker([lat, lng], markerOptions);
     return deps.title !== undefined ? marker.bindPopup(createSafePopupContent(deps.title)) : marker;

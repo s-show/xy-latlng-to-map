@@ -869,6 +869,26 @@ const BUILTIN_SCENARIOS = {
 
     const urlMarkerCount = await page.locator('.leaflet-marker-icon').count();
     assertions.push(assertCondition(urlMarkerCount === 1, `expected 1 URL marker, got ${urlMarkerCount}`));
+    await page.locator('.leaflet-marker-icon').first().click({ button: 'right' });
+    await page.getByRole('link', { name: '不動産情報ライブラリの情報を表示', exact: true }).click();
+    await page.locator('.reinfolib-popup').getByText('都市計画区域/区域区分', { exact: true }).waitFor();
+    const reinfolibPopupText = (await page.locator('.reinfolib-popup').textContent()) ?? '';
+    assertions.push(
+      assertCondition(
+        reinfolibPopupText.includes('市街化区域') && reinfolibPopupText.includes('商業地域'),
+        `expected Reinfolib popup from URL marker context menu, got "${reinfolibPopupText.slice(0, 120)}"`,
+      ),
+    );
+    await page.screenshot({ path: resolve(evidenceDir, 'step-marker-reinfolib.png'), animations: 'disabled' });
+    await page.locator('.leaflet-popup-close-button').click();
+    await page.waitForFunction(() => document.querySelectorAll('.leaflet-popup-content').length === 0);
+    const markerCountAfterReinfolibClose = await page.locator('.leaflet-marker-icon').count();
+    assertions.push(
+      assertCondition(
+        markerCountAfterReinfolibClose === 1,
+        `expected URL marker preserved after Reinfolib popup close, got ${markerCountAfterReinfolibClose}`,
+      ),
+    );
     await page.locator('.leaflet-marker-icon').first().click();
     const popupText = (await page.locator('.leaflet-popup-content').textContent())?.trim() ?? '';
     assertions.push(

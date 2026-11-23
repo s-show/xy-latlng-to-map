@@ -212,4 +212,45 @@ test.describe('xy-latlng-to-map core workflows (offline mocked)', () => {
     expect(diagnostics.pageErrors).toEqual([]);
     expect(diagnostics.blockedExternalRequests).toEqual([]);
   });
+
+  test('displays Reinfolib info from right-click menu of a coordinate-table marker and keeps marker on close', async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    const diagnostics = await installOfflineMocks(context, page, baseURL!);
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await waitForMapReady(page);
+
+    await openMenu(page);
+    await page.locator('#source-is-latlng').check();
+    await page.locator('#source-is-jgd2011').check();
+    await page.locator('#clear-source-table-btn').click();
+    await setTableCell(page, '#source-data-table', 0, 0, '35.6580992222');
+    await setTableCell(page, '#source-data-table', 1, 0, '139.7413574722');
+    await setTableCell(page, '#source-data-table', 2, 0, '日本経緯度原点');
+    await page.locator('#select-marker-icon').selectOption('red');
+    await page.locator('#select-line-color').selectOption('no');
+    await page.getByRole('button', { name: 'アイコンの一括追加' }).click();
+    await closeMenu(page);
+    await waitForMapReady(page);
+
+    await expect(page.locator('.leaflet-marker-icon')).toHaveCount(1);
+    await page.locator('.leaflet-marker-icon').first().click({ button: 'right' });
+    await page.getByRole('link', { name: '不動産情報ライブラリの情報を表示', exact: true }).click();
+
+    const popup = page.locator('.reinfolib-popup');
+    await expect(popup).toContainText('市街化区域');
+    await expect(popup).toContainText('商業地域');
+    await expect(popup).toContainText('500%');
+    await expect(page.locator('#reinfolib-print-info')).toHaveClass(/reinfolib-print-grid--has-content/);
+
+    await page.locator('.leaflet-popup-close-button').click();
+    await expect(page.locator('.leaflet-marker-icon')).toHaveCount(1);
+    await expect(page.locator('#reinfolib-print-info')).not.toHaveClass(/reinfolib-print-grid--has-content/);
+
+    expect(diagnostics.consoleErrors).toEqual([]);
+    expect(diagnostics.pageErrors).toEqual([]);
+    expect(diagnostics.blockedExternalRequests).toEqual([]);
+  });
 });

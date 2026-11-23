@@ -21,6 +21,7 @@ export interface MapContext {
   readonly map: L.Map;
   readonly measurementState: MeasurementState;
   readonly icons: MapIcons;
+  readonly showReinfolibInfo: (latlng: L.LatLng, marker?: L.Marker) => void;
   dispose(): void;
 }
 
@@ -84,6 +85,7 @@ export function createMapContext(
         map,
         measurementState,
         icons: icons.markers,
+        onShowReinfolibInfo: (latlng) => showReinfolibInfo(latlng),
       });
       marker.bindTooltip(`緯度経度: ${Number(e.latlng.lat)}<br />${e.latlng.lng}`, {}).openTooltip();
       marker.addTo(map);
@@ -200,6 +202,7 @@ export function createMapContext(
     map,
     measurementState,
     icons,
+    showReinfolibInfo,
     dispose() {
       if (disposed) {
         return;

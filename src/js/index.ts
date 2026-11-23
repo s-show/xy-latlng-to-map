@@ -93,13 +93,15 @@ export function bootstrapApp(options: BootstrapOptions = {}): AppHandle {
     googleMapsApiKey: options.googleMapsApiKey,
     notify,
   });
-  const { map, measurementState, icons } = mapContext;
+  const { map, measurementState, icons, showReinfolibInfo } = mapContext;
+  const showReinfolibInfoForMarker = (latlng: L.LatLng) => showReinfolibInfo(latlng);
   const tables = (options.createTables ?? createAppTables)(doc);
   const { sourceTable, convertedTable } = tables;
   const markerApiController = createMarkerApiController({
     map,
     measurementState,
     icons: icons.markers,
+    onShowReinfolibInfo: showReinfolibInfoForMarker,
   });
   win.xyLatLngToMap = markerApiController.publicApi;
 
@@ -301,7 +303,11 @@ export function bootstrapApp(options: BootstrapOptions = {}): AppHandle {
               map,
               dataGroups.map((group) => convertRows(toMap, group)),
               { iconColor: isIconColor(iconColor) ? iconColor : null, lineColor: selectedLineColor() },
-              { measurementState, icons: icons.markers },
+              {
+                measurementState,
+                icons: icons.markers,
+                onShowReinfolibInfo: showReinfolibInfoForMarker,
+              },
             );
           }
           e.preventDefault();

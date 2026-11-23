@@ -65,4 +65,49 @@ describe('marker module (decoupled)', () => {
     expect(map.hasLayer(result.markers[0])).toBe(true);
     expect(map.hasLayer(result.polylines[0])).toBe(true);
   });
+
+  test('IconColor マーカーは右クリックメニューに不動産情報ライブラリの情報表示を持ち、length/photo には出さない', () => {
+    const measurementState = createMeasurementState();
+    const onShowReinfolibInfo = jest.fn();
+
+    const iconMarker = createMarker(35.6581, 139.7414, 'red', {
+      map,
+      measurementState,
+      icons,
+      onShowReinfolibInfo,
+    }).addTo(map);
+    const lengthMarker = createMarker(35.6581, 139.7414, 'length', {
+      map,
+      measurementState,
+      icons,
+      onShowReinfolibInfo,
+    }).addTo(map);
+    const photoMarker = createMarker(35.6581, 139.7414, 'photo', {
+      map,
+      measurementState,
+      icons,
+      onShowReinfolibInfo,
+    }).addTo(map);
+
+    type MenuItem = { text: string; callback: (e: { relatedTarget?: L.Layer }) => void };
+    const getItems = (m: L.Marker): MenuItem[] =>
+      ((m.options as unknown as { contextmenuItems?: MenuItem[] }).contextmenuItems ?? []);
+
+    const reinfolibItem = getItems(iconMarker).find(
+      (item) => item.text === '不動産情報ライブラリの情報を表示',
+    );
+    expect(reinfolibItem).toBeDefined();
+    reinfolibItem!.callback({ relatedTarget: iconMarker });
+    expect(onShowReinfolibInfo).toHaveBeenCalledTimes(1);
+    const calledLatLng = onShowReinfolibInfo.mock.calls[0][0] as L.LatLng;
+    expect(calledLatLng.lat).toBeCloseTo(35.6581, 6);
+    expect(calledLatLng.lng).toBeCloseTo(139.7414, 6);
+
+    expect(
+      getItems(lengthMarker).some((item) => item.text === '不動産情報ライブラリの情報を表示'),
+    ).toBe(false);
+    expect(
+      getItems(photoMarker).some((item) => item.text === '不動産情報ライブラリの情報を表示'),
+    ).toBe(false);
+  });
 });

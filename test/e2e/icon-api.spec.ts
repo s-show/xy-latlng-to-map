@@ -62,6 +62,43 @@ test.describe('Icon-Add API (URL query and window.xyLatLngToMap)', () => {
     expect(diagnostics.blockedExternalRequests).toEqual([]);
   });
 
+  test('displays Reinfolib info from right-click menu of a URL-parameter marker and keeps marker and memo popup', async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    const diagnostics = await installOfflineMocks(context, page, baseURL!);
+    await page.goto('/?lat=35.6580992222&lng=139.7413574722&color=blue&memo=%E5%8E%9F%E7%82%B9', {
+      waitUntil: 'networkidle',
+    });
+    await waitForMapReady(page);
+
+    await expect(page.locator('.leaflet-marker-icon')).toHaveCount(1);
+    await page.locator('.leaflet-marker-icon').first().click({ button: 'right' });
+    await page.getByRole('link', { name: '不動産情報ライブラリの情報を表示', exact: true }).click();
+
+    const popup = page.locator('.reinfolib-popup');
+    await expect(popup).toContainText('市街化区域');
+    await expect(popup).toContainText('商業地域');
+    await expect(popup).toContainText('500%');
+    await expect(page.locator('#reinfolib-print-info')).toHaveClass(/reinfolib-print-grid--has-content/);
+
+    await page.locator('.leaflet-popup-close-button').click();
+    await expect(page.locator('.reinfolib-popup')).toHaveCount(0);
+    await expect(page.locator('.leaflet-marker-icon')).toHaveCount(1);
+    await expect(page.locator('#reinfolib-print-info')).not.toHaveClass(/reinfolib-print-grid--has-content/);
+
+    const markerCountInApi = await page.evaluate(() => window.xyLatLngToMap?.getMarkers().length ?? 0);
+    expect(markerCountInApi).toBe(1);
+
+    await page.locator('.leaflet-marker-icon').first().click();
+    await expect(page.locator('.leaflet-popup-content')).toContainText('原点');
+
+    expect(diagnostics.consoleErrors).toEqual([]);
+    expect(diagnostics.pageErrors).toEqual([]);
+    expect(diagnostics.blockedExternalRequests).toEqual([]);
+  });
+
   test('hydrates multi-point URL query with connecting polyline and XSS-safe popup', async ({
     context,
     page,

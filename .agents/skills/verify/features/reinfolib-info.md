@@ -5,13 +5,15 @@ Reinfolib urban planning info lets a user right-click a point on the map to fetc
 ## Sub-features
 
 - `reinfolib-point-popup` displays formatted attributes for all 6 layers (`XKT001`, `XKT002`, `XKT014`, `XKT023`, `XKT024`, `XKT029`) at the clicked point regardless of overlay toggle state.
+- `reinfolib-marker-menu` displays the same 6-layer popup from the right-click menu of coordinate-table, URL-parameter, and JS-API icon markers without deleting the marker when the popup closes.
 - `reinfolib-print-grid` populates `#reinfolib-print-info` with `.reinfolib-print-grid--has-content` so printing outputs a 2nd-page 3x2 table.
-- `reinfolib-popup-cleanup` removes the temporary clicked marker and clears `#reinfolib-print-info` when the popup is closed.
+- `reinfolib-popup-cleanup` removes the temporary clicked marker (for empty-map clicks) and clears `#reinfolib-print-info` when the popup is closed.
 
 ## How to get to it (user POV)
 
 - Right-click a location on `#map` and choose `不動産情報ライブラリの情報を表示`.
-- Read the popup sections and click the popup's `×` close button (`.leaflet-popup-close-button`) to dismiss both the popup and its temporary marker.
+- Right-click an existing icon marker (added from the coordinate table, URL parameters, JS API, or map right-click) and choose `不動産情報ライブラリの情報を表示`.
+- Read the popup sections and click the popup's `×` close button (`.leaflet-popup-close-button`) to dismiss the popup.
 
 ## Driving it with verify-app.mjs
 

@@ -109,6 +109,39 @@ describe('createMarkerApiController', () => {
     expect(fitBoundsSpy).toHaveBeenCalledTimes(1);
     expect(controller.publicApi.clearMarkers()).toEqual({ clearedMarkers: 2, clearedLines: 1 });
   });
+
+  test('API / URL 追加マーカーの右クリックメニューから onShowReinfolibInfo が呼ばれる', () => {
+    const measurementState = createMeasurementState();
+    const onShowReinfolibInfo = jest.fn();
+    const controller = createMarkerApiController({
+      map,
+      measurementState,
+      icons,
+      onShowReinfolibInfo,
+    });
+
+    const result = controller.applyQueryParams('?lat=35.658099&lng=139.741357&memo=原点');
+    expect(result.ok).toBe(true);
+
+    type MenuItem = { text: string; callback: (e: { relatedTarget?: L.Layer }) => void };
+    let apiMarker: L.Marker | null = null;
+    map.eachLayer((layer) => {
+      if (layer instanceof L.Marker && layer.options.attribution === 'apiMarker') {
+        apiMarker = layer;
+      }
+    });
+    expect(apiMarker).not.toBeNull();
+    const items =
+      (apiMarker!.options as unknown as { contextmenuItems?: MenuItem[] }).contextmenuItems ?? [];
+    const reinfolibItem = items.find((item) => item.text === '不動産情報ライブラリの情報を表示');
+    expect(reinfolibItem).toBeDefined();
+
+    reinfolibItem!.callback({ relatedTarget: apiMarker! });
+    expect(onShowReinfolibInfo).toHaveBeenCalledTimes(1);
+    const calledLatLng = onShowReinfolibInfo.mock.calls[0][0] as L.LatLng;
+    expect(calledLatLng.lat).toBeCloseTo(35.658099, 6);
+    expect(calledLatLng.lng).toBeCloseTo(139.741357, 6);
+  });
 });
 
 describe('bootstrapApp URL hydration and window.xyLatLngToMap', () => {

@@ -35,6 +35,7 @@ export interface MarkerApiDeps {
   readonly map: L.Map;
   readonly measurementState: MeasurementState;
   readonly icons?: MarkerIconSet;
+  readonly onShowReinfolibInfo?: (latlng: L.LatLng) => void;
 }
 
 export function formatApiErrors(errors: readonly ApiError[]): string {
@@ -42,7 +43,7 @@ export function formatApiErrors(errors: readonly ApiError[]): string {
 }
 
 export function createMarkerApiController(deps: MarkerApiDeps): MarkerApiController {
-  const { map, measurementState, icons } = deps;
+  const { map, measurementState, icons, onShowReinfolibInfo } = deps;
   const markerEntries = new Map<string, { readonly record: MarkerRecord; readonly marker: L.Marker }>();
   const markerIdByLayer = new WeakMap<L.Marker, string>();
   const apiPolylines = new Set<L.Polyline>();
@@ -107,6 +108,7 @@ export function createMarkerApiController(deps: MarkerApiDeps): MarkerApiControl
         markerAttribution: 'apiMarker',
         polylineAttribution: 'apiMarkerPolyline',
         onMarkerRemove: handleMarkerRemoved,
+        onShowReinfolibInfo,
       },
     );
 
