@@ -11,6 +11,8 @@
   "scripts": {
     "check": "./scripts/check.sh",
     "dev": "vite dev",
+    "dev:proxy": "pnpm --dir proxy dev --port 8788 --ip 0.0.0.0",
+    "dev:all": "node scripts/dev-all.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "manual:screenshots": "node scripts/capture-manual-screenshots.mjs",

@@ -19,6 +19,7 @@
             emmet-ls
             typescript-language-server
             eslint_d
+            wrangler
           ];
           shellHook = ''
             echo "Entering custom Nix shell..."
