@@ -86,8 +86,8 @@
         </li>
         <li>クリック地点の詳しい情報を確認する
           <ol class="user-guide__text">
-            <li>情報を確認したい地点で右クリックします</li>
-            <li>右クリックして表示されるメニューから「不動産情報ライブラリの情報を表示」をクリックします。</li>
+            <li>情報を確認したい地点（または配置済みのアイコン）で右クリックします</li>
+            <li>右クリックして表示されるメニューから「不動産情報ライブラリの情報を表示」をクリックします（配置済みアイコンから開いた場合は、ポップアップを閉じてもアイコンは残ります）。</li>
           </ol>
         </li>
       </ol>
@@ -99,6 +99,15 @@
         <li>「検索」を押すか、Enter を押します</li>
         <li>該当する場所が1件ならその地点へ地図が移動します</li>
         <li>該当が複数あれば候補一覧が表示されます。候補をクリックするか、↑ ↓ で選んで Enter で確定します。Esc を押すと一覧を閉じます。</li>
+      </ol>
+    </details>
+    <details class="user-guide__details" name="user-guide-details">
+      <summary id="add-marker-by-api" class="user-guide__title">URLパラメーターやブラウザAPIでアイコンを追加する</summary>
+      <ol class="user-guide__text">
+        <li>URLで1点追加する: 緯度経度は <code>?lat=35.658099&amp;lng=139.741357&amp;memo=地点名</code>（度分秒形式も可）、XY座標は <code>?x=-37875.1959&amp;y=-7958.6436&amp;zone=9&amp;geodetic=JGD2011</code> のように指定して開きます（Xは南北、Yは東西）。</li>
+        <li>URLで複数点追加する: <code>?type=latlng&amp;p=35.65858,139.745433,地点A&amp;p=35.65749,139.74824,地点B&amp;color=green&amp;line=yellow</code> のように <code>p</code> を繰り返します（最大500点）。</li>
+        <li>ブラウザJS APIで操作する: 開発者コンソール等から <code>window.xyLatLngToMap.addMarkers(...)</code>、<code>getMarkers()</code>、<code>clearMarkers()</code> を実行できます。</li>
+        <li>追加したアイコンもクリックでメモ表示、右クリックで削除・距離計測・不動産情報ライブラリの情報表示ができます。詳しいパラメーター一覧は「詳しい操作マニュアルを開く」を参照してください。</li>
       </ol>
     </details>
   </div>

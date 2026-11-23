@@ -1,12 +1,27 @@
-import { isValidNumber } from './isvalidNumber';
-import { zen2han } from './zen2han';
-import { sanitizeMemo } from './sanitizeMemo';
-import { dms2deg } from '../js/DMSLatLngParser.js';
+import { isValidNumber } from './isvalidNumber.js';
+import { zen2han } from './zen2han.js';
+import { sanitizeMemo } from './sanitizeMemo.js';
+import { dms2deg } from './DMSLatLngParser.js';
 import 'jsuites/dist/jsuites.js';
 import 'jsuites/dist/jsuites.css';
 import 'jspreadsheet-ce/dist/jspreadsheet.css';
-import jspreadsheet, { WorksheetInstance } from 'jspreadsheet-ce';
-import { CellValue } from 'jspreadsheet-ce';
+import jspreadsheet, {
+  WorksheetInstance,
+  CellValue,
+  JspreadsheetInstanceElement,
+} from 'jspreadsheet-ce';
+
+function isJspreadsheetElement(el: HTMLDivElement): el is JspreadsheetInstanceElement {
+  return 'spreadsheet' in el;
+}
+
+export interface AppTables {
+  readonly sourceTable: WorksheetInstance[];
+  readonly convertedTable: WorksheetInstance[];
+  clearTable(tableName: 'source' | 'converted'): void;
+  resizeTable(viewPortWidth: number): void;
+  dispose(): void;
+}
 
 /*
  * 入力値または貼り付け値を事前確認して不適当なデータを無視する処理。
@@ -17,32 +32,28 @@ import { CellValue } from 'jspreadsheet-ce';
  * 度分秒形式の緯度経度を十進数形式の緯度経度に変換している。
  *
  * 3列目 memo (tooltip_text) は自由記述の文字列として受け付けるため、
- * HTML インジェクションや CSV 数式インジェクションの受け口になる。
- * onbeforechange は入力・貼り付けの両方で全セルに対して呼ばれるため、
- * ここで sanitizeMemo() による無害化を行っている。
+ * onbeforechange で sanitizeMemo() による無害化を行っている。
  */
-const beforechangeSourceTable = (
+export const beforechangeSourceTable = (
   _instance: WorksheetInstance,
   _cell: HTMLTableCellElement,
   _x: string | number,
   _y: string | number,
-  value: CellValue
+  value: CellValue,
 ) => {
   if (typeof _x === 'number' && _x < 2) {
     if (typeof value === 'string' && value !== null && value.match(/度|°/) == null) {
-      // 桁区切りのカンマを取り除く
       value = value.replace(',', '');
       if (isValidNumber(zen2han(value))) {
         return zen2han(value);
-      } else {
-        return '';
       }
-    } else if (typeof value === 'string') {
+      return '';
+    }
+    if (typeof value === 'string') {
       return dms2deg(value);
     }
   }
   if (typeof _x === 'number' && _x === 2) {
-    // 3列目 memo は文字列を受け付ける列。素のテキストに無害化してから採用する。
     return sanitizeMemo(value);
   }
   return value;
@@ -50,28 +61,20 @@ const beforechangeSourceTable = (
 
 /**
  * 変換元テーブルにデータを貼り付けて空行がなくなったら行を追加する
- * キーボードから入力する場合、行は自動的に追加される。
  */
 const afterPaste = (instance: WorksheetInstance): void => {
-  const tableData: CellValue[][] = instance.getData()
-  const tableRows: number = tableData.length; // テーブルの行数を格納
+  const tableData: CellValue[][] = instance.getData();
+  const tableRows: number = tableData.length;
   const lastRowData: CellValue[] = tableData[tableRows - 1];
   if (lastRowData[0] != '' && lastRowData[1] != '') {
     instance.insertRow(1);
   }
 };
 
-/**
- * 行削除・貼り付けのみ表示するようにしている
- * コードは https://github.com/jspreadsheet/ce/blob/master/src/index.js を参照
- */
 const sourceTableContextMenuItems = (
   obj: WorksheetInstance,
   x: string | number | null,
   y: string | number | null,
-  // _e: PointerEvent,
-  // _items: ContextMenuItem[], // 本来のコンテキストメニューのメニュー群
-  // _section: ContextMenuRole // 右クリックした場所の情報
 ) => {
   console.info(obj);
   const newItems = [];
@@ -79,7 +82,7 @@ const sourceTableContextMenuItems = (
     title: '行を削除',
     onclick: () => {
       if (y !== null && y !== undefined) {
-        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y.toString()));
+        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y.toString(), 10));
       }
     },
   });
@@ -88,32 +91,23 @@ const sourceTableContextMenuItems = (
     shortcut: 'Ctrl + V',
     onclick: () => {
       if (x !== null && x !== undefined && y !== null && y !== undefined) {
-        navigator.clipboard.readText().then((text) => {
-          obj.paste(+x, +y, text);
-        })
-          .catch(error => {
+        navigator.clipboard
+          .readText()
+          .then((text) => {
+            obj.paste(+x, +y, text);
+          })
+          .catch((error) => {
             console.error('Clipboard access failed. Please use Ctrl+V instead.', error);
             alert('クリップボードへのアクセスに失敗しました。Ctrl+Vをお使いください。');
           });
       }
-    }
+    },
   });
   return newItems;
 };
-/**
- * コピーのみ表示するようにしている
- * コードは https://github.com/jspreadsheet/ce/blob/master/src/index.js を参照
- */
-const convertedTableContextMenuItems = (
-  obj: WorksheetInstance,
-  // _x: string | number | null,
-  // _y: string | number | null,
-  // _e: PointerEvent,
-  // _items: ContextMenuItem[], // 本来のコンテキストメニューのメニュー群
-  // _section: ContextMenuRole // 右クリックした場所の情報
-) => {
-  const newItems = [];
-  newItems.push({
+
+const convertedTableContextMenuItems = (obj: WorksheetInstance) => [
+  {
     title: 'データを全てコピー',
     shortcut: 'Ctrl + C',
     onclick: () => {
@@ -121,21 +115,7 @@ const convertedTableContextMenuItems = (
       obj.copy();
       obj.resetSelection();
     },
-  });
-  return newItems;
-};
-
-// コンテキストメニューに表示するメニューの日本語訳
-jspreadsheet.setDictionary({
-  'deleteSelectedRows': '選択した行を削除',
-  'copy': '表の値をコピー',
-  'paste': '表に値を貼り付け',
-});
-
-const initTableData = [
-  [110.1, 51.1],
-  [120.2, 52.2],
-  [30.3, 53.3],
+  },
 ];
 
 const worksheetConfig = {
@@ -146,8 +126,6 @@ const worksheetConfig = {
 
 const columnsConfig = [
   {
-    // `as const` 演算子を使って `type` の型を `'numeric'` という文字列リテラル型に変換している。
-    // こうしないと `Column` 型の定義に合致しなくなってしまう。
     type: 'numeric' as const,
     title: 'X(緯度)',
     width: 110,
@@ -167,66 +145,94 @@ const columnsConfig = [
   },
 ];
 
-// convertedTable用に readonly を追加
-const readonlyColumnsConfig = columnsConfig.map(col => ({ ...col, readOnly: true }));
+const readonlyColumnsConfig = columnsConfig.map((col) => ({ ...col, readOnly: true }));
 
-export const sourceTable = jspreadsheet(document.getElementById('source-data-table') as HTMLDivElement, {
-  worksheets: [{
-    ...worksheetConfig,
-    data: initTableData,
-    columns: [
-      ...columnsConfig
-    ]
-  }],
-  onbeforechange: beforechangeSourceTable,
-  contextMenu: sourceTableContextMenuItems,
-  onpaste: afterPaste,
-});
-
-export const convertedTable = jspreadsheet(document.getElementById('converted-data-table') as HTMLDivElement, {
-  worksheets: [{
-    ...worksheetConfig,
-    data: initTableData,
-    columns: [
-      ...readonlyColumnsConfig
-    ]
-  }],
-  contextMenu: convertedTableContextMenuItems,
-});
-
-// テーブルのデータを削除する関数
-export function clearTable(e: PointerEvent, tableName: string): void {
-  const tableData: CellValue[][] = [['', '']];
-  if (tableName == 'source') {
-    sourceTable[0].setData(tableData);
-  } else {
-    convertedTable[0].setData(tableData);
-  }
-  e.preventDefault();
+function createInitialTableData(): number[][] {
+  return [
+    [110.1, 51.1],
+    [120.2, 52.2],
+    [30.3, 53.3],
+  ];
 }
 
-export function resizeTable(viewPortWidth: number): void {
-  // viewPortWidth <= 992 で col-lg-* が適用される
-  // viewPortWidth < 992 でデータテーブルと地図が縦並びになるのでテーブルの幅を戻している。
-  if (viewPortWidth < 992) {
-    sourceTable[0].setWidth([0, 1], [75, 75, 70]);
-    sourceTable[0].hideIndex();
-    convertedTable[0].setWidth([0, 1], [60, 60, 60]);
-    convertedTable[0].hideIndex();
-  } else if (viewPortWidth <= 1400) {
-    sourceTable[0].setWidth([0, 1], [105, 105, 105]);
-    sourceTable[0].hideIndex();
-    convertedTable[0].setWidth([0, 1], [90, 90, 80]);
-    convertedTable[0].hideIndex();
-  } else if (viewPortWidth <= 1800) {
-    sourceTable[0].setWidth([0, 1], [125, 125, 135]);
-    sourceTable[0].showIndex();
-    convertedTable[0].setWidth([0, 1], [125, 125, 135]);
-    convertedTable[0].showIndex();
-  } else {
-    sourceTable[0].setWidth([0, 1], [140, 140, 160]);
-    sourceTable[0].showIndex();
-    convertedTable[0].setWidth([0, 1], [140, 140, 160]);
-    convertedTable[0].showIndex();
+export function createAppTables(doc: Document = document): AppTables {
+  jspreadsheet.setDictionary({
+    deleteSelectedRows: '選択した行を削除',
+    copy: '表の値をコピー',
+    paste: '表に値を貼り付け',
+  });
+
+  const sourceEl = doc.getElementById('source-data-table') as HTMLDivElement | null;
+  const convertedEl = doc.getElementById('converted-data-table') as HTMLDivElement | null;
+  if (sourceEl === null || convertedEl === null) {
+    throw new Error('Table containers #source-data-table and #converted-data-table are required.');
   }
+
+  const sourceTable = jspreadsheet(sourceEl, {
+    worksheets: [
+      {
+        ...worksheetConfig,
+        data: createInitialTableData(),
+        columns: [...columnsConfig],
+      },
+    ],
+    onbeforechange: beforechangeSourceTable,
+    contextMenu: sourceTableContextMenuItems,
+    onpaste: afterPaste,
+  });
+
+  const convertedTable = jspreadsheet(convertedEl, {
+    worksheets: [
+      {
+        ...worksheetConfig,
+        data: createInitialTableData(),
+        columns: [...readonlyColumnsConfig],
+      },
+    ],
+    contextMenu: convertedTableContextMenuItems,
+  });
+
+  return {
+    sourceTable,
+    convertedTable,
+    clearTable(tableName: 'source' | 'converted'): void {
+      const tableData: CellValue[][] = [['', '']];
+      if (tableName === 'source') {
+        sourceTable[0].setData(tableData);
+      } else {
+        convertedTable[0].setData(tableData);
+      }
+    },
+    resizeTable(viewPortWidth: number): void {
+      if (viewPortWidth < 992) {
+        sourceTable[0].setWidth([0, 1], [75, 75, 70]);
+        sourceTable[0].hideIndex();
+        convertedTable[0].setWidth([0, 1], [60, 60, 60]);
+        convertedTable[0].hideIndex();
+      } else if (viewPortWidth <= 1400) {
+        sourceTable[0].setWidth([0, 1], [105, 105, 105]);
+        sourceTable[0].hideIndex();
+        convertedTable[0].setWidth([0, 1], [90, 90, 80]);
+        convertedTable[0].hideIndex();
+      } else if (viewPortWidth <= 1800) {
+        sourceTable[0].setWidth([0, 1], [125, 125, 135]);
+        sourceTable[0].showIndex();
+        convertedTable[0].setWidth([0, 1], [125, 125, 135]);
+        convertedTable[0].showIndex();
+      } else {
+        sourceTable[0].setWidth([0, 1], [140, 140, 160]);
+        sourceTable[0].showIndex();
+        convertedTable[0].setWidth([0, 1], [140, 140, 160]);
+        convertedTable[0].showIndex();
+      }
+    },
+    dispose(): void {
+      if (isJspreadsheetElement(sourceEl)) {
+        jspreadsheet.destroy(sourceEl);
+      }
+      if (isJspreadsheetElement(convertedEl)) {
+        jspreadsheet.destroy(convertedEl);
+      }
+    },
+  };
 }

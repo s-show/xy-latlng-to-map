@@ -1,27 +1,52 @@
-import { map, measureLocations, measureMarkers } from './map';
 import 'leaflet-arrowheads';
 import { spheroid } from 'geo4326';
-import L from 'leaflet'
+import L from 'leaflet';
+
+export interface MeasurePoints {
+  start: L.LatLng | null;
+  end: L.LatLng | null;
+}
+
+export interface MeasurementState {
+  markers: MeasurePoints;
+  locations: MeasurePoints;
+}
+
+export type MeasurementReferrer = 'marker' | 'circle' | 'point';
+
+export function createMeasurementState(): MeasurementState {
+  return {
+    markers: { start: null, end: null },
+    locations: { start: null, end: null },
+  };
+}
+
+export function calculateDistanceMeters(
+  start: { readonly lat: number; readonly lng: number },
+  end: { readonly lat: number; readonly lng: number },
+): number {
+  return Math.round(
+    spheroid.distance([
+      [start.lng, start.lat],
+      [end.lng, end.lat],
+    ]),
+  );
+}
 
 /**
- * 2点間の距離計測処理。マップへの書き込みも行う。
- * @param {string} referrer 呼び出し元を区別するための引数
+ * 2点間の距離計測処理。マップへの書き込みと計測状態のリセットを行う。
  */
-export function measureLength(referrer: string) {
-  let measureStart = null;
-  let measureEnd = null;
-  if (referrer == 'marker' || referrer == 'circle') {
-    measureStart = measureMarkers.start;
-    measureEnd = measureMarkers.end;
-  } else {
-    measureStart = measureLocations.start;
-    measureEnd = measureLocations.end;
+export function measureLength(
+  map: L.Map,
+  state: MeasurementState,
+  referrer: MeasurementReferrer,
+): L.Polyline | false {
+  const points = referrer === 'marker' || referrer === 'circle' ? state.markers : state.locations;
+  if (points.start === null || points.end === null) {
+    return false;
   }
-  if (measureStart == null || measureEnd == null) {
-    return false
-  }
-  const startLatLng = L.latLng(Number(measureStart.lat), Number(measureStart.lng));
-  const endLatLng = L.latLng(Number(measureEnd.lat), Number(measureEnd.lng));
+  const startLatLng = L.latLng(Number(points.start.lat), Number(points.start.lng));
+  const endLatLng = L.latLng(Number(points.end.lat), Number(points.end.lng));
   const polyline = L.polyline(
     [
       [startLatLng.lat, startLatLng.lng],
@@ -32,33 +57,27 @@ export function measureLength(referrer: string) {
       weight: 4,
       color: '#696969',
       attribution: 'measurementPolyline',
-    }
+    },
   );
   polyline.arrowheads({
     yawn: 45,
     size: '25px',
   });
   polyline.addTo(map);
+  const distanceMeters = calculateDistanceMeters(startLatLng, endLatLng);
   const polylineTooltip = L.tooltip(
     polyline.getCenter(),
     {
-      content:
-        '距離: ' +
-        Math.round(
-          spheroid.distance([
-            [startLatLng.lng, startLatLng.lat],
-            [endLatLng.lng, endLatLng.lat],
-          ])
-        ) +
-        'm',
+      content: `距離: ${distanceMeters}m`,
       direction: 'center',
       permanent: true,
       attribution: 'measurementTooltip',
-    } as L.TooltipOptions & { attribution: string }
+    } as L.TooltipOptions & { attribution: string },
   );
   polyline.bindTooltip(polylineTooltip);
-  measureMarkers.start = null;
-  measureMarkers.end = null;
-  measureLocations.start = null;
-  measureLocations.end = null;
+  state.markers.start = null;
+  state.markers.end = null;
+  state.locations.start = null;
+  state.locations.end = null;
+  return polyline;
 }

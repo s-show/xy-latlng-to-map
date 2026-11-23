@@ -11,13 +11,16 @@
   "scripts": {
     "check": "./scripts/check.sh",
     "dev": "vite dev",
+    "dev:proxy": "pnpm --dir proxy dev --port 8788 --ip 0.0.0.0",
+    "dev:all": "node scripts/dev-all.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "manual:screenshots": "node scripts/capture-manual-screenshots.mjs",
     "benchmark:vector": "node scripts/benchmark-vector-rendering.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

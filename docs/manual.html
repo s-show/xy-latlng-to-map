@@ -266,6 +266,35 @@
 
     th { background: var(--panel); }
 
+    code {
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--panel);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      margin: 14px 0 20px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      line-height: 1.55;
+    }
+
+    pre code {
+      padding: 0;
+      background: transparent;
+      font-size: 0.88rem;
+    }
+
+    pre.url-example {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
     kbd {
       display: inline-block;
       min-width: 1.8em;
@@ -323,6 +352,7 @@
       section { padding-top: 8mm; }
       h2, h3 { break-after: avoid; }
       figure a { border-radius: 0; box-shadow: none; }
+      pre { white-space: pre-wrap; word-break: break-all; }
       a { color: inherit; text-decoration: none; }
       .quick-start { grid-template-columns: 1fr 1fr 1fr; }
     }
@@ -332,7 +362,7 @@
   <header class="cover">
     <p class="cover__eyebrow">User manual</p>
     <h1>座標の地図表示と<br>座標・緯度経度の変換</h1>
-    <p class="cover__lead">住所検索、座標の入力、地図への図形追加、都市計画・防災情報の確認、距離計測、座標変換、CSV出力、写真位置表示の操作マニュアルです。</p>
+    <p class="cover__lead">住所検索、座標の入力、地図への図形追加、都市計画・防災情報の確認、距離計測、座標変換、CSV出力、写真位置表示、URLパラメーター・ブラウザAPI連携の操作マニュアルです。</p>
     <div class="cover__meta">
       <span>デスクトップ版</span>
       <span>HTMLマニュアル</span>
@@ -354,6 +384,7 @@
         <li><a href="#measure">距離を計測する</a></li>
         <li><a href="#convert">座標を変換・出力する</a></li>
         <li><a href="#photo">写真の撮影場所を表示する</a></li>
+        <li><a href="#icon-api">URLパラメーター・ブラウザAPIでアイコンを追加する</a></li>
         <li><a href="#print">地図表示・削除・印刷</a></li>
         <li><a href="#trouble">困ったときは</a></li>
       </ol>
@@ -588,7 +619,7 @@
           <li>「不動産情報ライブラリの情報を表示」を選びます。</li>
           <li>クリック地点にアイコンが追加され、6種類の情報が1つのポップアップに表示されます。ポップアップ内をスクロールして確認します。</li>
         </ol>
-        <p>レイヤーメニューで情報を地図に重ねていない場合も、右クリックした地点の情報を確認できます。該当する情報がない項目には「指定無し」と表示されます。通信エラーなどで情報を取得できなかった項目には「情報を取得できませんでした」と表示されます。ポップアップを閉じると、クリック地点のアイコンも消えます。</p>
+        <p>レイヤーメニューで情報を地図に重ねていない場合も、右クリックした地点の情報を確認できます。該当する情報がない項目には「指定無し」と表示されます。通信エラーなどで情報を取得できなかった項目には「情報を取得できませんでした」と表示されます。地図上を右クリックして開いた場合はポップアップを閉じるとクリック地点のアイコンも消えます。すでに配置済みのアイコン（データテーブル、URLパラメーター、ブラウザAPI、地図右クリックで追加したアイコン）を右クリックして「不動産情報ライブラリの情報を表示」を選んだ場合は、ポップアップを閉じてもアイコンは残ります。</p>
         <figure>
           <a href="assets/screenshots/04-reinfolib-info.png" target="_blank">
             <img src="assets/screenshots/04-reinfolib-info.png" alt="地図のクリック地点にアイコンを追加し、不動産情報ライブラリの都市計画・防災情報をポップアップ表示した状態" width="1440" height="1000" loading="lazy">
@@ -667,8 +698,87 @@
         </div>
       </section>
 
+      <section id="icon-api">
+        <h2>11. URLパラメーター・ブラウザAPIでアイコンを追加する</h2>
+        <p>画面のメニューから入力せずに、URLクエリパラメーター（ページを開いたときの自動表示）またはブラウザJS API（<code>window.xyLatLngToMap</code>）を使って地図へアイコンと線を追加できます。どちらも地図上の表示のみを更新し、メニュー内のデータテーブルは変更しません。</p>
+
+        <div class="warning">
+          <strong>平面直角座標（XY）の軸の向きに注意</strong>
+          日本の平面直角座標系の定義に従い、第1座標（<code>x</code> / <code>first</code>）は南北方向（北が正）、第2座標（<code>y</code> / <code>second</code>）は東西方向（東が正）として扱います。
+        </div>
+
+        <h3>URLパラメーターで追加する</h3>
+        <p>外部の表計算ソフトや他システムからリンクを開くだけで、指定地点にアイコンを表示できます。緯度経度は十進数形式と度分秒形式（<code>北緯35度39分29秒1572</code>、<code>35°39′53.82″</code> など）の両方に対応しています。</p>
+
+        <p><strong>単一点（緯度経度・十進数または度分秒）の例</strong></p>
+        <pre class="url-example"><code>https://xy-latlng-to-map.com/?lat=35.658099&amp;lng=139.741357&amp;color=red&amp;memo=日本経緯度原点&amp;zoom=16</code></pre>
+        <pre class="url-example"><code>https://xy-latlng-to-map.com/?lat=北緯35度39分29秒1572&amp;lng=東経139度44分28秒8869&amp;memo=日本経緯度原点</code></pre>
+
+        <p><strong>単一点（平面直角座標 XY）の例</strong></p>
+        <pre class="url-example"><code>https://xy-latlng-to-map.com/?x=-37875.1959&amp;y=-7958.6436&amp;zone=9&amp;geodetic=JGD2011&amp;color=blue&amp;memo=東京タワー付近</code></pre>
+
+        <p><strong>複数点（<code>p</code> パラメーターの繰り返し＋線）の例</strong></p>
+        <p><code>p=第1座標,第2座標[,メモ]</code> を繰り返して指定します。3個目以降のカンマはメモ文字列として保持されます。<code>color</code> と <code>line</code> は URL 全体で 1 回指定すれば全点に適用されます。</p>
+        <pre class="url-example"><code>https://xy-latlng-to-map.com/?type=latlng&amp;geodetic=JGD2011&amp;p=35.65858,139.745433,東京タワー&amp;p=35.65749,139.74824,増上寺&amp;color=green&amp;line=yellow</code></pre>
+
+        <table>
+          <thead>
+            <tr><th>パラメーター</th><th>内容</th><th>既定値</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>lat</code>, <code>lng</code></td><td>単一点の緯度・経度（十進数または度分秒形式。<code>x</code>/<code>y</code> や <code>p</code> とは併用不可）</td><td>なし</td></tr>
+            <tr><td><code>x</code>, <code>y</code></td><td>単一点の平面直角座標 X（南北）・Y（東西）。<code>zone</code> の指定が必須</td><td>なし</td></tr>
+            <tr><td><code>p</code></td><td>複数点指定 <code>first,second[,memo]</code>（最大500点。<code>type=latlng</code> 時は度分秒形式も可）</td><td>なし</td></tr>
+            <tr><td><code>type</code></td><td><code>latlng</code> または <code>XY</code>（<code>lat</code>/<code>lng</code>・<code>x</code>/<code>y</code> 指定時は自動推定）</td><td><code>latlng</code></td></tr>
+            <tr><td><code>geodetic</code></td><td>測地系: <code>JGD2011</code> / <code>JGD2000</code> / <code>TOKYO</code></td><td><code>JGD2011</code></td></tr>
+            <tr><td><code>zone</code></td><td>平面直角座標系の系番号 <code>1</code>〜<code>19</code>（<code>XY</code> 時は必須、<code>latlng</code> 時は省略または <code>0</code>）</td><td><code>0</code>（<code>latlng</code> 時）</td></tr>
+            <tr><td><code>color</code></td><td>アイコンの色: <code>red</code> / <code>blue</code> / <code>yellow</code> / <code>green</code></td><td><code>red</code></td></tr>
+            <tr><td><code>line</code></td><td>隣り合う点を結ぶ線の色: <code>red</code> / <code>blue</code> / <code>yellow</code> / <code>green</code> / <code>none</code></td><td>なし</td></tr>
+            <tr><td><code>memo</code></td><td>単一点のポップアップ表示テキスト（プレーンテキスト表示、最大200文字）</td><td>空文字</td></tr>
+            <tr><td><code>zoom</code></td><td>ズームレベル <code>2</code>〜<code>18</code> の整数（省略時: 1点は15、複数点は全体が収まる範囲）</td><td>自動</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note">
+          <strong>URLやAPIで追加したアイコンの操作とエラー表示</strong>
+          追加されたアイコンはクリックでメモを表示でき、右クリックメニューから「アイコンを削除」「距離計測」「不動産情報ライブラリの情報を表示」も利用できます。パラメーターに不備がある場合はアイコンを追加せず、画面下部のエラー欄に理由を表示します。日本語メモ付きで地点数が多い場合は URL 長の上限に達することがあるため、下のブラウザJS APIを利用してください。
+        </div>
+
+        <h3>ブラウザJS API（<code>window.xyLatLngToMap</code>）で操作する</h3>
+        <p>ページを開いた状態で、開発者コンソールやブラウザ自動化ツール（Playwright 等）から <code>window.xyLatLngToMap</code> を呼び出してアイコンを追加・参照・削除できます。</p>
+        <pre><code>// アイコンを追加（points または複数グループの groups を指定可能、最大500点）
+const result = window.xyLatLngToMap.addMarkers({
+  type: 'XY',
+  geodeticSystem: 'JGD2011',
+  zoneNo: 9,
+  points: [
+    { first: -37875.1959, second: -7958.6436, memo: '東京タワー付近' },
+    { first: -37995.0, second: -7704.0, memo: '増上寺付近' },
+  ],
+  iconColor: 'red',
+  lineColor: 'yellow',
+  zoom: null,
+});
+
+// 追加済みアイコン一覧を取得
+const markers = window.xyLatLngToMap.getMarkers();
+
+// API / URL で追加したアイコンと線を削除
+const cleared = window.xyLatLngToMap.clearMarkers();</code></pre>
+        <table>
+          <thead>
+            <tr><th>メソッド</th><th>内容と戻り値</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>addMarkers(input)</code></td><td>座標群を検証・変換して地図へ追加します。成功時は <code>{ ok: true, data: { markers } }</code>、不正入力時は <code>{ ok: false, errors }</code> を返します。</td></tr>
+            <tr><td><code>getMarkers()</code></td><td>APIおよびURLパラメーター経由で追加済みの一覧（<code>id</code>, <code>lat</code>, <code>lng</code>, <code>color</code>, <code>memo</code>, <code>source</code>）を返します。</td></tr>
+            <tr><td><code>clearMarkers()</code></td><td>APIおよびURLパラメーター経由で追加したアイコンと線のみを削除し、<code>{ clearedMarkers, clearedLines }</code> を返します。</td></tr>
+          </tbody>
+        </table>
+      </section>
+
       <section id="print">
-        <h2>11. 地図表示・削除・印刷</h2>
+        <h2>12. 地図表示・削除・印刷</h2>
         <h3>地図の種類を変える</h3>
         <p>地図右上のレイヤーボタンにポインターを合わせ、標準地図、淡色地図、航空写真などから選択します。</p>
 
@@ -689,7 +799,7 @@
       </section>
 
       <section id="trouble">
-        <h2>12. 困ったときは</h2>
+        <h2>13. 困ったときは</h2>
         <table>
           <thead>
             <tr><th>症状</th><th>確認すること</th></tr>
@@ -704,6 +814,7 @@
             <tr><td>写真の位置が表示されない</td><td>画像にGPS位置情報が記録されているか確認します。</td></tr>
             <tr><td>都市計画・防災情報が表示されない</td><td>レイヤーメニューのチェック欄とネットワーク接続を確認します。地点に該当する情報がない場合は「指定無し」と表示されます。「情報を取得できませんでした」と表示された場合は、情報の有無を確認できていません。時間をおいて、もう一度右クリックメニューから表示してください。</td></tr>
             <tr><td>画面上の図形を消したい</td><td>「地図加工」の「全図形を削除」を使用します。</td></tr>
+            <tr><td>URLパラメーターでアイコンが表示されずエラーが出る</td><td>画面下部のエラー欄を確認します。XY座標での <code>zone</code>（1〜19）未指定、<code>lat</code>/<code>lng</code>・<code>x</code>/<code>y</code>・<code>p</code> の混在、未対応の色や測地系、500点超過があると描画されません。</td></tr>
           </tbody>
         </table>
         <ul class="checklist">

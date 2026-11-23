@@ -5,15 +5,29 @@ import { isValidNumber } from './isvalidNumber.js';
 
 export type CoordinateType = 'XY' | 'latlng';
 
+export type ZoneNo =
+  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19;
+
 /**
- * 座標値がどの座標系のものかを表す。
- * zoneNo は平面直角座標の系番号（1〜19）で、緯度経度は 0 を使う。
+ * 座標値がどの座標系のものかを表す判別共用体。
+ * 緯度経度は zoneNo: 0、平面直角座標（XY）は系番号 1〜19 のみを許す。
  */
-export type CoordinateSystem = {
-  type: CoordinateType;
-  geodeticSystem: GeodeticSystemName;
-  zoneNo: number;
-};
+export type CoordinateSystem =
+  | {
+      readonly type: 'latlng';
+      readonly geodeticSystem: GeodeticSystemName;
+      readonly zoneNo: 0;
+    }
+  | {
+      readonly type: 'XY';
+      readonly geodeticSystem: GeodeticSystemName;
+      readonly zoneNo: ZoneNo;
+    };
+
+export function isZoneNo(value: number): value is ZoneNo {
+  return Number.isInteger(value) && value >= 1 && value <= 19;
+}
 
 export type Conversion = {
   source: CoordinateSystem;
@@ -68,10 +82,16 @@ export function parseCoordinateSystem(raw: {
     return null;
   }
   const zoneNo = Number(raw.zoneNo);
-  if (!Number.isInteger(zoneNo) || zoneNo < 0 || zoneNo >= geodeticSystems[raw.geodeticSystem].length) {
+  if (raw.type === 'latlng') {
+    if (zoneNo !== 0) {
+      return null;
+    }
+    return { type: 'latlng', geodeticSystem: raw.geodeticSystem, zoneNo: 0 };
+  }
+  if (!isZoneNo(zoneNo)) {
     return null;
   }
-  return { type: raw.type, geodeticSystem: raw.geodeticSystem, zoneNo };
+  return { type: 'XY', geodeticSystem: raw.geodeticSystem, zoneNo };
 }
 
 /**
@@ -95,7 +115,8 @@ export function convertRows(conversion: Conversion, rows: readonly SourceRow[]):
   return rows.map((row) => {
     // proj4 は「経度・緯度」の順で受け取り、同じ順で返す
     const [second, first] = proj4(from, to, [Number(row[1]), Number(row[0])]);
-    return [Number(first), Number(second), String(row[2])];
+    const memo = row[2] === undefined || row[2] === null ? '' : String(row[2]);
+    return [Number(first), Number(second), memo];
   });
 }
 
